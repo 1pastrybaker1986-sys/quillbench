@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="wash" x1="80" y1="40" x2="440" y2="480" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fdf6f2"/>
+      <stop offset="0.45" stop-color="#f2d6d2"/>
+      <stop offset="1" stop-color="#e8c9c0"/>
+    </linearGradient>
+    <linearGradient id="quill" x1="140" y1="400" x2="380" y2="120" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#a85a66"/>
+      <stop offset="0.55" stop-color="#c47a84"/>
+      <stop offset="1" stop-color="#d09272"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="96" fill="url(#wash)"/>
+  <circle cx="290" cy="210" r="150" fill="#c47a84" opacity="0.18"/>
+  <path d="M148 392c92-28 168-118 196-214 6-20 28-32 48-26l14 4c14 4 22 18 18 32-24 92-92 182-160 236l-116-32z" fill="url(#quill)"/>
+  <path d="M148 392l-28 36c-6 8 2 18 12 14l42-18-26-32z" fill="#8c4652"/>
+  <path d="M210 340c48-56 96-128 118-188" stroke="#f3e0d6" stroke-width="14" stroke-linecap="round" opacity="0.75"/>
+  <path d="M344 152l34-78" stroke="#d09272" stroke-width="18" stroke-linecap="round"/>
+</svg>

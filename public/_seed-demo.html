@@ -1,0 +1,24 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>seed</title>
+<script>
+const now = new Date().toISOString();
+localStorage.setItem("quillbench.session.v1", JSON.stringify({
+  userId: "user_demo", displayName: "Demo Writer",
+  email: "writer@quillbench.demo", createdAt: now
+}));
+const SAMPLE = "Chapter One\nThe first unquiet hour\n\nThe orchard held its breath. Leaves turned their pale undersides to a sky that had not yet decided on weather, and the house at the end of the lane kept its windows shut against a rumor of rain.\n\nShe stood in the kitchen with a manuscript that was not yet a book and a kettle that had already forgotten why it had been lit. The work, she knew, was not the sentences. The work was everything after.";
+const ownerId = "user_demo";
+localStorage.setItem("quillbench.books.v1", JSON.stringify([
+  { id: "book_"+ownerId+"_edens-fall", ownerId, title: "Eden’s Fall", status: "formatting",
+    trim: "5.5x8.5", theme: "trade-paperback", coverSrc: "/covers/edens-fall-front.png",
+    coverPackNote: "Print pack already attached — front, back, 300 dpi, and combined PDF. Don’t rebuild.",
+    manuscriptText: SAMPLE, authorName: "Sarah Brundige", subtitle: "", dedication: "",
+    copyrightYear: "2026", publisherLine: "", createdAt: now, updatedAt: now },
+  { id: "book_"+ownerId+"_night-orchard", ownerId, title: "Night Orchard", status: "draft",
+    trim: "6x9", theme: "trade-paperback", coverSrc: null, coverPackNote: "",
+    manuscriptText: "", authorName: "", subtitle: "", dedication: "", copyrightYear: "",
+    publisherLine: "", createdAt: now, updatedAt: now }
+]));
+location.replace(new URLSearchParams(location.search).get("go") || "/");
+</script>

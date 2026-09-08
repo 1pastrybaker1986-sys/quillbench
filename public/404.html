@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Quillbench</title>
+    <script>
+      // Static-host SPA bridge: send unknown paths back to the app shell.
+      location.replace("/" + (location.search || "") + (location.hash || ""));
+    </script>
+    <meta http-equiv="refresh" content="0;url=/" />
+  </head>
+  <body>
+    <p><a href="/">Continue to Quillbench</a></p>
+  </body>
+</html>

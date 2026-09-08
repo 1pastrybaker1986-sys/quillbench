@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Quillbench</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,560;0,9..144,680;1,9..144,400&family=Figtree:wght@400;500;600;650&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/_index-shot.css" />
+</head>
+<body>
+<div class="workspace">
+  <header class="work-head">
+    <button class="back" type="button">← Library</button>
+    <div class="work-title-row">
+      <h1>Eden’s Fall</h1>
+      <span class="pill formatting">Formatting</span>
+    </div>
+    <nav class="modules" aria-label="Modules">
+      <button type="button" class="mod stub">Grammar · coming</button>
+      <button type="button" class="mod stub">Editing · coming</button>
+      <button type="button" class="mod active">Formatting</button>
+      <button type="button" class="mod stub">Publishing · coming</button>
+    </nav>
+  </header>
+  <div class="bench">
+    <aside class="rail">
+      <div class="rail-block">
+        <h3>Manuscript</h3>
+        <div class="drop-slot">
+          <textarea class="ms-input" spellcheck="false">Chapter One
+The first unquiet hour
+
+The orchard held its breath. Leaves turned their pale undersides to a sky that had not yet decided on weather, and the house at the end of the lane kept its windows shut against a rumor of rain.
+
+She stood in the kitchen with a manuscript that was not yet a book and a kettle that had already forgotten why it had been lit. The work, she knew, was not the sentences. The work was everything after.</textarea>
+          <div class="ms-actions">
+            <button class="linkish" type="button">Use sample chapter</button>
+            <span class="ms-hint">.txt or .md</span>
+          </div>
+        </div>
+      </div>
+      <div class="rail-block">
+        <h3>Trim size</h3>
+        <div class="trim-options">
+          <button type="button" class="trim selected">
+            <span class="trim-shape t55"></span>
+            <span><b>5.5 × 8.5</b><span>KDP trade</span></span>
+          </button>
+          <button type="button" class="trim">
+            <span class="trim-shape t69"></span>
+            <span><b>6 × 9</b><span>KDP trade</span></span>
+          </button>
+        </div>
+      </div>
+      <div class="rail-block">
+        <h3>Theme</h3>
+        <div class="theme-card theme-static" aria-current="true">
+          <strong>Selected · Trade paperback</strong>
+          <span>Default interior · more themes later</span>
+        </div>
+      </div>
+      <div class="rail-block">
+        <h3>Cover</h3>
+        <div class="cover-slot has-cover">
+          <img src="/covers/edens-fall-front.png" alt="" />
+          <p>Print pack already attached — front, back, 300 dpi, and combined PDF. Don’t rebuild.</p>
+        </div>
+      </div>
+      <div class="rail-block">
+        <h3>Export</h3>
+        <div class="exports">
+          <button class="btn-export" type="button">Print PDF</button>
+          <button class="btn-export" type="button">EPUB</button>
+        </div>
+      </div>
+    </aside>
+    <section class="preview-wrap">
+      <div class="preview-caption">Print spread preview · placeholder</div>
+      <div class="spread" aria-label="Print spread preview">
+        <article class="page verso" style="width:286px;height:442px">
+          <div class="page-inner">
+            <div class="running">Eden’s Fall</div>
+            <div class="ch-label">Chapter One</div>
+            <h2 class="ch-title">The first unquiet hour</h2>
+            <div class="prose">
+              <p class="first">The orchard held its breath. Leaves turned their pale undersides to a sky that had not yet decided on weather, and the house at the end of the lane kept its windows shut against a rumor of rain.</p>
+              <p>She stood in the kitchen with a manuscript that was not yet a book and a kettle that had already forgotten why it had been lit. The work, she knew, was not the sentences. The work was everything after.</p>
+            </div>
+            <div class="folio">2</div>
+          </div>
+        </article>
+        <article class="page recto" style="width:286px;height:442px">
+          <div class="page-inner">
+            <div class="running">Eden’s Fall</div>
+            <div class="prose" style="margin-top:2.2rem">
+              <p>Trim, theme, a spread that would one day be ink on paper. For now the pages were only a shape — a promise of 5.5 by 8.5, or six by nine, waiting for type that knew how to sit.</p>
+              <p>Outside, the first crow found the fence post. Inside, she turned a leaf and began again.</p>
+            </div>
+            <div class="folio">3</div>
+          </div>
+        </article>
+      </div>
+    </section>
+  </div>
+</div>
+</body>
+</html>
