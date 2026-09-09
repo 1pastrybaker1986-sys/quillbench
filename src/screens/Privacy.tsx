@@ -54,11 +54,12 @@ export default function Privacy({ onBack }: Props) {
         </section>
 
         <section className="legal-section">
-          <h2>Payments later</h2>
+          <h2>Payments</h2>
           <p>
-            Studio package Unlock is a local stub today. When Stripe goes live, checkout will use
-            Stripe’s flow for payment details. Quillbench will not store your full card number on
-            this device. We’ll update this page when paid unlocks are real.
+            Studio packages use Stripe Checkout for secure payment. Card details are handled by
+            Stripe — Quillbench does not store your full card number on this device. After a
+            successful checkout, unlocks are saved on this device until accounts launch for sync
+            across phones and computers.
           </p>
         </section>
 

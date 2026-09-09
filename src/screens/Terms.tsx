@@ -30,17 +30,16 @@ export default function Terms({ onBack }: Props) {
           <p>
             Free tools on this device (scan, grammar notes, editing board, formatting, export)
             plus optional <strong>studio packages</strong> (Full Edit, Cover, Marketing, Bundle).
-            Package prices on the landing and Publishing shelf are the intended offer when
-            payments are live.
+            Package prices on the landing and Publishing shelf are available via Stripe
+            Checkout.
           </p>
         </section>
 
         <section className="legal-section">
-          <h2>Unlock stub</h2>
+          <h2>Paid unlocks</h2>
           <p>
-            Until Stripe checkout is live, Unlock marks a package as owned in localStorage on this
-            device only. That is a preview — not a paid purchase. Real billing will replace the
-            stub; device unlocks may not carry over to a future account.
+            Paid unlocks use Stripe Checkout. After a successful payment, ownership is recorded on
+            this device. Unlocks may not sync to other phones or computers until accounts launch.
           </p>
         </section>
 

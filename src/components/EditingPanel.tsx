@@ -116,9 +116,9 @@ export default function EditingPanel({ bookId, onSeePackages, onToast }: Props) 
           <div className="pkg-cta-copy">
             <h3>Unlock Full Edit package</h3>
             <p>
-              Keep using the free board. Full Edit adds priority review notes for your editor —
-              a done-with-you pass when checkout goes live. Payments coming soon — unlocks save on
-              this device for now.
+              Keep using the free board. Unlock opens Stripe Checkout for Full Edit — priority
+              review notes for your editor, a done-with-you pass. Unlocks stay on this device for
+              now; accounts for sync across phones and computers are coming soon.
             </p>
             <div className="pkg-cta-actions">
               <button className="btn-solid" type="button" onClick={() => unlock("full-edit")}>

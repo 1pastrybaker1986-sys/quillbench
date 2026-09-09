@@ -33,7 +33,7 @@ export const PACKAGES: StudioPackage[] = [
     title: "Full Edit",
     price: 249,
     blurb:
-      "Four-pass board — developmental through proof — with priority review notes when checkout goes live.",
+      "Four-pass board — developmental through proof — with priority review notes included with Full Edit.",
     unlocks: ["full-edit"],
   },
   {

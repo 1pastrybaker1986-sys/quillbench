@@ -381,8 +381,8 @@ export default function PublishingPanel({ bookId, bookSignals, onToast }: Props)
       <section className="pub-section">
         <h3>Studio packages</h3>
         <p className="pub-stub-note">
-          Payments coming soon — unlocks save on this device for now. Billing defaults to stub;
-          Stripe Checkout wires in when env + session endpoint are ready.
+          Secure checkout via Stripe. After payment, unlocks are saved on this device until you
+          sign in with an account (coming soon for sync across phones and computers).
         </p>
         <ul className="pkg-grid">
           {packages.map((pkg) => {

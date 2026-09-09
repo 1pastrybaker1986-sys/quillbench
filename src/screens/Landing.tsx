@@ -103,7 +103,7 @@ export default function Landing({ onSignedIn, onOpenPrivacy, onOpenTerms }: Prop
 
       <section className="landing-price-strip" aria-label="Studio package prices">
         <p className="landing-price-label">
-          Studio packages <span>· Checkout wired — payments soon</span>
+          Studio packages <span>· Stripe Checkout</span>
         </p>
         <ul>
           {PACKAGES.map((p) => (
@@ -122,19 +122,19 @@ export default function Landing({ onSignedIn, onOpenPrivacy, onOpenTerms }: Prop
       */}
       <section className="landing-waitlist" aria-labelledby="waitlist-heading">
         <div className="landing-waitlist-card">
-          <p className="landing-waitlist-eyebrow">Payments coming soon</p>
-          <h2 id="waitlist-heading">Get notified when live payments turn on</h2>
+          <p className="landing-waitlist-eyebrow">Product updates</p>
+          <h2 id="waitlist-heading">Stay in the loop for accounts &amp; cross-device sync</h2>
           <p className="landing-waitlist-lede">
-            Checkout path is ready. Leave your email on this device — we’ll ping you when Stripe keys go live. No account required yet.
+            Stripe Checkout is live. Leave your email on this device — we’ll share product updates and when accounts arrive so unlocks can sync across phones and computers.
           </p>
           {waitlistDone ? (
             <p className="landing-waitlist-thanks" role="status">
-              You’re on the list. Thanks — we’ll be in touch when payments go live.
+              You’re on the list. Thanks — we’ll share product updates and account news here.
             </p>
           ) : (
             <form className="landing-waitlist-form" onSubmit={joinWaitlist}>
               <label className="sr-only" htmlFor="waitlist-email">
-                Email for payment notifications
+                Email for product updates
               </label>
               <input
                 id="waitlist-email"
@@ -146,7 +146,7 @@ export default function Landing({ onSignedIn, onOpenPrivacy, onOpenTerms }: Prop
                 required
               />
               <button className="btn btn-primary" type="submit">
-                Notify me when payments turn on
+                Keep me updated
               </button>
             </form>
           )}
