@@ -87,7 +87,44 @@ function saveBooks(books: Book[]) {
   writeJson(BOOKS_KEY, books);
 }
 
-function seedBooks(ownerId: string): Book[] {
+function seedDemoBooks(ownerId: string): Book[] {
+  const t = now();
+  return [
+    {
+      id: `book_${ownerId}_glass-harbor`,
+      ownerId,
+      title: "The Glass Harbor",
+      status: "formatting",
+      trim: "5.5x8.5",
+      theme: "trade-paperback",
+      coverSrc: "/covers/demo-placeholder.svg",
+      coverPackNote: "Placeholder cover for the public demo — not a real title.",
+      manuscriptText: SAMPLE_CHAPTER,
+      authorName: "Demo Writer",
+      copyrightYear: "2026",
+      createdAt: t,
+      updatedAt: t,
+    },
+    {
+      id: `book_${ownerId}_copper-thread`,
+      ownerId,
+      title: "Copper Thread",
+      status: "draft",
+      trim: "6x9",
+      theme: "trade-paperback",
+      coverSrc: "/covers/demo-placeholder-alt.svg",
+      coverPackNote: "Placeholder cover for the public demo — not a real title.",
+      manuscriptText: SAMPLE_CHAPTER,
+      authorName: "Demo Writer",
+      copyrightYear: "2026",
+      createdAt: t,
+      updatedAt: t,
+    },
+  ];
+}
+
+/** Personal bench seed — real titles/covers for email sign-in only, never demo. */
+function seedWriterBooks(ownerId: string): Book[] {
   const t = now();
   return [
     {
@@ -120,10 +157,33 @@ function seedBooks(ownerId: string): Book[] {
   ];
 }
 
+const DEMO_LEGACY_SUFFIXES = ["_edens-fall", "_night-orchard"];
+
+/** Replace an older demo library that still showed real titles/covers. */
+function migrateDemoLibraryIfNeeded(ownerId: string) {
+  if (ownerId !== DEMO_USER_ID) return;
+  const books = allBooks();
+  const mine = books.filter((b) => b.ownerId === ownerId);
+  if (mine.length === 0) return;
+  const looksLegacy = mine.some(
+    (b) =>
+      DEMO_LEGACY_SUFFIXES.some((s) => b.id.endsWith(s)) ||
+      b.coverSrc === "/covers/edens-fall-front.png" ||
+      b.title === "Eden’s Fall" ||
+      b.title === "Night Orchard" ||
+      b.authorName === "Sarah Brundige",
+  );
+  if (!looksLegacy) return;
+  const others = books.filter((b) => b.ownerId !== ownerId);
+  saveBooks([...others, ...seedDemoBooks(ownerId)]);
+}
+
 function ensureSeededLibrary(ownerId: string) {
+  migrateDemoLibraryIfNeeded(ownerId);
   const books = allBooks();
   if (books.some((b) => b.ownerId === ownerId)) return;
-  saveBooks([...books, ...seedBooks(ownerId)]);
+  const seed = ownerId === DEMO_USER_ID ? seedDemoBooks(ownerId) : seedWriterBooks(ownerId);
+  saveBooks([...books, ...seed]);
 }
 
 const WRITER_COVER_NOTE =

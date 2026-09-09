@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900" viewBox="0 0 600 900" role="img" aria-label="Sample cover">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fff6f2"/>
+      <stop offset="45%" stop-color="#f3c9b8"/>
+      <stop offset="100%" stop-color="#d45f6c"/>
+    </linearGradient>
+    <linearGradient id="band" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a1214" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#1a1214" stop-opacity="0.55"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="900" fill="url(#bg)"/>
+  <circle cx="460" cy="180" r="140" fill="#ffe8df" opacity="0.65"/>
+  <circle cx="120" cy="720" r="180" fill="#c9a27a" opacity="0.35"/>
+  <path d="M80 280 C220 220, 380 340, 520 260" fill="none" stroke="#fff" stroke-width="18" opacity="0.45"/>
+  <path d="M60 520 C200 460, 400 580, 560 500" fill="none" stroke="#8b3a45" stroke-width="10" opacity="0.25"/>
+  <rect x="0" y="560" width="600" height="340" fill="url(#band)"/>
+  <text x="48" y="640" fill="#fff6f2" font-family="Georgia, serif" font-size="42" font-weight="600">Sample title</text>
+  <text x="48" y="690" fill="#ffe8df" font-family="system-ui, sans-serif" font-size="20" letter-spacing="0.08em">QUILLBENCH DEMO</text>
+</svg>
