@@ -3,6 +3,7 @@ import { signInDemo, signInWithEmail } from "../lib/store";
 import { addWaitlistEmail } from "../lib/waitlist";
 import type { Session } from "../lib/types";
 import Nib from "../components/Nib";
+import ProductDemo from "../components/ProductDemo";
 
 type Props = {
   onSignedIn: (session: Session) => void;
@@ -95,16 +96,14 @@ export default function Landing({ onSignedIn, onOpenPrivacy, onOpenTerms }: Prop
             </button>
           </div>
         </div>
-        <div className="landing-hero-art" aria-hidden="true">
-          <div className="landing-hero-glow" />
-          <img src="/art/hero-manuscript.svg" alt="" width={360} height={315} />
-          <img className="landing-hero-flourish" src="/art/quill-flourish.svg" alt="" width={320} height={24} />
+        <div className="landing-hero-aside">
+          <ProductDemo />
         </div>
       </section>
 
       <section className="landing-price-strip" aria-label="Studio package prices">
         <p className="landing-price-label">
-          Studio packages <span>· Payments coming soon</span>
+          Studio packages <span>· Checkout wired — payments soon</span>
         </p>
         <ul>
           {PACKAGES.map((p) => (
@@ -124,9 +123,9 @@ export default function Landing({ onSignedIn, onOpenPrivacy, onOpenTerms }: Prop
       <section className="landing-waitlist" aria-labelledby="waitlist-heading">
         <div className="landing-waitlist-card">
           <p className="landing-waitlist-eyebrow">Payments coming soon</p>
-          <h2 id="waitlist-heading">Get notified when checkout goes live</h2>
+          <h2 id="waitlist-heading">Get notified when live payments turn on</h2>
           <p className="landing-waitlist-lede">
-            Leave your email on this device. We’ll use it when Stripe unlocks — no account required yet.
+            Checkout path is ready. Leave your email on this device — we’ll ping you when Stripe keys go live. No account required yet.
           </p>
           {waitlistDone ? (
             <p className="landing-waitlist-thanks" role="status">
@@ -147,7 +146,7 @@ export default function Landing({ onSignedIn, onOpenPrivacy, onOpenTerms }: Prop
                 required
               />
               <button className="btn btn-primary" type="submit">
-                Notify me when payments go live
+                Notify me when payments turn on
               </button>
             </form>
           )}
