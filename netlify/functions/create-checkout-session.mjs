@@ -87,6 +87,12 @@ export async function handler(event) {
     });
   }
 
+  if (!priceId.startsWith("price_")) {
+    return json(400, {
+      error: "Invalid priceId: must use a Stripe Price ID (price_…), not a product id.",
+    });
+  }
+
   try {
     const stripe = new Stripe(secretKey);
     const session = await stripe.checkout.sessions.create({
@@ -109,6 +115,8 @@ export async function handler(event) {
         : "Failed to create Checkout Session.";
     // Do not log secret key or raw env; only a generic failure note.
     console.error("create-checkout-session failed:", message);
-    return json(502, { error: "Could not create Checkout Session. Please try again." });
+    return json(502, {
+      error: `Could not create Checkout Session. ${message}`,
+    });
   }
 }
