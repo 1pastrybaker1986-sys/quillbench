@@ -35,9 +35,11 @@ function json(statusCode, body) {
 function resolvePriceId(packageId, clientPriceId) {
   const envName = PRICE_ENV_BY_PACKAGE[packageId];
   const fromEnv = envName ? process.env[envName]?.trim() : "";
-  if (fromEnv) return fromEnv;
-  if (typeof clientPriceId === "string" && clientPriceId.trim()) {
-    return clientPriceId.trim();
+  // Prefer env only when it is a real Stripe Price id (price_…); ignore product ids etc.
+  if (fromEnv && fromEnv.startsWith("price_")) return fromEnv;
+  if (typeof clientPriceId === "string") {
+    const fromClient = clientPriceId.trim();
+    if (fromClient.startsWith("price_")) return fromClient;
   }
   return "";
 }
