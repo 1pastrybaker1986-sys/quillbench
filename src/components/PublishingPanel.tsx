@@ -10,6 +10,11 @@ import {
 } from "../lib/packages";
 import { startCheckout } from "../lib/billing";
 import {
+  SOFT_LAUNCH,
+  formatCatalogBundlePrice,
+  formatSoftBundlePrice,
+} from "../lib/softLaunch";
+import {
   getChecklist,
   listChecklist,
   setChecklistItem,
@@ -292,7 +297,7 @@ export default function PublishingPanel({ bookId, bookSignals, onToast }: Props)
                   Unlock Cover Design · $179
                 </button>
                 <button className="btn-export" type="button" onClick={() => unlock("studio-bundle")}>
-                  Studio Bundle · $499
+                  Studio Bundle · $449 soft launch
                 </button>
               </div>
             </div>
@@ -370,7 +375,7 @@ export default function PublishingPanel({ bookId, bookSignals, onToast }: Props)
                   Unlock Marketing · $129
                 </button>
                 <button className="btn-export" type="button" onClick={() => unlock("studio-bundle")}>
-                  Studio Bundle · $499
+                  Studio Bundle · $449 soft launch
                 </button>
               </div>
             </div>
@@ -381,8 +386,10 @@ export default function PublishingPanel({ bookId, bookSignals, onToast }: Props)
       <section className="pub-section">
         <h3>Studio packages</h3>
         <p className="pub-stub-note">
-          Secure checkout via Stripe. After payment, unlocks are saved on this device until you
-          sign in with an account (coming soon for sync across phones and computers).
+          Soft launch: Studio Bundle {formatSoftBundlePrice()} ({formatCatalogBundlePrice()}{" "}
+          catalog) — use code <strong>{SOFT_LAUNCH.couponCode}</strong> at checkout when prompted
+          for ${SOFT_LAUNCH.discountDollars} off. Checkout uses Stripe prices unless that coupon
+          exists. Unlocks save on this device until accounts sync across phones and computers.
         </p>
         <ul className="pkg-grid">
           {packages.map((pkg) => {
@@ -397,9 +404,18 @@ export default function PublishingPanel({ bookId, bookSignals, onToast }: Props)
               >
                 <div className="pkg-card-top">
                   <h4>{pkg.title}</h4>
-                  <span className="pkg-price">{formatPrice(pkg.price)}</span>
+                  <span className="pkg-price">
+                    {pkg.featured ? (
+                      <>
+                        <span className="pkg-price-soft">{formatSoftBundlePrice()}</span>{" "}
+                        <span className="pkg-price-was">{formatPrice(pkg.price)}</span>
+                      </>
+                    ) : (
+                      formatPrice(pkg.price)
+                    )}
+                  </span>
                 </div>
-                {pkg.featured ? <span className="pkg-badge best">Best value</span> : null}
+                {pkg.featured ? <span className="pkg-badge best">Soft launch · Best value</span> : null}
                 <p className="pkg-blurb">{pkg.blurb}</p>
                 {isOwned ? (
                   <span className="pkg-badge owned">Owned</span>

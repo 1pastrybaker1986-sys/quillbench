@@ -20,6 +20,12 @@
     />
   </head>
   <body>
+    <!-- Netlify Forms detection (SPA): enable notifications in Netlify → Forms → quillbench-waitlist -->
+    <form name="quillbench-waitlist" netlify netlify-honeypot="bot-field" hidden>
+      <input type="text" name="bot-field" />
+      <input type="email" name="email" />
+      <input type="text" name="source" />
+    </form>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

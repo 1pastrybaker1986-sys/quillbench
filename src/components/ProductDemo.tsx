@@ -158,7 +158,7 @@ export default function ProductDemo() {
             )}
             {current.id === "publishing" && (
               <div className="pd-publish">
-                <div className="pd-pkg featured">Studio Bundle · $499</div>
+                <div className="pd-pkg featured">Studio Bundle · $449 soft launch</div>
                 <div className="pd-pkg">Full Edit · $249</div>
                 <div className="pd-pkg">Cover · $179</div>
                 <div className="pd-pkg">Marketing · $129</div>

@@ -1,6 +1,11 @@
 import { FormEvent, useState } from "react";
 import { signInDemo, signInWithEmail } from "../lib/store";
-import { addWaitlistEmail } from "../lib/waitlist";
+import { submitWaitlist } from "../lib/waitlist";
+import {
+  formatCatalogBundlePrice,
+  formatSoftBundlePrice,
+  SOFT_LAUNCH,
+} from "../lib/softLaunch";
 import type { Session } from "../lib/types";
 import Nib from "../components/Nib";
 import ProductDemo from "../components/ProductDemo";
@@ -30,13 +35,19 @@ const PACKAGES = [
   { name: "Full Edit", price: "$249" },
   { name: "Cover", price: "$179" },
   { name: "Marketing", price: "$129" },
-  { name: "Bundle", price: "$499" },
+  {
+    name: "Bundle",
+    price: formatSoftBundlePrice(),
+    was: formatCatalogBundlePrice(),
+    soft: true,
+  },
 ] as const;
 
 export default function Landing({ onSignedIn, onOpenPrivacy, onOpenTerms }: Props) {
   const [email, setEmail] = useState("");
   const [waitlistEmail, setWaitlistEmail] = useState("");
   const [waitlistDone, setWaitlistDone] = useState(false);
+  const [waitlistBusy, setWaitlistBusy] = useState(false);
 
   function continueWithEmail(e: FormEvent) {
     e.preventDefault();
@@ -44,9 +55,13 @@ export default function Landing({ onSignedIn, onOpenPrivacy, onOpenTerms }: Prop
     onSignedIn(signInWithEmail(email));
   }
 
-  function joinWaitlist(e: FormEvent) {
+  async function joinWaitlist(e: FormEvent) {
     e.preventDefault();
-    if (!addWaitlistEmail(waitlistEmail)) return;
+    if (waitlistBusy) return;
+    setWaitlistBusy(true);
+    const ok = await submitWaitlist(waitlistEmail);
+    setWaitlistBusy(false);
+    if (!ok) return;
     setWaitlistDone(true);
     setWaitlistEmail("");
   }
@@ -54,6 +69,11 @@ export default function Landing({ onSignedIn, onOpenPrivacy, onOpenTerms }: Prop
   function scrollToSignIn() {
     document.getElementById("landing-signin")?.scrollIntoView({ behavior: "smooth", block: "center" });
     window.setTimeout(() => document.getElementById("email")?.focus(), 350);
+  }
+
+  function scrollToWaitlist() {
+    document.getElementById("landing-waitlist")?.scrollIntoView({ behavior: "smooth", block: "center" });
+    window.setTimeout(() => document.getElementById("waitlist-email")?.focus(), 350);
   }
 
   return (
@@ -68,10 +88,39 @@ export default function Landing({ onSignedIn, onOpenPrivacy, onOpenTerms }: Prop
         </button>
       </header>
 
+      <section className="landing-bundle-hero" aria-labelledby="bundle-hero-heading">
+        <div className="landing-bundle-card">
+          <p className="landing-bundle-eyebrow">Soft launch · early access</p>
+          <h1 id="bundle-hero-heading">Studio Bundle</h1>
+          <p className="landing-bundle-tag">
+            Full Edit + Cover Design + Marketing — one unlock for writers taking a book to market.
+          </p>
+          <div className="landing-bundle-price-row">
+            <span className="landing-bundle-soft">{formatSoftBundlePrice()}</span>
+            <span className="landing-bundle-was">{formatCatalogBundlePrice()}</span>
+            <span className="landing-bundle-save">${SOFT_LAUNCH.discountDollars} off</span>
+          </div>
+          <p className="landing-bundle-window">
+            Soft-launch offer for a {SOFT_LAUNCH.windowLabel} {SOFT_LAUNCH.softLaunchAround}. Save
+            your spot for early access — then use code <strong>{SOFT_LAUNCH.couponCode}</strong> at
+            checkout when prompted (or enjoy the soft-launch price messaging here). Checkout still
+            uses Stripe catalog prices unless that coupon exists in your Stripe Dashboard.
+          </p>
+          <div className="landing-bundle-actions">
+            <button className="btn btn-primary" type="button" onClick={scrollToWaitlist}>
+              Save my spot
+            </button>
+            <button className="btn btn-ghost landing-cta-secondary" type="button" onClick={scrollToSignIn}>
+              Try the bench free
+            </button>
+          </div>
+        </div>
+      </section>
+
       <section className="landing-hero" aria-labelledby="landing-headline">
         <div className="landing-hero-copy">
           <p className="landing-eyebrow">Book production for writers</p>
-          <h1 id="landing-headline">From typed pages to publish-ready files</h1>
+          <h2 id="landing-headline">From typed pages to publish-ready files</h2>
           <p className="landing-lede">
             One rose-gold bench for Scan, Grammar, Editing, Formatting, and Publishing — start free on
             this device.
@@ -109,35 +158,61 @@ export default function Landing({ onSignedIn, onOpenPrivacy, onOpenTerms }: Prop
           {PACKAGES.map((p) => (
             <li key={p.name}>
               <span>{p.name}</span>
-              <strong>{p.price}</strong>
+              {"soft" in p && p.soft ? (
+                <strong className="landing-price-soft">
+                  <span className="landing-price-was">{p.was}</span> {p.price}
+                </strong>
+              ) : (
+                <strong>{p.price}</strong>
+              )}
             </li>
           ))}
         </ul>
       </section>
 
       {/*
-        Waitlist: primary UX = localStorage quillbench.waitlist.v1.
-        Optional later: mailto:hello@quillbench.app?subject=Waitlist
-        or Formspree POST https://formspree.io/f/YOUR_FORM_ID — see ../DEPLOY.md
+        Waitlist: localStorage quillbench.waitlist.v1 + Netlify Forms `quillbench-waitlist`.
+        Sarah: Netlify → Forms → enable email notifications to her Gmail / hello@quillbench.app
       */}
-      <section className="landing-waitlist" aria-labelledby="waitlist-heading">
+      <section className="landing-waitlist" id="landing-waitlist" aria-labelledby="waitlist-heading">
         <div className="landing-waitlist-card">
-          <p className="landing-waitlist-eyebrow">Product updates</p>
-          <h2 id="waitlist-heading">Stay in the loop for accounts &amp; cross-device sync</h2>
+          <p className="landing-waitlist-eyebrow">Early access</p>
+          <h2 id="waitlist-heading">
+            Early access + ${SOFT_LAUNCH.discountDollars} off the Studio Bundle
+          </h2>
           <p className="landing-waitlist-lede">
-            Stripe Checkout is live. Leave your email on this device — we’ll share product updates and when accounts arrive so unlocks can sync across phones and computers.
+            Soft launch {SOFT_LAUNCH.softLaunchAround} — a {SOFT_LAUNCH.windowLabel}. Leave your
+            email to save your spot. At checkout, use code <strong>{SOFT_LAUNCH.couponCode}</strong>{" "}
+            when prompted for ${SOFT_LAUNCH.discountDollars} off ({formatCatalogBundlePrice()} →{" "}
+            {formatSoftBundlePrice()}). Honest note: Stripe charges the catalog price unless that
+            coupon is set up in the Dashboard.
           </p>
           {waitlistDone ? (
             <p className="landing-waitlist-thanks" role="status">
-              You’re on the list. Thanks — we’ll share product updates and account news here.
+              You’re on the list. We’ll email early-access notes — and remind you about{" "}
+              {SOFT_LAUNCH.couponCode} at checkout.
             </p>
           ) : (
-            <form className="landing-waitlist-form" onSubmit={joinWaitlist}>
+            <form
+              className="landing-waitlist-form"
+              name="quillbench-waitlist"
+              method="POST"
+              data-netlify="true"
+              data-netlify-honeypot="bot-field"
+              onSubmit={(e) => void joinWaitlist(e)}
+            >
+              <input type="hidden" name="form-name" value="quillbench-waitlist" />
+              <p className="sr-only" aria-hidden="true">
+                <label>
+                  Don’t fill this out: <input name="bot-field" tabIndex={-1} autoComplete="off" />
+                </label>
+              </p>
               <label className="sr-only" htmlFor="waitlist-email">
-                Email for product updates
+                Email for early access
               </label>
               <input
                 id="waitlist-email"
+                name="email"
                 type="email"
                 autoComplete="email"
                 placeholder="you@example.com"
@@ -145,8 +220,8 @@ export default function Landing({ onSignedIn, onOpenPrivacy, onOpenTerms }: Prop
                 onChange={(e) => setWaitlistEmail(e.target.value)}
                 required
               />
-              <button className="btn btn-primary" type="submit">
-                Keep me updated
+              <button className="btn btn-primary" type="submit" disabled={waitlistBusy}>
+                {waitlistBusy ? "Saving…" : "Save my spot"}
               </button>
             </form>
           )}
@@ -193,7 +268,7 @@ export default function Landing({ onSignedIn, onOpenPrivacy, onOpenTerms }: Prop
 
       <footer className="landing-foot">
         <img src="/art/quill-flourish.svg" alt="" width={280} height={20} aria-hidden="true" />
-        <p>Quillbench · draft to publish-ready · local preview until public host</p>
+        <p>Quillbench · draft to publish-ready · soft launch {SOFT_LAUNCH.softLaunchAround}</p>
         <nav className="legal-links" aria-label="Legal and support">
           <button className="legal-link" type="button" onClick={onOpenPrivacy}>
             Privacy

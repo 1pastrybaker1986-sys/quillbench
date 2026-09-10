@@ -102,6 +102,8 @@ export async function handler(event) {
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: successUrl,
       cancel_url: cancelUrl,
+      // Soft-launch: writers can enter SOFTLAUNCH50 when Sarah creates that coupon.
+      allow_promotion_codes: true,
       metadata: { packageId },
     });
 

@@ -2513,7 +2513,8 @@ input:focus {
   color: var(--rose-deep);
 }
 
-.landing-hero-copy h1 {
+.landing-hero-copy h1,
+.landing-hero-copy h2 {
   font-family: var(--font-display);
   font-weight: 560;
   font-size: clamp(2.15rem, 5vw, 3.55rem);
@@ -2788,7 +2789,8 @@ input:focus {
     grid-template-columns: 1fr;
   }
 
-  .landing-hero-copy h1 {
+  .landing-hero-copy h1,
+  .landing-hero-copy h2 {
     max-width: none;
   }
 
@@ -3484,5 +3486,227 @@ a.legal-link {
   .product-demo-panel,
   .pd-scan-beam {
     animation: none;
+  }
+}
+
+
+/* ---- Soft-launch Studio Bundle hero + export buy nudge ---- */
+
+.landing-bundle-hero {
+  padding: clamp(1.25rem, 4vw, 2.5rem) clamp(1.25rem, 4vw, 3rem) 0;
+}
+
+.landing-bundle-card {
+  position: relative;
+  padding: clamp(1.35rem, 3vw, 2rem) clamp(1.25rem, 3vw, 2.25rem);
+  border-radius: 22px;
+  background:
+    linear-gradient(135deg, rgba(255, 253, 251, 0.96), rgba(255, 232, 224, 0.88)),
+    radial-gradient(circle at 88% 12%, rgba(212, 95, 108, 0.18), transparent 45%);
+  border: 1px solid rgba(212, 95, 108, 0.32);
+  box-shadow: 0 18px 48px rgba(162, 61, 76, 0.12), 0 1px 0 rgba(255, 255, 255, 0.8) inset;
+}
+
+.landing-bundle-eyebrow {
+  margin: 0 0 0.45rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--rose-deep);
+}
+
+.landing-bundle-card h1 {
+  font-family: var(--font-display);
+  font-weight: 560;
+  font-size: clamp(1.85rem, 4vw, 2.75rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin: 0;
+  color: var(--rose-deep);
+}
+
+.landing-bundle-tag {
+  margin: 0.65rem 0 0;
+  max-width: 48ch;
+  color: #6b5558;
+  line-height: 1.5;
+  font-size: 1.02rem;
+}
+
+.landing-bundle-price-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.65rem 0.85rem;
+  margin-top: 1.1rem;
+}
+
+.landing-bundle-soft {
+  font-family: var(--font-display);
+  font-size: clamp(1.85rem, 3.5vw, 2.4rem);
+  font-weight: 650;
+  color: var(--rose-deep);
+  letter-spacing: -0.02em;
+}
+
+.landing-bundle-was {
+  font-size: 1.05rem;
+  color: #9a7a7e;
+  text-decoration: line-through;
+}
+
+.landing-bundle-save {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.28rem 0.65rem;
+  border-radius: 999px;
+  background: var(--grad-rose);
+  color: #1a1012;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.landing-bundle-window {
+  margin: 0.95rem 0 0;
+  max-width: 62ch;
+  color: #6b5558;
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.landing-bundle-window strong {
+  color: var(--rose-deep);
+  font-weight: 650;
+}
+
+.landing-bundle-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 1.25rem;
+}
+
+.landing-bundle-actions .btn {
+  width: auto;
+  margin-top: 0;
+  min-width: 10rem;
+  padding-inline: 1.25rem;
+}
+
+.landing-price-was {
+  margin-right: 0.35rem;
+  color: #9a7a7e;
+  font-weight: 500;
+  text-decoration: line-through;
+  font-size: 0.88em;
+}
+
+.landing-price-soft {
+  color: var(--rose-deep);
+}
+
+.pkg-price-soft {
+  color: var(--rose-deep);
+  font-weight: 700;
+}
+
+.pkg-price-was {
+  color: #9a7a7e;
+  font-weight: 500;
+  text-decoration: line-through;
+  font-size: 0.85em;
+}
+
+.export-buy-nudge {
+  position: fixed;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  z-index: 45;
+  width: min(24rem, calc(100vw - 2rem));
+  padding: 1.15rem 1.2rem 1.05rem;
+  border-radius: 18px;
+  background: linear-gradient(160deg, #fffdfb 0%, #fce8e2 100%);
+  border: 1px solid rgba(212, 95, 108, 0.35);
+  box-shadow: 0 18px 48px rgba(90, 46, 52, 0.22), 0 1px 0 rgba(255, 255, 255, 0.85) inset;
+}
+
+.export-buy-nudge-dismiss {
+  position: absolute;
+  top: 0.45rem;
+  right: 0.55rem;
+  border: 0;
+  background: transparent;
+  color: #8a6a6e;
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0.25rem 0.4rem;
+}
+
+.export-buy-nudge-eyebrow {
+  margin: 0;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--rose-deep);
+}
+
+.export-buy-nudge-title {
+  margin: 0.35rem 0 0;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 560;
+  color: #3a2428;
+}
+
+.export-buy-nudge-lede {
+  margin: 0.55rem 0 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: #6b5558;
+}
+
+.export-buy-nudge-was {
+  text-decoration: line-through;
+  color: #9a7a7e;
+}
+
+.export-buy-nudge-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem 0.55rem;
+  margin-top: 0.95rem;
+}
+
+.export-buy-nudge-actions .btn {
+  width: auto;
+  margin-top: 0;
+  padding: 0.55rem 0.95rem;
+  font-size: 0.88rem;
+}
+
+.export-buy-nudge-alt {
+  border: 1px solid rgba(212, 95, 108, 0.28) !important;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.7) !important;
+}
+
+.export-buy-nudge-later {
+  margin-left: 0.15rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #8a6a6e;
+}
+
+@media (max-width: 640px) {
+  .export-buy-nudge {
+    left: 1rem;
+    right: 1rem;
+    bottom: 1rem;
+    width: auto;
   }
 }

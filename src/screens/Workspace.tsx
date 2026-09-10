@@ -15,6 +15,7 @@ import SpreadPreview from "../components/SpreadPreview";
 import Toast from "../components/Toast";
 import EditingPanel from "../components/EditingPanel";
 import PublishingPanel from "../components/PublishingPanel";
+import ExportBuyNudge from "../components/ExportBuyNudge";
 
 type Props = {
   session: Session;
@@ -167,6 +168,7 @@ export default function Workspace({ bookId, onBack }: Props) {
   const [module, setModule] = useState<ModuleId>("formatting");
   const [toast, setToast] = useState<string | null>(null);
   const [exportTip, setExportTip] = useState(false);
+  const [buyNudge, setBuyNudge] = useState(false);
   const [draftText, setDraftText] = useState(initial?.manuscriptText ?? "");
   const [draftMatter, setDraftMatter] = useState<MatterDraft>(() => matterFrom(initial));
   const [dragging, setDragging] = useState(false);
@@ -415,6 +417,7 @@ export default function Workspace({ bookId, onBack }: Props) {
       if (logged) setBook(logged);
       setToast(`Downloaded ${filename}`);
       setExportTip(true);
+      setBuyNudge(true);
     } catch {
       setToast("Print PDF failed — try again");
     } finally {
@@ -437,6 +440,7 @@ export default function Workspace({ bookId, onBack }: Props) {
       if (logged) setBook(logged);
       setToast(`Downloaded ${filename}`);
       setExportTip(true);
+      setBuyNudge(true);
     } catch {
       setToast("EPUB failed — try again");
     } finally {
@@ -842,6 +846,15 @@ export default function Workspace({ bookId, onBack }: Props) {
         </div>
       )}
 
+      {buyNudge ? (
+        <ExportBuyNudge
+          onSeePackages={() => {
+            setBuyNudge(false);
+            setModule("publishing");
+          }}
+          onDismiss={() => setBuyNudge(false)}
+        />
+      ) : null}
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}
     </div>
   );

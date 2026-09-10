@@ -2,7 +2,7 @@
 
 A book-production bench for writers. Take a manuscript from draft to publish-ready files — grammar, editing, formatting, publishing ops — in one place.
 
-This is **milestone 19** (waitlist + support) on top of m18 legal pages, m17 Stripe scaffold, m16 landing/deploy, and earlier work through **milestone 15**: richer rose-gold color punch + lightweight SVG/CSS graphics (sign-in hero, library ornament, workspace flourish) on top of m14 publish-ready hardening, m13 package payoffs + readiness meter, m12 visual/nav, m11 competitive polish, Editing board + Publishing packages, Scan page detect, Grammar v0, and Formatting PDF/EPUB/cover/locker.
+This is **soft-launch Days 1–5** (Bundle hero, waitlist → Sarah email, post-export buy nudge) on **milestone 19** waitlist/support, m18 legal, m17 Stripe scaffold, m16 landing/deploy, and earlier work through **milestone 15**: richer rose-gold color punch + lightweight SVG/CSS graphics (sign-in hero, library ornament, workspace flourish) on top of m14 publish-ready hardening, m13 package payoffs + readiness meter, m12 visual/nav, m11 competitive polish, Editing board + Publishing packages, Scan page detect, Grammar v0, and Formatting PDF/EPUB/cover/locker.
 
 Sarah is the first writer through it. The app is for many writers, not Sarah-only.
 
@@ -43,7 +43,8 @@ Refresh keeps the demo session, matter/manuscript, cover, and locker. Sign out f
 - Grammar v0 via `src/lib/grammarCheck.ts` (repeated words, whitespace, pacing, quote mix — flag, don’t flatten voice)
 - Editing board + Publishing packages/checklist (local unlocks; payments coming soon)
 - Privacy + Terms pages (Landing / Library footers; `?page=privacy|terms`)
-- Landing payments waitlist (`quillbench.waitlist.v1`) + support `hello@quillbench.app`
+- Soft-launch Studio Bundle hero ($449 / SOFTLAUNCH50) + waitlist (`quillbench.waitlist.v1` + Netlify Forms `quillbench-waitlist`) + support `hello@quillbench.app`
+- Post-export buy nudge → Publishing packages
 - One visual system; not a CRUD admin
 
 ## What this build is not
@@ -89,6 +90,7 @@ Refresh keeps the demo session, matter/manuscript, cover, and locker. Sign out f
 | `../milestone-14-publish-harden.md` | Publish-harden ship note |
 | `../milestone-18-legal-pages.md` | Privacy + Terms pages |
 | `../milestone-19-waitlist-support.md` | Waitlist + support contact |
+| `SOFT-LAUNCH-D1-5.md` | Soft-launch D1–5: Bundle offer, Netlify Forms, Stripe coupon/Live keys |
 
 ## Later
 

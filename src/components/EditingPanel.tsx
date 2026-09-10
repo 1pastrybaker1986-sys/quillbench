@@ -125,7 +125,7 @@ export default function EditingPanel({ bookId, onSeePackages, onToast }: Props) 
                 Unlock Full Edit · $249
               </button>
               <button className="btn-export" type="button" onClick={() => unlock("studio-bundle")}>
-                Studio Bundle · $499
+                Studio Bundle · $449 soft launch
               </button>
               <button className="linkish" type="button" onClick={onSeePackages}>
                 See all packages
