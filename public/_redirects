@@ -1,2 +1,4 @@
-# Netlify / Cloudflare Pages SPA fallback — all routes → index.html
+# Netlify merges with netlify.toml — more specific first.
+# waitlist.html must stay a real static file for Forms POSTs (see netlify.toml).
+/waitlist.html  /waitlist.html  200
 /*    /index.html   200

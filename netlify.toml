@@ -2,6 +2,13 @@
   command = "npm run build"
   publish = "dist"
 
+# Keep form POST target out of SPA fallback (more specific rules first)
+[[redirects]]
+  from = "/waitlist.html"
+  to = "/waitlist.html"
+  status = 200
+  force = false
+
 [[redirects]]
   from = "/*"
   to = "/index.html"

@@ -14,13 +14,17 @@ App: `quillbench/`
 
 ## Sarah must click — Netlify Forms notifications
 
-1. Open **Netlify** → your Quillbench site → **Forms**.
-2. Confirm form **`quillbench-waitlist`** appears after deploy (hidden form in `index.html` + Landing POST).
-3. Open the form → **Settings / Notifications** (or site **Forms → Form notifications**).
-4. Add an **email notification** to **your Gmail** (and/or `hello@quillbench.app`) for new submissions.
-5. Optional: outbound to Slack later — email is enough for soft launch.
+After deploy of the waitlist fix (POST → `/waitlist.html`, not SPA `/`):
 
-Without this step, waitlist still saves on the visitor’s device but **you will not get email**.
+1. Open the live landing and click **Save my spot** once with a real email (forces Netlify to register the submission against the static form page).
+2. Open **Netlify** → your Quillbench site → **Forms**.
+3. Confirm form **`quillbench-waitlist`** appears (detection: hidden form in `index.html` + static `public/waitlist.html`; submissions POST to `/waitlist.html`).
+4. Refresh Forms if needed until the submission shows.
+5. Open the form → **Settings / Notifications** (or site **Forms → Form notifications**).
+6. **Then** enable an **email notification** to **your Gmail** (and/or `hello@quillbench.app`) for new submissions.
+7. Optional: outbound to Slack later — email is enough for soft launch.
+
+Without the notification step, waitlist still saves on the visitor’s device but **you will not get email**.
 
 ## Sarah must click — Stripe coupon SOFTLAUNCH50
 

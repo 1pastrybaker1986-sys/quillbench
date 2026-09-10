@@ -2,8 +2,9 @@
  * Soft-launch waitlist — localStorage backup + Netlify Forms notify.
  * Key: quillbench.waitlist.v1 (string[]).
  *
- * Netlify Forms: form name `quillbench-waitlist` (hidden form in index.html for
- * build-time detection). Sarah must enable form notifications in Netlify UI
+ * Netlify Forms: form name `quillbench-waitlist`. Detection form in index.html;
+ * submissions POST to /waitlist.html (static page — SPA catch-all must not
+ * swallow that POST). Sarah must enable form notifications in Netlify UI
  * → Forms → quillbench-waitlist → email notifications to her Gmail
  * (or hello@quillbench.app). Support: hello@quillbench.app
  */
@@ -51,6 +52,7 @@ export function isOnWaitlist(email: string): boolean {
 /**
  * Instant localStorage save, then best-effort Netlify Forms POST so Sarah
  * gets an email notification (when Forms notifications are enabled).
+ * POST target is /waitlist.html — not / — so the SPA fallback does not 404.
  */
 export async function submitWaitlist(email: string): Promise<boolean> {
   const trimmed = email.trim().toLowerCase();
@@ -61,7 +63,7 @@ export async function submitWaitlist(email: string): Promise<boolean> {
     body.set("form-name", WAITLIST_FORM_NAME);
     body.set("email", trimmed);
     body.set("source", "landing-soft-launch");
-    await fetch("/", {
+    await fetch("/waitlist.html", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: body.toString(),
