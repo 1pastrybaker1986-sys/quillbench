@@ -32,6 +32,26 @@ function json(statusCode, body) {
   };
 }
 
+function softLaunchCouponId() {
+  return process.env.STRIPE_COUPON_SOFTLAUNCH?.trim() || "SOFTLAUNCH50";
+}
+
+async function createCheckoutSession(stripe, fields) {
+  try {
+    return await stripe.checkout.sessions.create({
+      ...fields,
+      branding_settings: { display_name: "Quillbench" },
+    });
+  } catch (brandErr) {
+    const brandMsg =
+      brandErr && typeof brandErr === "object" && "message" in brandErr
+        ? String(brandErr.message)
+        : "";
+    if (!/branding_settings|unknown parameter/i.test(brandMsg)) throw brandErr;
+    return await stripe.checkout.sessions.create(fields);
+  }
+}
+
 function resolvePriceId(packageId, clientPriceId) {
   const envName = PRICE_ENV_BY_PACKAGE[packageId];
   const fromEnv = envName ? process.env[envName]?.trim() : "";
@@ -97,30 +117,33 @@ export async function handler(event) {
 
   try {
     const stripe = new Stripe(secretKey);
-    const base = {
+    const fields = {
       mode: "payment",
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: successUrl,
       cancel_url: cancelUrl,
-      // Soft-launch: writers can enter SOFTLAUNCH50 when Sarah creates that coupon.
-      allow_promotion_codes: true,
       metadata: { packageId },
     };
-    // Prefer Quillbench on Checkout even if the Stripe account DBA is still SpaceRanger1X.
-    // Fall back if this Stripe API version rejects branding_settings (avoids 502).
+    // Stripe forbids discounts + allow_promotion_codes on the same session.
     let session;
-    try {
-      session = await stripe.checkout.sessions.create({
-        ...base,
-        branding_settings: { display_name: "Quillbench" },
+    if (packageId === "studio-bundle") {
+      try {
+        session = await createCheckoutSession(stripe, {
+          ...fields,
+          discounts: [{ coupon: softLaunchCouponId() }],
+        });
+      } catch (couponErr) {
+        // Coupon id missing or is a promo code — keep Checkout working with a typed code.
+        session = await createCheckoutSession(stripe, {
+          ...fields,
+          allow_promotion_codes: true,
+        });
+      }
+    } else {
+      session = await createCheckoutSession(stripe, {
+        ...fields,
+        allow_promotion_codes: true,
       });
-    } catch (brandErr) {
-      const brandMsg =
-        brandErr && typeof brandErr === "object" && "message" in brandErr
-          ? String(brandErr.message)
-          : "";
-      if (!/branding_settings|unknown parameter|invalid/i.test(brandMsg)) throw brandErr;
-      session = await stripe.checkout.sessions.create(base);
     }
 
     if (!session.url) {

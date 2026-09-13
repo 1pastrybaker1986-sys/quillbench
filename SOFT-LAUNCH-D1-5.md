@@ -7,7 +7,7 @@ App: `quillbench/`
 
 ## What shipped
 
-1. **Landing Studio Bundle hero** — early-access framing, soft-launch **$449** ($50 off **$499**), 48-hour soft-launch window copy, code **SOFTLAUNCH50** (“use at checkout when prompted”). Honest note: checkout still uses Stripe catalog prices unless the coupon exists.
+1. **Landing Studio Bundle hero** — early-access framing, soft-launch **$449** ($50 off **$499**), 48-hour soft-launch window copy, code **SOFTLAUNCH50**. Studio Bundle Checkout **auto-applies** that coupon when it exists in Stripe; other packages still offer a promo field.
 2. **Waitlist** — headline/lede for early access + $50 off Bundle; button **Save my spot**. Submits to Netlify Forms (`quillbench-waitlist`) **and** keeps `localStorage` (`quillbench.waitlist.v1`) for instant UX. Support: `hello@quillbench.app`.
 3. **Post-export buy nudge** — after successful Print PDF or EPUB, dismissible rose-gold banner: Studio Bundle soft-launch primary, Cover Design / Full Edit alternatives, Not now. **See packages** switches to Publishing.
 4. **Publishing / Editing / demo** — soft-launch price messaging on Bundle; still env-based Stripe Checkout (no fake discount charging).
@@ -30,7 +30,7 @@ Without the notification step, waitlist still saves on the visitor’s device bu
 
 1. Stripe Dashboard → **Product catalog** → **Coupons** (or **Promotion codes**).
 2. Create coupon id / code **`SOFTLAUNCH50`**: **$50 off** (fixed amount), once per customer (or as you prefer).
-3. Attach a **promotion code** `SOFTLAUNCH50` so Checkout can accept it when “Allow promotion codes” is on for the session (optional wiring — if not enabled on the Checkout Session yet, tell writers the soft-launch price is the offer framing and apply the coupon manually / enable `allow_promotion_codes` later).
+3. Create the **coupon** with id **`SOFTLAUNCH50`** ($50 off). The Checkout function applies that coupon id on Studio Bundle sessions. A separate promotion code is optional (fallback path if the coupon id is missing).
 4. Do **not** change the Studio Bundle **Price** to $449 unless you want that permanent — keep catalog at **$499** and discount via coupon.
 
 Checkout in this app does **not** invent a $449 charge. It uses your Stripe **price_…** ids from env.
