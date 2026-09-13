@@ -40,6 +40,7 @@ const PACKAGES = [
     price: formatSoftBundlePrice(),
     was: formatCatalogBundlePrice(),
     soft: true,
+    note: SOFT_LAUNCH.couponCode,
   },
 ] as const;
 
@@ -161,6 +162,9 @@ export default function Landing({ onSignedIn, onOpenPrivacy, onOpenTerms }: Prop
               {"soft" in p && p.soft ? (
                 <strong className="landing-price-soft">
                   <span className="landing-price-was">{p.was}</span> {p.price}
+                  {"note" in p && p.note ? (
+                    <span className="landing-price-code"> · {p.note}</span>
+                  ) : null}
                 </strong>
               ) : (
                 <strong>{p.price}</strong>
@@ -183,8 +187,8 @@ export default function Landing({ onSignedIn, onOpenPrivacy, onOpenTerms }: Prop
           <p className="landing-waitlist-lede">
             Soft launch {SOFT_LAUNCH.softLaunchAround} — a {SOFT_LAUNCH.windowLabel}. Leave your
             email to save your spot. Studio Bundle Checkout is already{" "}
-            {formatSoftBundlePrice()} with <strong>{SOFT_LAUNCH.couponCode}</strong> applied (
-            ${SOFT_LAUNCH.discountDollars} off {formatCatalogBundlePrice()}).
+            {formatSoftBundlePrice()} with <strong>{SOFT_LAUNCH.couponCode}</strong> applied
+            (${SOFT_LAUNCH.discountDollars} off {formatCatalogBundlePrice()}).
           </p>
           {waitlistDone ? (
             <p className="landing-waitlist-thanks" role="status">
