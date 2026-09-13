@@ -1,7 +1,6 @@
 /**
  * Soft-launch offer copy + pricing (cash-first, ~9/15).
- * Checkout still uses Stripe catalog prices unless coupon SOFTLAUNCH50 exists.
- * Do not invent discount charging in code.
+ * Studio Bundle Checkout auto-applies Stripe promo/coupon SOFTLAUNCH50 ($449).
  */
 
 export const SOFT_LAUNCH = {
@@ -10,7 +9,7 @@ export const SOFT_LAUNCH = {
   /** Soft-launch display price when $50 off applies */
   bundleSoftPrice: 449,
   discountDollars: 50,
-  /** Stripe Dashboard coupon id Sarah must create ($50 off, once) */
+  /** Stripe promotion code / coupon writers see in messaging */
   couponCode: "SOFTLAUNCH50",
   /** Rough public window framing for early-access copy */
   windowLabel: "48-hour soft-launch window",

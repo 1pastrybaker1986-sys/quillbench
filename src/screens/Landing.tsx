@@ -102,9 +102,9 @@ export default function Landing({ onSignedIn, onOpenPrivacy, onOpenTerms }: Prop
           </div>
           <p className="landing-bundle-window">
             Soft-launch offer for a {SOFT_LAUNCH.windowLabel} {SOFT_LAUNCH.softLaunchAround}. Save
-            your spot for early access — then use code <strong>{SOFT_LAUNCH.couponCode}</strong> at
-            checkout when prompted (or enjoy the soft-launch price messaging here). Checkout still
-            uses Stripe catalog prices unless that coupon exists in your Stripe Dashboard.
+            your spot for early access. Studio Bundle Checkout applies code{" "}
+            <strong>{SOFT_LAUNCH.couponCode}</strong> automatically (
+            {formatCatalogBundlePrice()} → {formatSoftBundlePrice()}).
           </p>
           <div className="landing-bundle-actions">
             <button className="btn btn-primary" type="button" onClick={scrollToWaitlist}>
@@ -182,15 +182,14 @@ export default function Landing({ onSignedIn, onOpenPrivacy, onOpenTerms }: Prop
           </h2>
           <p className="landing-waitlist-lede">
             Soft launch {SOFT_LAUNCH.softLaunchAround} — a {SOFT_LAUNCH.windowLabel}. Leave your
-            email to save your spot. At checkout, use code <strong>{SOFT_LAUNCH.couponCode}</strong>{" "}
-            when prompted for ${SOFT_LAUNCH.discountDollars} off ({formatCatalogBundlePrice()} →{" "}
-            {formatSoftBundlePrice()}). Honest note: Stripe charges the catalog price unless that
-            coupon is set up in the Dashboard.
+            email to save your spot. Studio Bundle Checkout is already{" "}
+            {formatSoftBundlePrice()} with <strong>{SOFT_LAUNCH.couponCode}</strong> applied (
+            ${SOFT_LAUNCH.discountDollars} off {formatCatalogBundlePrice()}).
           </p>
           {waitlistDone ? (
             <p className="landing-waitlist-thanks" role="status">
-              You’re on the list. We’ll email early-access notes — and remind you about{" "}
-              {SOFT_LAUNCH.couponCode} at checkout.
+              You’re on the list. We’ll email early-access notes. Studio Bundle Checkout already
+              includes {SOFT_LAUNCH.couponCode} ({formatSoftBundlePrice()}).
             </p>
           ) : (
             <form

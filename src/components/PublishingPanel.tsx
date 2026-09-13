@@ -386,10 +386,10 @@ export default function PublishingPanel({ bookId, bookSignals, onToast }: Props)
       <section className="pub-section">
         <h3>Studio packages</h3>
         <p className="pub-stub-note">
-          Soft launch: Studio Bundle {formatSoftBundlePrice()} ({formatCatalogBundlePrice()}{" "}
-          catalog) — use code <strong>{SOFT_LAUNCH.couponCode}</strong> at checkout when prompted
-          for ${SOFT_LAUNCH.discountDollars} off. Checkout uses Stripe prices unless that coupon
-          exists. Unlocks save on this device until accounts sync across phones and computers.
+          Soft launch: Studio Bundle Checkout opens at {formatSoftBundlePrice()} with{" "}
+          <strong>{SOFT_LAUNCH.couponCode}</strong> auto-applied (${SOFT_LAUNCH.discountDollars} off{" "}
+          {formatCatalogBundlePrice()}). Unlocks save on this device until accounts sync across
+          phones and computers.
         </p>
         <ul className="pkg-grid">
           {packages.map((pkg) => {

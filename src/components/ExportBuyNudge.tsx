@@ -16,8 +16,8 @@ export default function ExportBuyNudge({ onSeePackages, onDismiss }: Props) {
       <p className="export-buy-nudge-lede">
         Full Edit + Cover + Marketing for {formatSoftBundlePrice()}{" "}
         <span className="export-buy-nudge-was">({formatCatalogBundlePrice()})</span> during the{" "}
-        {SOFT_LAUNCH.windowLabel}. Use code <strong>{SOFT_LAUNCH.couponCode}</strong> at checkout when
-        prompted.
+        {SOFT_LAUNCH.windowLabel}. Checkout applies <strong>{SOFT_LAUNCH.couponCode}</strong>{" "}
+        automatically.
       </p>
       <div className="export-buy-nudge-actions">
         <button className="btn btn-primary" type="button" onClick={onSeePackages}>
