@@ -97,7 +97,7 @@ export async function handler(event) {
 
   try {
     const stripe = new Stripe(secretKey);
-    const session = await stripe.checkout.sessions.create({
+    const base = {
       mode: "payment",
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: successUrl,
@@ -105,7 +105,23 @@ export async function handler(event) {
       // Soft-launch: writers can enter SOFTLAUNCH50 when Sarah creates that coupon.
       allow_promotion_codes: true,
       metadata: { packageId },
-    });
+    };
+    // Prefer Quillbench on Checkout even if the Stripe account DBA is still SpaceRanger1X.
+    // Fall back if this Stripe API version rejects branding_settings (avoids 502).
+    let session;
+    try {
+      session = await stripe.checkout.sessions.create({
+        ...base,
+        branding_settings: { display_name: "Quillbench" },
+      });
+    } catch (brandErr) {
+      const brandMsg =
+        brandErr && typeof brandErr === "object" && "message" in brandErr
+          ? String(brandErr.message)
+          : "";
+      if (!/branding_settings|unknown parameter|invalid/i.test(brandMsg)) throw brandErr;
+      session = await stripe.checkout.sessions.create(base);
+    }
 
     if (!session.url) {
       return json(502, { error: "Stripe did not return a Checkout URL." });
