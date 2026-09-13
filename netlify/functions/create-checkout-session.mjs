@@ -32,8 +32,28 @@ function json(statusCode, body) {
   };
 }
 
-function softLaunchCouponId() {
+function softLaunchCode() {
   return process.env.STRIPE_COUPON_SOFTLAUNCH?.trim() || "SOFTLAUNCH50";
+}
+
+/** Resolve SOFTLAUNCH50 as a promotion_code id or coupon id (Dashboard names often differ). */
+async function softLaunchDiscount(stripe) {
+  const code = softLaunchCode();
+  try {
+    const promos = await stripe.promotionCodes.list({ code, active: true, limit: 1 });
+    if (promos.data[0]?.id) return { promotion_code: promos.data[0].id };
+  } catch {
+    /* fall through */
+  }
+  // Coupon ids are often auto-generated; only try when env/code looks like a coupon id
+  // or matches a coupon that was deliberately named SOFTLAUNCH50.
+  try {
+    const coupon = await stripe.coupons.retrieve(code);
+    if (coupon?.id) return { coupon: coupon.id };
+  } catch {
+    /* fall through */
+  }
+  return null;
 }
 
 async function createCheckoutSession(stripe, fields) {
@@ -127,13 +147,21 @@ export async function handler(event) {
     // Stripe forbids discounts + allow_promotion_codes on the same session.
     let session;
     if (packageId === "studio-bundle") {
-      try {
-        session = await createCheckoutSession(stripe, {
-          ...fields,
-          discounts: [{ coupon: softLaunchCouponId() }],
-        });
-      } catch (couponErr) {
-        // Coupon id missing or is a promo code — keep Checkout working with a typed code.
+      const discount = await softLaunchDiscount(stripe);
+      if (discount) {
+        try {
+          session = await createCheckoutSession(stripe, {
+            ...fields,
+            discounts: [discount],
+          });
+        } catch {
+          session = await createCheckoutSession(stripe, {
+            ...fields,
+            allow_promotion_codes: true,
+          });
+        }
+      } else {
+        // Soft-launch code not found in this Stripe mode — keep typed promo field.
         session = await createCheckoutSession(stripe, {
           ...fields,
           allow_promotion_codes: true,
