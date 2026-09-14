@@ -10,6 +10,15 @@ She stood in the kitchen with a manuscript that was not yet a book and a kettle 
 Trim, theme, a spread that would one day be ink on paper. For now the pages were only a shape — a promise of 5.5 by 8.5, or six by nine, waiting for type that knew how to sit.
 
 Outside, the first crow found the fence post. Inside, she turned a leaf and began again.
+
+* * *
+
+The kettle clicked off. She did not pour. The page still needed a second hour.
+
+Chapter Two
+A second light
+
+Morning did not arrive so much as it leaked. The lane was wet, the fence post empty, and the manuscript had not grown kinder overnight.
 `;
 
 export type ParsedChapter = {
@@ -29,6 +38,15 @@ export type ParsedManuscript = {
 const CHAPTER_LINE =
   /^(chapter\s+[\wIVXLC0-9]+|prologue|epilogue|part\s+[\wIVXLC0-9]+)\b/i;
 
+/** Normalized marker stored in paragraph lists. */
+export const SCENE_BREAK = "* * *";
+
+const SCENE_BREAK_LINE = /^(?:\*\s*){3,}$|^(?:#\s*){3,}$|^(?:-{3,}|\u2014{2,})$/;
+
+export function isSceneBreakPara(text: string): boolean {
+  return SCENE_BREAK_LINE.test(text.trim());
+}
+
 function isShortHeading(line: string): boolean {
   if (!line || line.length > 72) return false;
   if (/[.?!]$/.test(line)) return false;
@@ -46,7 +64,8 @@ function linesToParagraphs(bodyLines: string[]): string[] {
   return rest
     .split(/\n\s*\n/)
     .map((p) => p.replace(/\n/g, " ").trim())
-    .filter(Boolean);
+    .filter(Boolean)
+    .map((p) => (isSceneBreakPara(p) ? SCENE_BREAK : p));
 }
 
 function chapterFrom(

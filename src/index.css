@@ -1101,6 +1101,7 @@ input:focus {
   text-transform: uppercase;
   color: #c47a84;
   margin: 1.2rem 0 0.35rem;
+  text-align: center;
 }
 
 .ch-title {
@@ -1109,6 +1110,7 @@ input:focus {
   font-size: 1.35rem;
   margin: 0 0 1.1rem;
   letter-spacing: -0.02em;
+  text-align: center;
 }
 
 .prose {
@@ -1121,6 +1123,20 @@ input:focus {
 .prose p { margin: 0 0 0.7em; }
 .prose p.first { text-indent: 0; }
 .prose p + p { text-indent: 1.1em; }
+.prose p.scene-break,
+.prose p.scene-break + p { text-indent: 0; }
+.prose p.scene-break {
+  text-align: center;
+  letter-spacing: 0.32em;
+  margin: 1.1em 0;
+}
+.chapter-flow {
+  text-align: center;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  color: var(--rose-deep);
+  margin: 0 0 0.65rem;
+}
 
 .folio {
   margin-top: auto;

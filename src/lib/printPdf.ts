@@ -6,7 +6,11 @@ import {
   rgb,
 } from "pdf-lib";
 import type { Book } from "./types";
-import { parseManuscript } from "./sampleManuscript";
+import {
+  chapterNavTitle,
+  isSceneBreakPara,
+  parseManuscript,
+} from "./sampleManuscript";
 
 const MARGIN_IN = 0.75;
 const PT = 72;
@@ -147,6 +151,55 @@ async function embedFonts(doc: PDFDocument): Promise<Fonts> {
 
 function newPage(doc: PDFDocument, w: number, h: number): PDFPage {
   return doc.addPage([w, h]);
+}
+
+function drawHalfTitle(
+  page: PDFPage,
+  book: Book,
+  fonts: Fonts,
+  w: number,
+  h: number,
+  innerW: number,
+) {
+  const titleLines = wrapText(book.title || "Untitled", fonts.roman, 16, innerW);
+  let y = h * 0.55;
+  for (const line of titleLines) {
+    drawCentered(page, line, y, fonts.roman, 16, w);
+    y -= 22;
+  }
+}
+
+function drawToc(
+  page: PDFPage,
+  book: Book,
+  fonts: Fonts,
+  w: number,
+  h: number,
+  innerW: number,
+  margin: number,
+) {
+  const parsed = parseManuscript(book.manuscriptText ?? "");
+  const chapters = parsed.chapters.filter(
+    (ch) => ch.label || ch.title || ch.paragraphs.length > 0,
+  );
+  let y = h - margin - 8;
+  drawCentered(page, "Contents", y, fonts.bold, 16, w);
+  y -= 36;
+  chapters.forEach((chapter, index) => {
+    const heading = chapterNavTitle(chapter, `Chapter ${index + 1}`);
+    const lines = wrapText(heading, fonts.roman, 12, innerW);
+    for (const line of lines) {
+      page.drawText(line, {
+        x: margin,
+        y,
+        size: 12,
+        font: fonts.roman,
+        color: INK,
+      });
+      y -= 18;
+    }
+    y -= 6;
+  });
 }
 
 function drawTitlePage(
@@ -339,13 +392,7 @@ function drawBody(
     if (chapter.label) {
       const label = pdfSafe(chapter.label).toUpperCase();
       ensureRoom(lineH);
-      page.drawText(label, {
-        x: margin,
-        y,
-        size: 10,
-        font: fonts.roman,
-        color: INK,
-      });
+      drawCentered(page, label, y, fonts.roman, 10, w);
       y -= 18;
     }
 
@@ -353,20 +400,24 @@ function drawBody(
       const titleLines = wrapText(chapter.title, fonts.bold, 16, innerW);
       for (const line of titleLines) {
         ensureRoom(22);
-        page.drawText(line, {
-          x: margin,
-          y,
-          size: 16,
-          font: fonts.bold,
-          color: INK,
-        });
+        drawCentered(page, line, y, fonts.bold, 16, w);
         y -= 22;
       }
       y -= 14;
     }
 
-    chapter.paragraphs.forEach((para, i) => {
-      const paraIndent = i === 0 ? 0 : indent;
+    let firstBody = true;
+    chapter.paragraphs.forEach((para) => {
+      if (isSceneBreakPara(para)) {
+        ensureRoom(lineH * 2);
+        y -= 8;
+        drawCentered(page, "* * *", y, fonts.roman, 11, w);
+        y -= lineH + 8;
+        firstBody = true;
+        return;
+      }
+      const paraIndent = firstBody ? 0 : indent;
+      firstBody = false;
       const lines = wrapParagraph(para, fonts.roman, bodySize, innerW, paraIndent);
       if (lines.length === 0) return;
       for (const line of lines) {
@@ -394,6 +445,9 @@ export async function buildInteriorPdf(book: Book): Promise<Uint8Array> {
   const doc = await PDFDocument.create();
   const fonts = await embedFonts(doc);
 
+  const halfTitle = newPage(doc, w, h);
+  drawHalfTitle(halfTitle, book, fonts, w, h, innerW);
+
   const titlePage = newPage(doc, w, h);
   drawTitlePage(titlePage, book, fonts, w, h, innerW, margin);
 
@@ -404,6 +458,15 @@ export async function buildInteriorPdf(book: Book): Promise<Uint8Array> {
   if (dedication) {
     const dPage = newPage(doc, w, h);
     drawDedicationPage(dPage, dedication, fonts, w, h, innerW);
+  }
+
+  const parsed = parseManuscript(book.manuscriptText ?? "");
+  const chapterCount = parsed.chapters.filter(
+    (ch) => ch.label || ch.title || ch.paragraphs.length > 0,
+  ).length;
+  if (chapterCount >= 2) {
+    const tocPage = newPage(doc, w, h);
+    drawToc(tocPage, book, fonts, w, h, innerW, margin);
   }
 
   drawBody(doc, book, fonts, w, h, innerW, margin);

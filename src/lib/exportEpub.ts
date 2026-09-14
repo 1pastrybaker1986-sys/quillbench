@@ -1,6 +1,10 @@
 import JSZip from "jszip";
 import type { Book } from "./types";
-import { chapterNavTitle, parseManuscript } from "./sampleManuscript";
+import {
+  chapterNavTitle,
+  isSceneBreakPara,
+  parseManuscript,
+} from "./sampleManuscript";
 import { bookSlug } from "./printPdf";
 
 function esc(text: string): string {
@@ -11,7 +15,8 @@ function esc(text: string): string {
     .replace(/"/g, "&quot;");
 }
 
-function xhtml(title: string, body: string): string {
+function xhtml(title: string, body: string, epubType?: string): string {
+  const typeAttr = epubType ? ` epub:type="${epubType}"` : "";
   return `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="en" xml:lang="en">
@@ -20,7 +25,7 @@ function xhtml(title: string, body: string): string {
   <title>${esc(title)}</title>
   <link rel="stylesheet" type="text/css" href="styles.css" />
 </head>
-<body>
+<body${typeAttr}>
 ${body}
 </body>
 </html>`;
@@ -33,8 +38,10 @@ h2 { font-size: 1.15em; font-weight: 600; text-align: center; margin: 1.5em 0 0.
 .author { margin-top: 2em; font-style: italic; }
 .copyright { margin-top: 3em; font-size: 0.95em; }
 .dedication { text-align: center; font-style: italic; margin-top: 4em; }
+.halftitle { text-align: center; margin-top: 6em; font-size: 1.2em; }
 p { margin: 0 0 0.85em; text-indent: 1.2em; }
 p.first { text-indent: 0; }
+p.scene-break { text-align: center; text-indent: 0; letter-spacing: 0.28em; margin: 1.6em 0; }
 .chapter-label { text-align: center; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.85em; color: #666; margin-top: 2em; }
 .cover { text-align: center; margin: 0; }
 .cover img { max-width: 100%; height: auto; }
@@ -132,12 +139,26 @@ export async function buildEbookEpub(book: Book): Promise<Uint8Array> {
   }
 
   oebps.file(
+    "halftitle.xhtml",
+    xhtml(
+      title,
+      `<p class="halftitle first">${esc(title)}</p>`,
+      "halftitle",
+    ),
+  );
+  manifest.push(
+    `<item id="halftitle" href="halftitle.xhtml" media-type="application/xhtml+xml"/>`,
+  );
+  spine.push(`<itemref idref="halftitle"/>`);
+
+  oebps.file(
     "title.xhtml",
     xhtml(
       title,
       `<h1>${esc(title)}</h1>${
         subtitle ? `<p class="subtitle">${esc(subtitle)}</p>` : ""
       }<p class="author">${esc(author)}</p>`,
+      "titlepage",
     ),
   );
   manifest.push(
@@ -154,7 +175,7 @@ export async function buildEbookEpub(book: Book): Promise<Uint8Array> {
     .join("\n");
   oebps.file(
     "copyright.xhtml",
-    xhtml("Copyright", `<div class="copyright">${copyBits}</div>`),
+    xhtml("Copyright", `<div class="copyright">${copyBits}</div>`, "copyright-page"),
   );
   manifest.push(
     `<item id="copyright" href="copyright.xhtml" media-type="application/xhtml+xml"/>`,
@@ -167,6 +188,7 @@ export async function buildEbookEpub(book: Book): Promise<Uint8Array> {
       xhtml(
         "Dedication",
         `<p class="dedication first">${esc(dedication)}</p>`,
+        "dedication",
       ),
     );
     manifest.push(
@@ -201,9 +223,10 @@ export async function buildEbookEpub(book: Book): Promise<Uint8Array> {
     const paras =
       chapter.paragraphs.length > 0
         ? chapter.paragraphs
-            .map(
-              (p, i) =>
-                `<p class="${i === 0 ? "first" : ""}">${esc(p)}</p>`,
+            .map((p, i) =>
+              isSceneBreakPara(p)
+                ? `<p class="scene-break first">* * *</p>`
+                : `<p class="${i === 0 ? "first" : ""}">${esc(p)}</p>`,
             )
             .join("\n")
         : `<p class="first"> </p>`;
