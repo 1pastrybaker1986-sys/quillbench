@@ -8,6 +8,7 @@ import { isScanImage, joinManuscript, ocrImageFiles, SCAN_ACCEPT } from "../lib/
 import {
   checkManuscript,
   dismissIssue,
+  GRAMMAR_GROUP_LABELS,
   loadDismissedKeys,
   type GrammarIssue,
 } from "../lib/grammarCheck";
@@ -70,9 +71,20 @@ function GrammarPanel({
     return checkManuscript(text).filter((issue) => !dismissed.has(issue.key));
   }, [text, dismissed, scanTick]);
 
+  const grouped = useMemo(() => {
+    const order: GrammarIssue["group"][] = ["ocr", "rhythm", "tidy"];
+    return order
+      .map((group) => ({
+        group,
+        label: GRAMMAR_GROUP_LABELS[group],
+        items: issues.filter((i) => i.group === group),
+      }))
+      .filter((g) => g.items.length > 0);
+  }, [issues]);
+
   const emptyManuscript = text.trim().length === 0;
 
-  function onDismiss(key: string) {
+  function onKeep(key: string) {
     setDismissed(dismissIssue(bookId, key));
   }
 
@@ -87,11 +99,11 @@ function GrammarPanel({
       <header className="grammar-head">
         <h2>Grammar</h2>
         <p className="grammar-lede">
-          Fiction-aware review of the current manuscript. Notes to glance at — not a rewrite.
+          Fiction-aware review for typed and scanned pages. Notes to glance at — not a rewrite.
         </p>
         <p className="grammar-voice">
-          Dialect, fragments, and character speech are allowed. Scan pages text from Formatting
-          feeds this view.
+          Dialect, fragments, and character speech are allowed. OCR / typewriter tidy sits in its
+          own group. Scan pages text from Formatting feeds this view.
         </p>
         <div className="grammar-toolbar">
           <button
@@ -123,11 +135,18 @@ function GrammarPanel({
           <p>Dialect, fragments, and voice are left alone. Re-scan after you change the manuscript.</p>
         </div>
       ) : (
-        <ul className="grammar-list">
-          {issues.map((issue) => (
-            <GrammarIssueRow key={issue.key} issue={issue} onDismiss={onDismiss} />
+        <div className="grammar-groups">
+          {grouped.map((g) => (
+            <section key={g.group} className="grammar-group" aria-label={g.label}>
+              <h3 className="grammar-group-title">{g.label}</h3>
+              <ul className="grammar-list">
+                {g.items.map((issue) => (
+                  <GrammarIssueRow key={issue.key} issue={issue} onKeep={onKeep} />
+                ))}
+              </ul>
+            </section>
           ))}
-        </ul>
+        </div>
       )}
     </div>
   );
@@ -135,13 +154,13 @@ function GrammarPanel({
 
 function GrammarIssueRow({
   issue,
-  onDismiss,
+  onKeep,
 }: {
   issue: GrammarIssue;
-  onDismiss: (key: string) => void;
+  onKeep: (key: string) => void;
 }) {
   return (
-    <li className={`grammar-issue sev-${issue.severity}`}>
+    <li className={`grammar-issue sev-${issue.severity} group-${issue.group}`}>
       <div className="grammar-issue-top">
         <span className={`grammar-sev ${issue.severity}`}>
           {issue.severity === "warn" ? "Warn" : "Info"}
@@ -151,10 +170,7 @@ function GrammarIssueRow({
       <p className="grammar-note">{issue.note}</p>
       {issue.snippet ? <blockquote className="grammar-snippet">{issue.snippet}</blockquote> : null}
       <div className="grammar-actions">
-        <button className="btn-solid" type="button" onClick={() => onDismiss(issue.key)}>
-          Accept
-        </button>
-        <button className="linkish" type="button" onClick={() => onDismiss(issue.key)}>
+        <button className="linkish" type="button" onClick={() => onKeep(issue.key)}>
           Keep as-is
         </button>
       </div>

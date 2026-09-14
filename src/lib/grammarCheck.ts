@@ -1,6 +1,7 @@
 /**
  * Lightweight, fiction-aware manuscript notes. Client-side only — no paid API.
  * Flag for review; do not flatten dialect, fragments, or character speech.
+ * Tuned for typewritten / OCR manuscripts: hyphen joins, spaced letters, OCR slips.
  */
 
 export type GrammarSeverity = "info" | "warn";
@@ -11,7 +12,11 @@ export type GrammarIssueKind =
   | "missing-space"
   | "long-sentence"
   | "repeated-starter"
-  | "quote-mix";
+  | "quote-mix"
+  | "hyphen-join"
+  | "spaced-letters"
+  | "ocr-slip"
+  | "dash-ellipsis";
 
 export type GrammarIssue = {
   /** Stable fingerprint: kind + offset + clipped match. */
@@ -22,6 +27,8 @@ export type GrammarIssue = {
   note: string;
   snippet: string;
   start: number;
+  /** Rough family for grouped UI. */
+  group: "ocr" | "rhythm" | "tidy";
 };
 
 const DISMISSED_KEY = "quillbench.grammarDismissed.v1";
@@ -85,7 +92,10 @@ function splitParagraphs(text: string): { start: number; text: string }[] {
   return parts;
 }
 
-function pushIssue(out: GrammarIssue[], issue: Omit<GrammarIssue, "key"> & { match: string }) {
+function pushIssue(
+  out: GrammarIssue[],
+  issue: Omit<GrammarIssue, "key"> & { match: string },
+) {
   out.push({
     key: issueKey(issue.kind, issue.start, issue.match),
     kind: issue.kind,
@@ -94,6 +104,7 @@ function pushIssue(out: GrammarIssue[], issue: Omit<GrammarIssue, "key"> & { mat
     note: issue.note,
     snippet: issue.snippet,
     start: issue.start,
+    group: issue.group,
   });
 }
 
@@ -112,6 +123,7 @@ function findRepeatedWords(text: string, out: GrammarIssue[]) {
         pushIssue(out, {
           kind: "repeated-word",
           severity: soft ? "info" : "warn",
+          group: "rhythm",
           title: "Repeated word",
           note: soft
             ? "The same word twice in a row — often the right beat. Glance if you want."
@@ -133,11 +145,11 @@ function findOddWhitespace(text: string, out: GrammarIssue[]) {
     const start = m.index;
     const raw = m[0];
     const before = text.slice(Math.max(0, start - 4), start);
-    const typewriterTwin =
-      raw === "  " && /[.?!]["'”’)]?$/.test(before);
+    const typewriterTwin = raw === "  " && /[.?!]["'”’)]?$/.test(before);
     pushIssue(out, {
       kind: "odd-whitespace",
       severity: typewriterTwin ? "info" : "warn",
+      group: typewriterTwin ? "tidy" : "ocr",
       title: typewriterTwin ? "Two spaces" : "Odd whitespace",
       note: typewriterTwin
         ? "Two spaces after a stop — a typewriter habit. Fine to keep, or tidy for a modern line."
@@ -157,6 +169,7 @@ function findMissingSpace(text: string, out: GrammarIssue[]) {
     pushIssue(out, {
       kind: "missing-space",
       severity: "warn",
+      group: "ocr",
       title: "Missing space",
       note: "Punctuation running into the next word. Worth a glance — OCR does this a lot.",
       snippet: snippetAround(text, start, start + m[0].length),
@@ -178,6 +191,7 @@ function findLongSentences(text: string, out: GrammarIssue[]) {
     pushIssue(out, {
       kind: "long-sentence",
       severity: "info",
+      group: "rhythm",
       title: "Long sentence",
       note: `This sentence is ${n} words. Not wrong — a pacing note if you want a breath.`,
       snippet: snippetAround(text, start, Math.min(end, start + 90)),
@@ -202,9 +216,14 @@ function findRepeatedStarters(text: string, out: GrammarIssue[]) {
     pushIssue(out, {
       kind: "repeated-starter",
       severity: "info",
+      group: "rhythm",
       title: "Repeated opener",
       note: "This paragraph opens with the same first three words as the one before. Rhythm check only.",
-      snippet: snippetAround(text, paras[i].start, paras[i].start + Math.min(paras[i].text.length, 72)),
+      snippet: snippetAround(
+        text,
+        paras[i].start,
+        paras[i].start + Math.min(paras[i].text.length, 72),
+      ),
       start: paras[i].start,
       match: words,
     });
@@ -218,12 +237,104 @@ function findQuoteMix(text: string, out: GrammarIssue[]) {
   pushIssue(out, {
     kind: "quote-mix",
     severity: "info",
+    group: "tidy",
     title: "Quote marks mixed",
     note: "Straight and curly quotation marks both appear. A consistency pass is optional; mixed scans do this often.",
-    snippet: "Straight \" and curly “ ” in the same manuscript",
+    snippet: 'Straight " and curly “ ” in the same manuscript',
     start: 0,
     match: "mixed-quotes",
   });
+}
+
+/** Typewritten line wrap left as `word-\\nword` instead of rejoined. */
+function findHyphenJoins(text: string, out: GrammarIssue[]) {
+  const re = /([\p{L}]{2,})-\r?\n([\p{L}]{2,})/gu;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(text))) {
+    const start = m.index;
+    const joined = `${m[1]}${m[2]}`;
+    pushIssue(out, {
+      kind: "hyphen-join",
+      severity: "warn",
+      group: "ocr",
+      title: "Hyphenated line break",
+      note: `Looks like a typewriter wrap of “${joined}”. Join it, or keep the hyphen if it’s a real compound.`,
+      snippet: snippetAround(text, start, start + m[0].length),
+      start,
+      match: m[0].replace(/\r?\n/g, "↵"),
+    });
+  }
+}
+
+/** Spaced-out letters from a bad scan: "t h e" (3+ single letters). */
+function findSpacedLetters(text: string, out: GrammarIssue[]) {
+  const re = /\b(?:[\p{L}]\s){2,}[\p{L}]\b/gu;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(text))) {
+    const raw = m[0];
+    const letters = raw.replace(/\s+/g, "");
+    if (letters.length < 3) continue;
+    const start = m.index;
+    pushIssue(out, {
+      kind: "spaced-letters",
+      severity: "warn",
+      group: "ocr",
+      title: "Spaced letters",
+      note: `Letters look spaced out (“${letters}”). Common after a typed-page scan — tighten if it’s one word.`,
+      snippet: snippetAround(text, start, start + raw.length),
+      start,
+      match: raw,
+    });
+  }
+}
+
+/**
+ * Soft OCR slip hints — rn/cl clusters and digit 0 inside a letter word.
+ * Info only; many hits are real words (turn, clear). Cap to avoid noise.
+ */
+function findOcrSlips(text: string, out: GrammarIssue[]) {
+  let hits = 0;
+  const cap = 12;
+  // digit 0 inside an otherwise letter-ish token
+  const zeroRe = /\b[\p{L}]*0[\p{L}]+\b|\b[\p{L}]+0[\p{L}]*\b/gu;
+  let m: RegExpExecArray | null;
+  while ((m = zeroRe.exec(text))) {
+    if (hits >= cap) break;
+    const start = m.index;
+    pushIssue(out, {
+      kind: "ocr-slip",
+      severity: "info",
+      group: "ocr",
+      title: "Possible OCR slip",
+      note: "A zero landed inside a word — often an O that scanned wrong. Glance if the word looks off.",
+      snippet: snippetAround(text, start, start + m[0].length),
+      start,
+      match: m[0],
+    });
+    hits += 1;
+  }
+}
+
+function findDashEllipsis(text: string, out: GrammarIssue[]) {
+  const re = /\.{3,}|--+/g;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(text))) {
+    const raw = m[0];
+    const start = m.index;
+    const isEllipsis = raw.startsWith(".");
+    pushIssue(out, {
+      kind: "dash-ellipsis",
+      severity: "info",
+      group: "tidy",
+      title: isEllipsis ? "Typewriter ellipsis" : "Typewriter dash",
+      note: isEllipsis
+        ? "Three dots in a row — fine in typed pages. Optional tidy to a single ellipsis glyph."
+        : "Double hyphen — a typewriter em dash. Fine to keep, or swap for an em dash when you polish.",
+      snippet: snippetAround(text, start, start + raw.length),
+      start,
+      match: raw,
+    });
+  }
 }
 
 /** Analyze manuscript (or a draft string). Empty input → no issues. */
@@ -235,12 +346,22 @@ export function checkManuscript(text: string): GrammarIssue[] {
   findRepeatedWords(raw, out);
   findOddWhitespace(raw, out);
   findMissingSpace(raw, out);
+  findHyphenJoins(raw, out);
+  findSpacedLetters(raw, out);
+  findOcrSlips(raw, out);
+  findDashEllipsis(raw, out);
   findLongSentences(raw, out);
   findRepeatedStarters(raw, out);
   out.sort((a, b) => a.start - b.start || a.key.localeCompare(b.key));
   if (out.length <= MAX_ISSUES) return out;
   return out.slice(0, MAX_ISSUES);
 }
+
+export const GRAMMAR_GROUP_LABELS: Record<GrammarIssue["group"], string> = {
+  ocr: "Scan / typewriter",
+  rhythm: "Rhythm",
+  tidy: "Optional tidy",
+};
 
 function readDismissedMap(): DismissedMap {
   try {

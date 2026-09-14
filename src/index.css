@@ -1509,6 +1509,21 @@ input:focus {
   margin-top: 0.45rem;
 }
 
+.grammar-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 1.35rem;
+}
+
+.grammar-group-title {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 560;
+  letter-spacing: -0.01em;
+  color: var(--rose-deep);
+  margin: 0 0 0.55rem;
+}
+
 .grammar-list {
   list-style: none;
   margin: 1.5rem 0 0;
@@ -1524,6 +1539,10 @@ input:focus {
   border-radius: 14px;
   padding: 1rem 1.1rem 0.95rem;
   box-shadow: 0 8px 22px rgba(90, 46, 52, 0.06);
+}
+
+.grammar-issue.group-ocr {
+  border-left-color: #c9a227;
 }
 
 .grammar-issue.sev-warn {
