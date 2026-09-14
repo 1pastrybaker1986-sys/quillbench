@@ -10,6 +10,8 @@ export type PassDef = {
   id: PassId;
   label: string;
   purpose: string;
+  /** One-line prompt shown on the gate note. */
+  notePrompt: string;
 };
 
 export type PassState = {
@@ -26,21 +28,25 @@ export const PASSES: PassDef[] = [
     id: "developmental",
     label: "Developmental",
     purpose: "Plot, pacing, character, structure — story problems named and resolved or parked.",
+    notePrompt: "Name the story problem first — saggy middle, unearned ending, missing want…",
   },
   {
     id: "line",
     label: "Line",
     purpose: "Sentence-level clarity, rhythm, imagery — prose reads as intended.",
+    notePrompt: "Voice to protect, sentences that drag, images that don't earn their keep…",
   },
   {
     id: "copy",
     label: "Copy",
     purpose: "Continuity, names, timeline, facts, house style — internal consistency holds.",
+    notePrompt: "Names, timeline, house-style calls — what must stay consistent…",
   },
   {
     id: "proof",
     label: "Proof",
     purpose: "Last-pass typos after layout — print/ebook proof is clean.",
+    notePrompt: "Typos after layout — print vs ebook, running heads, last-page orphans…",
   },
 ];
 

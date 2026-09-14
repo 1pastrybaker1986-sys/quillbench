@@ -5,6 +5,7 @@
 export type LaunchItemId = "preorder" | "newsletter" | "social" | "kdp-categories";
 
 export type MarketingKit = {
+  audience: string;
   blurb: string;
   keywords: string;
   launch: Record<LaunchItemId, boolean>;
@@ -12,26 +13,35 @@ export type MarketingKit = {
 
 const STORAGE_KEY = "quillbench.marketingKit.v1";
 
-export const LAUNCH_ITEMS: { id: LaunchItemId; label: string; hint: string }[] = [
+export const LAUNCH_ITEMS: {
+  id: LaunchItemId;
+  label: string;
+  hint: string;
+  doneLooksLike: string;
+}[] = [
   {
     id: "preorder",
     label: "Preorder",
     hint: "Retail or direct preorder page live (or scheduled).",
+    doneLooksLike: "A real URL or a locked date — not a maybe.",
   },
   {
     id: "newsletter",
     label: "Newsletter",
     hint: "Launch note drafted for your list.",
+    doneLooksLike: "Subject line + body ready to send the week you launch.",
   },
   {
     id: "social",
     label: "Social",
     hint: "Cover reveal / launch posts planned.",
+    doneLooksLike: "At least one cover-reveal post and one launch-day post drafted.",
   },
   {
     id: "kdp-categories",
     label: "KDP categories",
     hint: "Browse categories + keywords chosen for discovery.",
+    doneLooksLike: "Two browse categories plus seven keywords written down.",
   },
 ];
 
@@ -39,6 +49,7 @@ type Store = Record<string, Partial<MarketingKit>>;
 
 function empty(): MarketingKit {
   return {
+    audience: "",
     blurb: "",
     keywords: "",
     launch: {
@@ -75,6 +86,7 @@ export function getMarketingKit(bookId: string): MarketingKit {
   const raw = readStore()[bookId] ?? {};
   const launch = raw.launch;
   return {
+    audience: typeof raw.audience === "string" ? raw.audience : base.audience,
     blurb: typeof raw.blurb === "string" ? raw.blurb : base.blurb,
     keywords: typeof raw.keywords === "string" ? raw.keywords : base.keywords,
     launch: {

@@ -55,6 +55,7 @@ type Props = {
 
 const DELIVERABLES: { id: CoverDeliverable; label: string }[] = [
   { id: "front", label: "Front cover" },
+  { id: "spine", label: "Spine" },
   { id: "back", label: "Back cover" },
   { id: "ebook", label: "Ebook cover" },
 ];
@@ -221,8 +222,9 @@ export default function PublishingPanel({ bookId, bookSignals, onToast }: Props)
               <span className="pkg-badge owned">Owned</span>
             </div>
             <p className="payoff-lede">
-              Trim preference, mood, must-haves, and deliverables — you attach final print/ebook
-              files in Formatting. We do not rebuild Eden&apos;s Fall covers.
+              Trim, comps, must-haves, do-nots, and a front / spine / back / ebook checklist —
+              attach final print/ebook files in Formatting. We do not rebuild Eden&apos;s Fall
+              covers.
             </p>
             <label className="editing-field">
               Trim preference
@@ -246,7 +248,20 @@ export default function PublishingPanel({ bookId, bookSignals, onToast }: Props)
                   setCoverBriefState((c) => ({ ...c, moodNotes: e.target.value }))
                 }
                 onBlur={() => patchCover({ moodNotes: coverBrief.moodNotes })}
-                placeholder="Tone, palette, comps, what the shelf should feel like…"
+                placeholder="Tone, palette, what the shelf should feel like…"
+                rows={3}
+                spellCheck={false}
+              />
+            </label>
+            <label className="editing-field">
+              Comps
+              <textarea
+                value={coverBrief.comps}
+                onChange={(e) =>
+                  setCoverBriefState((c) => ({ ...c, comps: e.target.value }))
+                }
+                onBlur={() => patchCover({ comps: coverBrief.comps })}
+                placeholder="2–3 covers that sit next to this book — and why."
                 rows={3}
                 spellCheck={false}
               />
@@ -260,6 +275,19 @@ export default function PublishingPanel({ bookId, bookSignals, onToast }: Props)
                 }
                 onBlur={() => patchCover({ mustHave: coverBrief.mustHave })}
                 placeholder="Title treatment, symbols, faces, text that must appear…"
+                rows={3}
+                spellCheck={false}
+              />
+            </label>
+            <label className="editing-field">
+              Do-nots
+              <textarea
+                value={coverBrief.doNots}
+                onChange={(e) =>
+                  setCoverBriefState((c) => ({ ...c, doNots: e.target.value }))
+                }
+                onBlur={() => patchCover({ doNots: coverBrief.doNots })}
+                placeholder="Stock tropes, colors, or faces that must not show up."
                 rows={3}
                 spellCheck={false}
               />
@@ -289,8 +317,8 @@ export default function PublishingPanel({ bookId, bookSignals, onToast }: Props)
             <div className="pkg-cta-copy">
               <h4>Cover Design locked</h4>
               <p>
-                Unlock to fill a cover brief — trim, mood, must-haves, and a front / back / ebook
-                deliverable checklist. Attach finals in Formatting.
+                Unlock the brief: trim, comps, must-haves, do-nots, and a front / spine / back /
+                ebook checklist. Attach finals in Formatting.
               </p>
               <div className="pkg-cta-actions">
                 <button className="btn-solid" type="button" onClick={() => unlock("cover-design")}>
@@ -314,8 +342,21 @@ export default function PublishingPanel({ bookId, bookSignals, onToast }: Props)
               <span className="pkg-badge owned">Owned</span>
             </div>
             <p className="payoff-lede">
-              Blurb, keywords, and a launch checklist so the book can find its readers.
+              Audience, blurb, keywords, and a launch kit with a done-looks-like on each check —
+              so $129 is a kit, not four boxes.
             </p>
+            <label className="editing-field">
+              Audience
+              <input
+                className="payoff-input"
+                type="text"
+                value={marketing.audience}
+                onChange={(e) => setMarketing((m) => ({ ...m, audience: e.target.value }))}
+                onBlur={() => patchMarketing({ audience: marketing.audience })}
+                placeholder="Who this is for in one line"
+                spellCheck={false}
+              />
+            </label>
             <label className="editing-field">
               Blurb
               <textarea
@@ -351,6 +392,7 @@ export default function PublishingPanel({ bookId, bookSignals, onToast }: Props)
                   <span className="pub-check-text">
                     <strong>{item.label}</strong>
                     <span className="pub-check-hint">{item.hint}</span>
+                    <span className="pub-check-hint">Done looks like: {item.doneLooksLike}</span>
                   </span>
                 </label>
               ))}
@@ -367,8 +409,8 @@ export default function PublishingPanel({ bookId, bookSignals, onToast }: Props)
             <div className="pkg-cta-copy">
               <h4>Marketing locked</h4>
               <p>
-                Unlock for blurb, keywords, and a launch checklist (preorder, newsletter, social,
-                KDP categories).
+                Unlock the kit: audience one-liner, blurb, keywords, and a launch checklist with a
+                done-looks-like on each item (preorder, newsletter, social, KDP categories).
               </p>
               <div className="pkg-cta-actions">
                 <button className="btn-solid" type="button" onClick={() => unlock("marketing")}>

@@ -11,7 +11,11 @@ import {
 } from "../lib/editingBoard";
 import { ownsFullEdit, type PackageId } from "../lib/packages";
 import { startCheckout } from "../lib/billing";
-import { getPriorityReview, setPriorityReview } from "../lib/priorityReview";
+import {
+  getPriorityReview,
+  setPriorityReview,
+  type PriorityReview,
+} from "../lib/priorityReview";
 
 type Props = {
   bookId: string;
@@ -32,7 +36,7 @@ export default function EditingPanel({ bookId, onSeePackages, onToast }: Props) 
   });
   const [hasFullEdit, setHasFullEdit] = useState(() => ownsFullEdit());
   const [savedFlash, setSavedFlash] = useState<PassId | null>(null);
-  const [priorityNotes, setPriorityNotes] = useState(() => getPriorityReview(bookId));
+  const [priorityNotes, setPriorityNotes] = useState<PriorityReview>(() => getPriorityReview(bookId));
   const [prioritySaved, setPrioritySaved] = useState(false);
 
   useEffect(() => {
@@ -82,7 +86,13 @@ export default function EditingPanel({ bookId, onSeePackages, onToast }: Props) 
 
   function onPriorityBlur() {
     const stored = getPriorityReview(bookId);
-    if (priorityNotes === stored) return;
+    if (
+      priorityNotes.focusFirst === stored.focusFirst &&
+      priorityNotes.openQuestions === stored.openQuestions &&
+      priorityNotes.nonNegotiables === stored.nonNegotiables
+    ) {
+      return;
+    }
     savePriority({ quiet: true });
   }
 
@@ -116,9 +126,10 @@ export default function EditingPanel({ bookId, onSeePackages, onToast }: Props) 
           <div className="pkg-cta-copy">
             <h3>Unlock Full Edit package</h3>
             <p>
-              Keep using the free board. Unlock opens Stripe Checkout for Full Edit — priority
-              review notes for your editor, a done-with-you pass. Unlocks stay on this device for
-              now; accounts for sync across phones and computers are coming soon.
+              Keep using the free board. Unlock Full Edit and you get three editor prompts
+              (focus-first, open questions, non-negotiables) plus a note on each four-pass gate.
+              Unlocks stay on this device for now; accounts for sync across phones and computers
+              are coming soon.
             </p>
             <div className="pkg-cta-actions">
               <button className="btn-solid" type="button" onClick={() => unlock("full-edit")}>
@@ -149,17 +160,45 @@ export default function EditingPanel({ bookId, onSeePackages, onToast }: Props) 
               <span className="pkg-chip priority">Full Edit</span>
             </div>
             <p className="payoff-lede">
-              Notes for your editor / priority pass — what to focus on first, open questions, and
-              non-negotiables before the four-pass board locks.
+              Three prompts for your editor before the four-pass board locks — so the $249 is a
+              brief, not a blank box.
             </p>
             <label className="editing-field">
-              Priority notes
+              Focus first
               <textarea
-                value={priorityNotes}
-                onChange={(e) => setPriorityNotes(e.target.value)}
+                value={priorityNotes.focusFirst}
+                onChange={(e) =>
+                  setPriorityNotes((n) => ({ ...n, focusFirst: e.target.value }))
+                }
                 onBlur={onPriorityBlur}
-                placeholder="Tone goals, plot risks, voice to protect, deadlines…"
-                rows={4}
+                placeholder="What the editor should attack first — plot, pacing, a character who doesn't earn it…"
+                rows={3}
+                spellCheck={false}
+              />
+            </label>
+            <label className="editing-field">
+              Open questions
+              <textarea
+                value={priorityNotes.openQuestions}
+                onChange={(e) =>
+                  setPriorityNotes((n) => ({ ...n, openQuestions: e.target.value }))
+                }
+                onBlur={onPriorityBlur}
+                placeholder="Decisions you still need — ending, POV, what can be cut…"
+                rows={3}
+                spellCheck={false}
+              />
+            </label>
+            <label className="editing-field">
+              Non-negotiables
+              <textarea
+                value={priorityNotes.nonNegotiables}
+                onChange={(e) =>
+                  setPriorityNotes((n) => ({ ...n, nonNegotiables: e.target.value }))
+                }
+                onBlur={onPriorityBlur}
+                placeholder="Voice, relationships, or scenes that must stay — protect these."
+                rows={3}
                 spellCheck={false}
               />
             </label>
@@ -213,7 +252,7 @@ export default function EditingPanel({ bookId, onSeePackages, onToast }: Props) 
                   value={draftNotes[pass.id] ?? ""}
                   onChange={(e) => onNoteChange(pass.id, e.target.value)}
                   onBlur={() => onNoteBlur(pass.id)}
-                  placeholder="Decisions, open questions, parked items…"
+                  placeholder={pass.notePrompt}
                   rows={3}
                   spellCheck={false}
                 />

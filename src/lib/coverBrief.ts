@@ -4,12 +4,14 @@
 
 export type CoverTrimPref = "" | "5.5x8.5" | "6x9" | "other";
 
-export type CoverDeliverable = "front" | "back" | "ebook";
+export type CoverDeliverable = "front" | "back" | "spine" | "ebook";
 
 export type CoverBrief = {
   trimPref: CoverTrimPref;
   moodNotes: string;
+  comps: string;
   mustHave: string;
+  doNots: string;
   deliverables: Record<CoverDeliverable, boolean>;
 };
 
@@ -21,8 +23,10 @@ function emptyBrief(): CoverBrief {
   return {
     trimPref: "",
     moodNotes: "",
+    comps: "",
     mustHave: "",
-    deliverables: { front: false, back: false, ebook: false },
+    doNots: "",
+    deliverables: { front: false, back: false, spine: false, ebook: false },
   };
 }
 
@@ -53,10 +57,13 @@ export function getCoverBrief(bookId: string): CoverBrief {
   return {
     trimPref: (raw.trimPref as CoverTrimPref) ?? base.trimPref,
     moodNotes: typeof raw.moodNotes === "string" ? raw.moodNotes : base.moodNotes,
+    comps: typeof raw.comps === "string" ? raw.comps : base.comps,
     mustHave: typeof raw.mustHave === "string" ? raw.mustHave : base.mustHave,
+    doNots: typeof raw.doNots === "string" ? raw.doNots : base.doNots,
     deliverables: {
       front: !!(d && d.front),
       back: !!(d && d.back),
+      spine: !!(d && d.spine),
       ebook: !!(d && d.ebook),
     },
   };

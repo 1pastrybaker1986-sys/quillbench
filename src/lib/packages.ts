@@ -33,21 +33,21 @@ export const PACKAGES: StudioPackage[] = [
     title: "Full Edit",
     price: 249,
     blurb:
-      "Four-pass board — developmental through proof — with priority review notes included with Full Edit.",
+      "Four-pass board plus priority review: focus-first, open questions, and non-negotiables for your editor.",
     unlocks: ["full-edit"],
   },
   {
     id: "cover-design",
     title: "Cover Design",
     price: 179,
-    blurb: "Brief + deliverable checklist. You attach final print/ebook files.",
+    blurb: "Cover brief with comps, do-nots, and front / spine / back / ebook deliverables. Attach finals in Formatting.",
     unlocks: ["cover-design"],
   },
   {
     id: "marketing",
     title: "Marketing",
     price: 129,
-    blurb: "Blurb, keywords, and launch checklist so the book can find its readers.",
+    blurb: "Audience one-liner, blurb, keywords, and a launch kit with a done-looks-like on each check.",
     unlocks: ["marketing"],
   },
 ];

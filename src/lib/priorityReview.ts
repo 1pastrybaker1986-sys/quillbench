@@ -1,10 +1,35 @@
 /**
  * Full Edit payoff — priority review notes per book (localStorage).
+ * v2 splits the old single blob into three editor prompts.
  */
 
-const STORAGE_KEY = "quillbench.priorityReview.v1";
+export type PriorityReview = {
+  focusFirst: string;
+  openQuestions: string;
+  nonNegotiables: string;
+};
 
-type Store = Record<string, string>;
+const STORAGE_KEY = "quillbench.priorityReview.v2";
+const LEGACY_KEY = "quillbench.priorityReview.v1";
+
+type Store = Record<string, PriorityReview>;
+type LegacyStore = Record<string, string>;
+
+function empty(): PriorityReview {
+  return { focusFirst: "", openQuestions: "", nonNegotiables: "" };
+}
+
+function readLegacy(): LegacyStore {
+  try {
+    const raw = localStorage.getItem(LEGACY_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw) as unknown;
+    if (!parsed || typeof parsed !== "object") return {};
+    return parsed as LegacyStore;
+  } catch {
+    return {};
+  }
+}
 
 function readStore(): Store {
   try {
@@ -26,13 +51,44 @@ function writeStore(store: Store): void {
   }
 }
 
-export function getPriorityReview(bookId: string): string {
-  return readStore()[bookId] ?? "";
+function normalize(raw: unknown, legacyBlob?: string): PriorityReview {
+  if (raw && typeof raw === "object") {
+    const o = raw as Partial<PriorityReview>;
+    return {
+      focusFirst: typeof o.focusFirst === "string" ? o.focusFirst : "",
+      openQuestions: typeof o.openQuestions === "string" ? o.openQuestions : "",
+      nonNegotiables: typeof o.nonNegotiables === "string" ? o.nonNegotiables : "",
+    };
+  }
+  if (typeof legacyBlob === "string" && legacyBlob.trim()) {
+    return { ...empty(), focusFirst: legacyBlob };
+  }
+  return empty();
 }
 
-export function setPriorityReview(bookId: string, notes: string): string {
+export function getPriorityReview(bookId: string): PriorityReview {
+  const v2 = readStore()[bookId];
+  if (v2) return normalize(v2);
+  const legacy = readLegacy()[bookId];
+  return normalize(undefined, typeof legacy === "string" ? legacy : undefined);
+}
+
+export function setPriorityReview(
+  bookId: string,
+  patch: Partial<PriorityReview>,
+): PriorityReview {
+  const cur = getPriorityReview(bookId);
+  const next: PriorityReview = {
+    focusFirst: patch.focusFirst !== undefined ? patch.focusFirst : cur.focusFirst,
+    openQuestions: patch.openQuestions !== undefined ? patch.openQuestions : cur.openQuestions,
+    nonNegotiables: patch.nonNegotiables !== undefined ? patch.nonNegotiables : cur.nonNegotiables,
+  };
   const store = readStore();
-  store[bookId] = notes;
+  store[bookId] = next;
   writeStore(store);
-  return notes;
+  return next;
+}
+
+export function freshPriorityReview(): PriorityReview {
+  return empty();
 }
