@@ -1,6 +1,7 @@
 /**
- * Soft-launch offer copy + pricing (cash-first, ~9/15).
+ * Soft-launch offer copy + pricing (cash-first).
  * Studio Bundle Checkout auto-applies Stripe promo/coupon SOFTLAUNCH50 ($449).
+ * Quiet extend through Oct 10 — no fake urgency / no 48-hour clock.
  */
 
 export const SOFT_LAUNCH = {
@@ -11,9 +12,11 @@ export const SOFT_LAUNCH = {
   discountDollars: 50,
   /** Stripe promotion code / coupon writers see in messaging */
   couponCode: "SOFTLAUNCH50",
-  /** Rough public window framing for early-access copy */
-  windowLabel: "48-hour soft-launch window",
-  softLaunchAround: "around September 15",
+  /** Soft window end for public framing (no countdown urgency) */
+  softLaunchThrough: "through October 10",
+  /** @deprecated prefer softLaunchThrough — kept for any leftover call sites */
+  windowLabel: "soft-launch pricing",
+  softLaunchAround: "through October 10",
 } as const;
 
 export function formatSoftBundlePrice(): string {
