@@ -636,6 +636,7 @@ input:focus {
   align-items: flex-end;
   padding: 1rem;
   position: relative;
+  box-shadow: inset 10px 0 14px -10px rgba(26, 16, 18, 0.45);
 }
 
 .cover::after {
@@ -678,7 +679,10 @@ input:focus {
   color: var(--ink-on-light);
 }
 
-.pill {
+.pill,
+.pill.draft,
+.pill.formatting,
+.pill.proof {
   display: inline-block;
   font-size: 0.7rem;
   font-weight: 700;
@@ -686,27 +690,13 @@ input:focus {
   text-transform: uppercase;
   padding: 0.32rem 0.7rem;
   border-radius: 999px;
-  background: var(--grad-rose-soft);
-  color: #5a2e34;
-  box-shadow: inset 0 0 0 1px rgba(212, 95, 108, 0.45);
-}
-
-.pill.formatting {
-  background: var(--grad-cta);
+  /* Rose-metal — one treatment for all WIP statuses */
+  background: linear-gradient(135deg, #ffe8df 0%, #f0c4b8 28%, #d45f6c 68%, #e09268 100%);
   color: #1a1012;
-  box-shadow: 0 5px 14px rgba(212, 95, 108, 0.38);
-}
-
-.pill.proof {
-  background: linear-gradient(135deg, #f6ddd0, #f0a8a0);
-  color: #3a2420;
-  box-shadow: inset 0 0 0 1px rgba(212, 95, 108, 0.35);
-}
-
-.pill.draft {
-  background: linear-gradient(135deg, #f8ddd4, #e8b0a4);
-  color: #5a2e34;
-  box-shadow: inset 0 0 0 1px rgba(162, 61, 76, 0.35);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 0 0 1px rgba(162, 61, 76, 0.28),
+    0 4px 12px rgba(162, 61, 76, 0.22);
 }
 
 /* ---- New book dialog ---- */
@@ -2726,17 +2716,32 @@ input:focus {
 .landing-hero-copy h1,
 .landing-hero-copy h2 {
   font-family: var(--font-display);
-  font-weight: 560;
+  font-weight: 680;
   font-size: clamp(2.35rem, 5.5vw, 3.75rem);
   line-height: 1.1;
   letter-spacing: -0.03em;
   margin: 0;
   max-width: 18ch;
-  background: var(--grad-rose);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  filter: drop-shadow(0 2px 0 rgba(255, 255, 255, 0.35));
+  color: var(--ink);
+  background: none;
+  -webkit-background-clip: unset;
+  background-clip: unset;
+  filter: none;
+  position: relative;
+  padding-bottom: 0.55rem;
+}
+
+.landing-hero-copy h1::after,
+.landing-hero-copy h2::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: min(7.5rem, 42%);
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--copper) 0%, #f0d0c4 55%, rgba(240, 208, 196, 0.15) 100%);
+  box-shadow: 0 1px 0 rgba(162, 61, 76, 0.18);
 }
 
 .landing-cta-bundle {
@@ -3955,7 +3960,7 @@ a.legal-link {
 /* ---- Soft-launch Studio Bundle hero + export buy nudge ---- */
 
 .landing-bundle-hero {
-  padding: clamp(1.25rem, 4vw, 2.5rem) clamp(1.25rem, 4vw, 3rem) 0;
+  padding: 0.35rem clamp(1.25rem, 4vw, 3rem) 0;
 }
 
 .landing-bundle-card {
@@ -3967,6 +3972,43 @@ a.legal-link {
     radial-gradient(circle at 88% 12%, rgba(212, 95, 108, 0.18), transparent 45%);
   border: 1px solid rgba(212, 95, 108, 0.32);
   box-shadow: 0 18px 48px rgba(162, 61, 76, 0.12), 0 1px 0 rgba(255, 255, 255, 0.8) inset;
+}
+
+/* Soft-launch single-line ribbon — atelier fold, not checkout mass */
+.landing-bundle-card.landing-bundle-ribbon {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem 1rem;
+  padding: 0.55rem 1rem;
+  border-radius: 999px;
+  background: linear-gradient(105deg, rgba(255, 253, 251, 0.95), rgba(255, 232, 224, 0.82));
+  border: 1px solid rgba(212, 95, 108, 0.28);
+  box-shadow: 0 8px 22px rgba(162, 61, 76, 0.08), 0 1px 0 rgba(255, 255, 255, 0.85) inset;
+}
+
+.landing-bundle-card.landing-bundle-ribbon .landing-bundle-eyebrow {
+  margin: 0;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+}
+
+.landing-bundle-ribbon-price {
+  font-family: var(--font-display);
+  font-weight: 650;
+  font-size: 1.15rem;
+  letter-spacing: -0.02em;
+  color: var(--rose-deep);
+}
+
+.landing-bundle-ribbon-cta {
+  width: auto;
+  margin: 0;
+  min-width: 0;
+  padding: 0.45rem 1rem;
+  font-size: 0.85rem;
+  border-radius: 999px;
 }
 
 .landing-bundle-eyebrow {

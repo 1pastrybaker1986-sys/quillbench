@@ -1,21 +1,31 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900" viewBox="0 0 600 900" role="img" aria-label="Sample cover">
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900" viewBox="0 0 600 900" role="img" aria-label="The Glass Harbor cover">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#fff6f2"/>
-      <stop offset="45%" stop-color="#f3c9b8"/>
-      <stop offset="100%" stop-color="#d45f6c"/>
+    <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2a181c"/>
+      <stop offset="42%" stop-color="#8b3a45"/>
+      <stop offset="78%" stop-color="#d45f6c"/>
+      <stop offset="100%" stop-color="#f0d0c4"/>
     </linearGradient>
-    <linearGradient id="band" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#1a1214" stop-opacity="0.08"/>
-      <stop offset="100%" stop-color="#1a1214" stop-opacity="0.55"/>
+    <linearGradient id="metal1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffe8df" stop-opacity="0.55"/>
+      <stop offset="50%" stop-color="#e09268" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#a23d4c" stop-opacity="0.15"/>
+    </linearGradient>
+    <linearGradient id="spine1" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#1a1012" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#1a1012" stop-opacity="0"/>
     </linearGradient>
   </defs>
-  <rect width="600" height="900" fill="url(#bg)"/>
-  <circle cx="460" cy="180" r="140" fill="#ffe8df" opacity="0.65"/>
-  <circle cx="120" cy="720" r="180" fill="#c9a27a" opacity="0.35"/>
-  <path d="M80 280 C220 220, 380 340, 520 260" fill="none" stroke="#fff" stroke-width="18" opacity="0.45"/>
-  <path d="M60 520 C200 460, 400 580, 560 500" fill="none" stroke="#8b3a45" stroke-width="10" opacity="0.25"/>
-  <rect x="0" y="560" width="600" height="340" fill="url(#band)"/>
-  <text x="48" y="640" fill="#fff6f2" font-family="Georgia, serif" font-size="42" font-weight="600">Sample title</text>
-  <text x="48" y="690" fill="#ffe8df" font-family="system-ui, sans-serif" font-size="20" letter-spacing="0.08em">QUILLBENCH DEMO</text>
+  <rect width="600" height="900" fill="url(#g1)"/>
+  <rect width="28" height="900" fill="url(#spine1)"/>
+  <rect x="48" y="48" width="504" height="804" fill="none" stroke="#ffe8df" stroke-opacity="0.42" stroke-width="1.5"/>
+  <rect x="58" y="58" width="484" height="784" fill="none" stroke="#e09268" stroke-opacity="0.28" stroke-width="0.75"/>
+  <circle cx="300" cy="280" r="92" fill="url(#metal1)" opacity="0.9"/>
+  <circle cx="300" cy="280" r="62" fill="none" stroke="#ffe8df" stroke-opacity="0.5" stroke-width="1.25"/>
+  <path d="M180 280 C220 240, 380 240, 420 280 C380 320, 220 320, 180 280 Z" fill="none" stroke="#f0d0c4" stroke-opacity="0.45" stroke-width="1.5"/>
+  <line x1="120" y1="520" x2="480" y2="520" stroke="#ffe8df" stroke-opacity="0.35" stroke-width="1"/>
+  <text x="300" y="575" text-anchor="middle" fill="#fff6f2" font-family="Georgia, 'Times New Roman', serif" font-size="38" font-weight="600" letter-spacing="0.04em">The Glass Harbor</text>
+  <text x="300" y="625" text-anchor="middle" fill="#f0d0c4" font-family="system-ui, sans-serif" font-size="14" letter-spacing="0.28em">A NOVEL</text>
+  <line x1="200" y1="660" x2="400" y2="660" stroke="#e09268" stroke-opacity="0.55" stroke-width="1"/>
+  <text x="300" y="820" text-anchor="middle" fill="#ffe8df" font-family="system-ui, sans-serif" font-size="13" letter-spacing="0.2em" opacity="0.85">QUILLBENCH</text>
 </svg>

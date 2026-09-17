@@ -1,14 +1,31 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900" viewBox="0 0 600 900" role="img" aria-label="Sample cover">
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900" viewBox="0 0 600 900" role="img" aria-label="Copper Thread cover">
   <defs>
-    <linearGradient id="bg2" x1="0" y1="1" x2="1" y2="0">
-      <stop offset="0%" stop-color="#2a181c"/>
-      <stop offset="55%" stop-color="#8b3a45"/>
-      <stop offset="100%" stop-color="#f3c9b8"/>
+    <linearGradient id="g2" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0%" stop-color="#1a1012"/>
+      <stop offset="35%" stop-color="#5a2e34"/>
+      <stop offset="70%" stop-color="#a23d4c"/>
+      <stop offset="100%" stop-color="#e09268"/>
+    </linearGradient>
+    <linearGradient id="band2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffe8df" stop-opacity="0"/>
+      <stop offset="40%" stop-color="#ffe8df" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#1a1012" stop-opacity="0.55"/>
+    </linearGradient>
+    <linearGradient id="spine2" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0e0809" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#0e0809" stop-opacity="0"/>
     </linearGradient>
   </defs>
-  <rect width="600" height="900" fill="url(#bg2)"/>
-  <rect x="40" y="40" width="520" height="820" fill="none" stroke="#ffe8df" stroke-opacity="0.35" stroke-width="2"/>
-  <circle cx="300" cy="320" r="110" fill="#ffe8df" opacity="0.2"/>
-  <text x="300" y="620" text-anchor="middle" fill="#fff6f2" font-family="Georgia, serif" font-size="40" font-weight="600">Another draft</text>
-  <text x="300" y="670" text-anchor="middle" fill="#f3c9b8" font-family="system-ui, sans-serif" font-size="18" letter-spacing="0.12em">PLACEHOLDER COVER</text>
+  <rect width="600" height="900" fill="url(#g2)"/>
+  <rect width="28" height="900" fill="url(#spine2)"/>
+  <rect x="0" y="0" width="600" height="900" fill="url(#band2)"/>
+  <rect x="52" y="52" width="496" height="796" fill="none" stroke="#f0d0c4" stroke-opacity="0.4" stroke-width="1.5"/>
+  <path d="M140 210 C240 160, 360 160, 460 210" fill="none" stroke="#e09268" stroke-width="2" opacity="0.7"/>
+  <path d="M160 230 C250 185, 350 185, 440 230" fill="none" stroke="#ffe8df" stroke-width="1" opacity="0.35"/>
+  <circle cx="300" cy="340" r="8" fill="#ffe8df" opacity="0.7"/>
+  <line x1="300" y1="348" x2="300" y2="480" stroke="#e09268" stroke-opacity="0.45" stroke-width="1"/>
+  <text x="300" y="560" text-anchor="middle" fill="#fff6f2" font-family="Georgia, 'Times New Roman', serif" font-size="42" font-weight="600" letter-spacing="0.06em">Copper Thread</text>
+  <text x="300" y="610" text-anchor="middle" fill="#f0d0c4" font-family="system-ui, sans-serif" font-size="13" letter-spacing="0.32em">STORIES</text>
+  <line x1="220" y1="640" x2="380" y2="640" stroke="#ffe8df" stroke-opacity="0.4" stroke-width="1"/>
+  <text x="300" y="820" text-anchor="middle" fill="#f0d0c4" font-family="system-ui, sans-serif" font-size="13" letter-spacing="0.2em" opacity="0.8">QUILLBENCH</text>
 </svg>

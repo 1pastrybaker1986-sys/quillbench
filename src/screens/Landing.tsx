@@ -98,7 +98,7 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
               type="button"
               onClick={() => onSignedIn(signInDemo())}
             >
-              Continue as demo
+              Start free
             </button>
             <button
               className="btn btn-ghost landing-cta-secondary landing-cta-bundle"
@@ -114,6 +114,23 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
         </div>
         <div className="landing-hero-aside">
           <ProductDemo onScanStart={onScanStart} />
+        </div>
+      </section>
+
+      <section
+        className="landing-bundle-hero"
+        aria-label="Studio Bundle soft launch"
+      >
+        <div className="landing-bundle-card landing-bundle-ribbon">
+          <p className="landing-bundle-eyebrow">Soft launch · Studio Bundle</p>
+          <span className="landing-bundle-ribbon-price">{formatSoftBundlePrice()}</span>
+          <button
+            className="btn btn-primary landing-bundle-ribbon-cta"
+            type="button"
+            onClick={scrollToWaitlist}
+          >
+            Save my spot
+          </button>
         </div>
       </section>
 
@@ -172,13 +189,6 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
           <div className="landing-bundle-actions">
             <button className="btn btn-primary" type="button" onClick={scrollToWaitlist}>
               Save my spot
-            </button>
-            <button
-              className="btn btn-ghost landing-cta-secondary"
-              type="button"
-              onClick={() => onSignedIn(signInDemo())}
-            >
-              Try the bench free
             </button>
           </div>
         </div>
