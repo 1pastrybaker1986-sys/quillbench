@@ -45,6 +45,19 @@ export type Book = {
   publisherLine?: string;
   /** Recent Print PDF / EPUB downloads (metadata locker; last 10). */
   exports?: BookExport[];
+  /** Four-pass editing board mirror (localStorage remains canonical). */
+  editingBoard?: {
+    developmental?: { status?: string; note?: string };
+    line?: { status?: string; note?: string };
+    copy?: { status?: string; note?: string };
+    proof?: { status?: string; note?: string };
+  };
+  /** Priority review prompts mirror (localStorage remains canonical). */
+  priorityReview?: {
+    focusFirst?: string;
+    openQuestions?: string;
+    nonNegotiables?: string;
+  };
   createdAt: string;
   updatedAt: string;
 };

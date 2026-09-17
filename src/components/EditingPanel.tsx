@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   getBoard,
   listPasses,
@@ -23,77 +23,175 @@ type Props = {
   onToast?: (msg: string) => void;
 };
 
+const DEBOUNCE_MS = 400;
+
+const PASS_IDS: PassId[] = ["developmental", "line", "copy", "proof"];
+
+function notesFromBoard(b: BookPassMap): Record<PassId, string> {
+  return {
+    developmental: b.developmental.note,
+    line: b.line.note,
+    copy: b.copy.note,
+    proof: b.proof.note,
+  };
+}
+
 export default function EditingPanel({ bookId, onSeePackages, onToast }: Props) {
   const [board, setBoard] = useState<BookPassMap>(() => getBoard(bookId));
-  const [draftNotes, setDraftNotes] = useState<Record<PassId, string>>(() => {
-    const b = getBoard(bookId);
-    return {
-      developmental: b.developmental.note,
-      line: b.line.note,
-      copy: b.copy.note,
-      proof: b.proof.note,
-    };
-  });
+  const [draftNotes, setDraftNotes] = useState<Record<PassId, string>>(() =>
+    notesFromBoard(getBoard(bookId)),
+  );
   const [hasFullEdit, setHasFullEdit] = useState(() => ownsFullEdit());
   const [savedFlash, setSavedFlash] = useState<PassId | null>(null);
-  const [priorityNotes, setPriorityNotes] = useState<PriorityReview>(() => getPriorityReview(bookId));
+  const [priorityNotes, setPriorityNotes] = useState<PriorityReview>(() =>
+    getPriorityReview(bookId),
+  );
   const [prioritySaved, setPrioritySaved] = useState(false);
 
-  useEffect(() => {
-    const b = getBoard(bookId);
-    setBoard(b);
-    setDraftNotes({
-      developmental: b.developmental.note,
-      line: b.line.note,
-      copy: b.copy.note,
-      proof: b.proof.note,
-    });
-    setHasFullEdit(ownsFullEdit());
-    setPriorityNotes(getPriorityReview(bookId));
-    setPrioritySaved(false);
-  }, [bookId]);
+  const draftNotesRef = useRef(draftNotes);
+  const boardRef = useRef(board);
+  const priorityNotesRef = useRef(priorityNotes);
+  const noteTimers = useRef<Partial<Record<PassId, number>>>({});
+  const priorityTimer = useRef<number | null>(null);
+  const bookIdRef = useRef(bookId);
 
-  function onStatus(passId: PassId, status: PassStatus) {
-    const next = savePass(bookId, passId, { status });
-    setBoard(next);
+  draftNotesRef.current = draftNotes;
+  boardRef.current = board;
+  priorityNotesRef.current = priorityNotes;
+  bookIdRef.current = bookId;
+
+  function clearNoteTimer(passId: PassId) {
+    const t = noteTimers.current[passId];
+    if (t != null) {
+      window.clearTimeout(t);
+      delete noteTimers.current[passId];
+    }
   }
 
-  function onNoteChange(passId: PassId, note: string) {
-    setDraftNotes((prev) => ({ ...prev, [passId]: note }));
+  function clearPriorityTimer() {
+    if (priorityTimer.current != null) {
+      window.clearTimeout(priorityTimer.current);
+      priorityTimer.current = null;
+    }
   }
 
-  function onSave(passId: PassId, opts?: { quiet?: boolean }) {
-    const next = savePass(bookId, passId, { note: draftNotes[passId] ?? "" });
+  function persistNote(id: string, passId: PassId, note: string, opts?: { quiet?: boolean }) {
+    const next = savePass(id, passId, { note });
     setBoard(next);
+    boardRef.current = next;
     setSavedFlash(passId);
     window.setTimeout(() => setSavedFlash((cur) => (cur === passId ? null : cur)), 1200);
     if (!opts?.quiet) onToast?.("Pass saved");
   }
 
-  function onNoteBlur(passId: PassId) {
-    const current = board[passId]?.note ?? "";
-    const draft = draftNotes[passId] ?? "";
-    if (draft === current) return;
-    onSave(passId, { quiet: true });
-  }
-
-  function savePriority(opts?: { quiet?: boolean }) {
-    setPriorityReview(bookId, priorityNotes);
+  function persistPriority(id: string, notes: PriorityReview, opts?: { quiet?: boolean }) {
+    setPriorityReview(id, notes);
     setPrioritySaved(true);
     window.setTimeout(() => setPrioritySaved(false), 1200);
     if (!opts?.quiet) onToast?.("Priority review notes saved");
   }
 
-  function onPriorityBlur() {
-    const stored = getPriorityReview(bookId);
+  function flushNote(passId: PassId, opts?: { quiet?: boolean }) {
+    clearNoteTimer(passId);
+    const id = bookIdRef.current;
+    const draft = draftNotesRef.current[passId] ?? "";
+    const current = boardRef.current[passId]?.note ?? "";
+    if (draft === current) return;
+    persistNote(id, passId, draft, opts ?? { quiet: true });
+  }
+
+  function flushPriority(opts?: { quiet?: boolean }) {
+    clearPriorityTimer();
+    const id = bookIdRef.current;
+    const notes = priorityNotesRef.current;
+    const stored = getPriorityReview(id);
     if (
-      priorityNotes.focusFirst === stored.focusFirst &&
-      priorityNotes.openQuestions === stored.openQuestions &&
-      priorityNotes.nonNegotiables === stored.nonNegotiables
+      notes.focusFirst === stored.focusFirst &&
+      notes.openQuestions === stored.openQuestions &&
+      notes.nonNegotiables === stored.nonNegotiables
     ) {
       return;
     }
-    savePriority({ quiet: true });
+    persistPriority(id, notes, opts ?? { quiet: true });
+  }
+
+  function flushAllPending() {
+    for (const passId of PASS_IDS) flushNote(passId, { quiet: true });
+    flushPriority({ quiet: true });
+  }
+
+  useEffect(() => {
+    const b = getBoard(bookId);
+    setBoard(b);
+    boardRef.current = b;
+    const notes = notesFromBoard(b);
+    setDraftNotes(notes);
+    draftNotesRef.current = notes;
+    setHasFullEdit(ownsFullEdit());
+    const pr = getPriorityReview(bookId);
+    setPriorityNotes(pr);
+    priorityNotesRef.current = pr;
+    setPrioritySaved(false);
+    for (const passId of PASS_IDS) clearNoteTimer(passId);
+    clearPriorityTimer();
+  }, [bookId]);
+
+  useEffect(() => {
+    return () => {
+      flushAllPending();
+    };
+    // Flush drafts on unmount / leave book / module switch.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bookId]);
+
+  function onStatus(passId: PassId, status: PassStatus) {
+    const next = savePass(bookId, passId, { status });
+    setBoard(next);
+    boardRef.current = next;
+  }
+
+  function onNoteChange(passId: PassId, note: string) {
+    setDraftNotes((prev) => {
+      const next = { ...prev, [passId]: note };
+      draftNotesRef.current = next;
+      return next;
+    });
+    clearNoteTimer(passId);
+    noteTimers.current[passId] = window.setTimeout(() => {
+      delete noteTimers.current[passId];
+      persistNote(bookIdRef.current, passId, note, { quiet: true });
+    }, DEBOUNCE_MS);
+  }
+
+  function onSave(passId: PassId, opts?: { quiet?: boolean }) {
+    clearNoteTimer(passId);
+    persistNote(bookId, passId, draftNotesRef.current[passId] ?? "", opts);
+  }
+
+  function onNoteBlur(passId: PassId) {
+    flushNote(passId, { quiet: true });
+  }
+
+  function onPriorityChange(patch: Partial<PriorityReview>) {
+    setPriorityNotes((prev) => {
+      const next = { ...prev, ...patch };
+      priorityNotesRef.current = next;
+      clearPriorityTimer();
+      priorityTimer.current = window.setTimeout(() => {
+        priorityTimer.current = null;
+        persistPriority(bookIdRef.current, next, { quiet: true });
+      }, DEBOUNCE_MS);
+      return next;
+    });
+  }
+
+  function savePriority(opts?: { quiet?: boolean }) {
+    clearPriorityTimer();
+    persistPriority(bookId, priorityNotesRef.current, opts);
+  }
+
+  function onPriorityBlur() {
+    flushPriority({ quiet: true });
   }
 
   async function unlock(id: PackageId) {
@@ -167,9 +265,7 @@ export default function EditingPanel({ bookId, onSeePackages, onToast }: Props) 
               Focus first
               <textarea
                 value={priorityNotes.focusFirst}
-                onChange={(e) =>
-                  setPriorityNotes((n) => ({ ...n, focusFirst: e.target.value }))
-                }
+                onChange={(e) => onPriorityChange({ focusFirst: e.target.value })}
                 onBlur={onPriorityBlur}
                 placeholder="What the editor should attack first — plot, pacing, a character who doesn't earn it…"
                 rows={3}
@@ -180,9 +276,7 @@ export default function EditingPanel({ bookId, onSeePackages, onToast }: Props) 
               Open questions
               <textarea
                 value={priorityNotes.openQuestions}
-                onChange={(e) =>
-                  setPriorityNotes((n) => ({ ...n, openQuestions: e.target.value }))
-                }
+                onChange={(e) => onPriorityChange({ openQuestions: e.target.value })}
                 onBlur={onPriorityBlur}
                 placeholder="Decisions you still need — ending, POV, what can be cut…"
                 rows={3}
@@ -193,9 +287,7 @@ export default function EditingPanel({ bookId, onSeePackages, onToast }: Props) 
               Non-negotiables
               <textarea
                 value={priorityNotes.nonNegotiables}
-                onChange={(e) =>
-                  setPriorityNotes((n) => ({ ...n, nonNegotiables: e.target.value }))
-                }
+                onChange={(e) => onPriorityChange({ nonNegotiables: e.target.value })}
                 onBlur={onPriorityBlur}
                 placeholder="Voice, relationships, or scenes that must stay — protect these."
                 rows={3}
@@ -206,7 +298,7 @@ export default function EditingPanel({ bookId, onSeePackages, onToast }: Props) 
               <button className="btn-solid" type="button" onClick={() => savePriority()}>
                 {prioritySaved ? "Saved" : "Save notes"}
               </button>
-              <span className="editing-autosave-hint">Auto-saves when you leave the field</span>
+              <span className="editing-autosave-hint">Auto-saves as you type</span>
             </div>
           </section>
         </>
@@ -261,7 +353,7 @@ export default function EditingPanel({ bookId, onSeePackages, onToast }: Props) 
                 <button className="btn-solid" type="button" onClick={() => onSave(pass.id)}>
                   {savedFlash === pass.id ? "Saved" : "Save"}
                 </button>
-                <span className="editing-autosave-hint">Auto-saves when you leave the note</span>
+                <span className="editing-autosave-hint">Auto-saves as you type</span>
               </div>
             </li>
           );

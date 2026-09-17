@@ -1,7 +1,10 @@
 /**
  * Full Edit payoff — priority review notes per book (localStorage).
  * v2 splits the old single blob into three editor prompts.
+ * Also mirrors onto the Book record in store (localStorage stays canonical).
  */
+
+import { getBook, updateBook } from "./store";
 
 export type PriorityReview = {
   focusFirst: string;
@@ -66,11 +69,40 @@ function normalize(raw: unknown, legacyBlob?: string): PriorityReview {
   return empty();
 }
 
+function hasContent(pr: PriorityReview): boolean {
+  return !!(pr.focusFirst.trim() || pr.openQuestions.trim() || pr.nonNegotiables.trim());
+}
+
+function mirrorToBook(bookId: string, next: PriorityReview): void {
+  try {
+    updateBook(bookId, { priorityReview: next });
+  } catch {
+    /* ignore */
+  }
+}
+
 export function getPriorityReview(bookId: string): PriorityReview {
-  const v2 = readStore()[bookId];
+  const store = readStore();
+  const v2 = store[bookId];
   if (v2) return normalize(v2);
+
   const legacy = readLegacy()[bookId];
-  return normalize(undefined, typeof legacy === "string" ? legacy : undefined);
+  if (typeof legacy === "string" && legacy.trim()) {
+    return normalize(undefined, legacy);
+  }
+
+  // Hydrate from Book record if neither v2 nor legacy has an entry.
+  const book = getBook(bookId);
+  if (book?.priorityReview) {
+    const fromBook = normalize(book.priorityReview);
+    if (hasContent(fromBook)) {
+      store[bookId] = fromBook;
+      writeStore(store);
+      return fromBook;
+    }
+  }
+
+  return empty();
 }
 
 export function setPriorityReview(
@@ -86,6 +118,7 @@ export function setPriorityReview(
   const store = readStore();
   store[bookId] = next;
   writeStore(store);
+  mirrorToBook(bookId, next);
   return next;
 }
 

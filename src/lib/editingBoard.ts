@@ -1,6 +1,9 @@
 /**
  * Four-pass editing board — per-book status + notes in localStorage.
+ * Also mirrors onto the Book record in store (localStorage stays canonical).
  */
+
+import { getBook, updateBook } from "./store";
 
 export type PassId = "developmental" | "line" | "copy" | "proof";
 
@@ -107,33 +110,66 @@ function normalizePass(raw: Partial<PassState> | undefined): PassState {
   };
 }
 
-export function getBoard(bookId: string): BookPassMap {
-  const store = readStore();
-  const book = store[bookId] ?? {};
+function normalizeBoard(raw: Partial<Record<PassId, Partial<PassState>>> | undefined): BookPassMap {
   return {
-    developmental: normalizePass(book.developmental),
-    line: normalizePass(book.line),
-    copy: normalizePass(book.copy),
-    proof: normalizePass(book.proof),
+    developmental: normalizePass(raw?.developmental),
+    line: normalizePass(raw?.line),
+    copy: normalizePass(raw?.copy),
+    proof: normalizePass(raw?.proof),
   };
 }
 
-export function setPassStatus(bookId: string, passId: PassId, status: PassStatus): BookPassMap {
+function boardHasContent(board: BookPassMap): boolean {
+  return (Object.keys(board) as PassId[]).some(
+    (id) => board[id].status !== "not-started" || board[id].note.trim().length > 0,
+  );
+}
+
+function mirrorToBook(bookId: string, board: BookPassMap): void {
+  try {
+    updateBook(bookId, { editingBoard: board });
+  } catch {
+    /* ignore — book may not exist yet */
+  }
+}
+
+export function getBoard(bookId: string): BookPassMap {
   const store = readStore();
-  const board = getBoard(bookId);
-  board[passId] = { ...board[passId], status };
+  if (store[bookId] != null) {
+    return normalizeBoard(store[bookId]);
+  }
+  // Hydrate from Book record if localStorage has no entry yet (migration).
+  const book = getBook(bookId);
+  const fromBook = book?.editingBoard;
+  if (fromBook) {
+    const board = normalizeBoard(fromBook as Partial<Record<PassId, Partial<PassState>>>);
+    if (boardHasContent(board)) {
+      store[bookId] = board;
+      writeStore(store);
+      return board;
+    }
+  }
+  return emptyBoard();
+}
+
+function writeBoard(bookId: string, board: BookPassMap): BookPassMap {
+  const store = readStore();
   store[bookId] = board;
   writeStore(store);
+  mirrorToBook(bookId, board);
   return board;
 }
 
+export function setPassStatus(bookId: string, passId: PassId, status: PassStatus): BookPassMap {
+  const board = getBoard(bookId);
+  board[passId] = { ...board[passId], status };
+  return writeBoard(bookId, board);
+}
+
 export function setPassNote(bookId: string, passId: PassId, note: string): BookPassMap {
-  const store = readStore();
   const board = getBoard(bookId);
   board[passId] = { ...board[passId], note };
-  store[bookId] = board;
-  writeStore(store);
-  return board;
+  return writeBoard(bookId, board);
 }
 
 export function savePass(
@@ -141,15 +177,12 @@ export function savePass(
   passId: PassId,
   patch: { status?: PassStatus; note?: string },
 ): BookPassMap {
-  const store = readStore();
   const board = getBoard(bookId);
   board[passId] = {
     status: patch.status ?? board[passId].status,
     note: patch.note !== undefined ? patch.note : board[passId].note,
   };
-  store[bookId] = board;
-  writeStore(store);
-  return board;
+  return writeBoard(bookId, board);
 }
 
 export function listPasses(): PassDef[] {

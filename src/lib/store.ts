@@ -21,6 +21,8 @@ export type BookPatch = Partial<
     | "coverSrc"
     | "coverPackNote"
     | "exports"
+    | "editingBoard"
+    | "priorityReview"
   >
 >;
 
