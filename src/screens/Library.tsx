@@ -1,7 +1,7 @@
 import { FormEvent, useState } from "react";
-import { createBook, listBooks, signOut } from "../lib/store";
+import { createBook, listBooks } from "../lib/store";
 import type { Book, Session } from "../lib/types";
-import Nib from "../components/Nib";
+import AccountMenu from "../components/AccountMenu";
 
 type Props = {
   session: Session;
@@ -16,10 +16,6 @@ const statusLabel: Record<Book["status"], string> = {
   formatting: "Formatting",
   proof: "Proof",
 };
-
-function possessive(name: string) {
-  return name.endsWith("s") ? `${name}’` : `${name}’s`;
-}
 
 export default function Library({ session, onOpenBook, onSignOut, onOpenPrivacy, onOpenTerms }: Props) {
   const [books, setBooks] = useState<Book[]>(() => listBooks(session.userId));
@@ -39,21 +35,7 @@ export default function Library({ session, onOpenBook, onSignOut, onOpenPrivacy,
     <div>
       <header className="topbar">
         <div className="topbar-left">
-          <Nib className="nib" />
-          <span className="wordmark">Quillbench</span>
-        </div>
-        <div className="topbar-right">
-          <span>{session.displayName}</span>
-          <button
-            className="linkish"
-            type="button"
-            onClick={() => {
-              signOut();
-              onSignOut();
-            }}
-          >
-            Sign out
-          </button>
+          <AccountMenu session={session} onSignOut={onSignOut} />
         </div>
       </header>
 
@@ -64,7 +46,7 @@ export default function Library({ session, onOpenBook, onSignOut, onOpenPrivacy,
         </div>
         <div className="library-head">
           <div>
-            <h1>{possessive(session.displayName)} library</h1>
+            <h1>Works in Progress</h1>
             <p>Books on this bench — not a shared shelf.</p>
             <div className="library-tip">
               <span className="library-tip-motif" aria-hidden="true">
@@ -85,28 +67,37 @@ export default function Library({ session, onOpenBook, onSignOut, onOpenPrivacy,
           <img src="/art/quill-flourish.svg" alt="" width={640} height={48} />
         </div>
 
-        <div className="book-grid">
-          {books.map((book) => (
-            <button
-              key={book.id}
-              className="book-card"
-              type="button"
-              onClick={() => onOpenBook(book.id)}
-            >
-              <div className="cover">
-                {book.coverSrc ? (
-                  <img src={book.coverSrc} alt="" />
-                ) : (
-                  <span className="cover-title">{book.title}</span>
-                )}
-              </div>
-              <div className="book-meta">
-                <h2>{book.title}</h2>
-                <span className={`pill ${book.status}`}>{statusLabel[book.status]}</span>
-              </div>
+        {books.length === 0 ? (
+          <div className="library-empty">
+            <p>No books in Works in Progress yet.</p>
+            <button className="btn-solid" type="button" onClick={() => setCreating(true)}>
+              Start a draft
             </button>
-          ))}
-        </div>
+          </div>
+        ) : (
+          <div className="book-grid">
+            {books.map((book) => (
+              <button
+                key={book.id}
+                className="book-card"
+                type="button"
+                onClick={() => onOpenBook(book.id)}
+              >
+                <div className="cover">
+                  {book.coverSrc ? (
+                    <img src={book.coverSrc} alt="" />
+                  ) : (
+                    <span className="cover-title">{book.title}</span>
+                  )}
+                </div>
+                <div className="book-meta">
+                  <h2>{book.title}</h2>
+                  <span className={`pill ${book.status}`}>{statusLabel[book.status]}</span>
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
       </main>
 
       <footer className="library-foot">

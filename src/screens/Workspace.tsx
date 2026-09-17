@@ -429,7 +429,7 @@ export default function Workspace({ bookId, initialModule, autoScan, onBack }: P
       <div className="coming">
         <p>That book isn’t on this bench.</p>
         <button className="linkish" type="button" onClick={onBack}>
-          Back to library
+          Back to Works in Progress
         </button>
       </div>
     );
@@ -500,7 +500,7 @@ export default function Workspace({ bookId, initialModule, autoScan, onBack }: P
     <div className="workspace">
       <header className="work-head">
         <button className="back" type="button" onClick={onBack}>
-          ← Library
+          ← Works in Progress
         </button>
         <div className="work-title-row">
           <h1>{book.title}</h1>
