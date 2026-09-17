@@ -2727,16 +2727,23 @@ input:focus {
 .landing-hero-copy h2 {
   font-family: var(--font-display);
   font-weight: 560;
-  font-size: clamp(2.15rem, 5vw, 3.55rem);
-  line-height: 1.12;
+  font-size: clamp(2.35rem, 5.5vw, 3.75rem);
+  line-height: 1.1;
   letter-spacing: -0.03em;
   margin: 0;
-  max-width: 14ch;
+  max-width: 18ch;
   background: var(--grad-rose);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
   filter: drop-shadow(0 2px 0 rgba(255, 255, 255, 0.35));
+}
+
+.landing-cta-bundle {
+  border-color: rgba(212, 95, 108, 0.45);
+  background: linear-gradient(135deg, rgba(255, 248, 245, 0.95), rgba(255, 224, 214, 0.85));
+  font-weight: 650;
+  color: var(--rose-deep);
 }
 
 .landing-lede {
@@ -3711,6 +3718,239 @@ a.legal-link {
   }
 }
 
+
+
+
+/* ---- P0 polish3: product tiles + Studio Bundle price card ---- */
+
+.landing-tiles {
+  padding: 0.5rem clamp(1.25rem, 4vw, 3rem) 0.25rem;
+}
+
+.landing-tiles-head {
+  margin-bottom: 1.15rem;
+  max-width: 40rem;
+}
+
+.landing-tiles-eyebrow {
+  margin: 0 0 0.4rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--rose-deep);
+}
+
+.landing-tiles-head h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 560;
+  font-size: clamp(1.35rem, 2.8vw, 1.75rem);
+  letter-spacing: -0.02em;
+  color: var(--ink-on-light);
+}
+
+.landing-tile-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.landing-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 1.35rem 1.25rem 1.2rem;
+  border-radius: 20px;
+  background:
+    linear-gradient(165deg, rgba(255, 253, 251, 0.98) 0%, rgba(255, 240, 234, 0.92) 55%, rgba(248, 221, 212, 0.78) 100%);
+  border: 1px solid rgba(212, 95, 108, 0.28);
+  box-shadow:
+    0 18px 40px rgba(162, 61, 76, 0.12),
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 0 0 1px rgba(224, 146, 104, 0.12);
+  overflow: hidden;
+  min-height: 11.5rem;
+}
+
+.landing-tile::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--grad-rose);
+}
+
+.landing-tile::after {
+  content: "";
+  position: absolute;
+  inset: auto -20% -40% 40%;
+  height: 70%;
+  background: radial-gradient(ellipse at center, rgba(240, 168, 160, 0.35), transparent 70%);
+  pointer-events: none;
+}
+
+.landing-tile-icon {
+  position: relative;
+  z-index: 1;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 14px;
+  background: var(--grad-rose);
+  box-shadow: 0 10px 22px rgba(212, 95, 108, 0.35), 0 0 0 4px rgba(240, 168, 160, 0.28);
+}
+
+.landing-tile-scan .landing-tile-icon {
+  background: linear-gradient(135deg, #ffe0d0 0%, #f09888 40%, #d45f6c 100%);
+}
+
+.landing-tile-edit .landing-tile-icon {
+  background: linear-gradient(135deg, #f6ddd0 0%, #e09268 45%, #a23d4c 100%);
+}
+
+.landing-tile-format .landing-tile-icon {
+  background: linear-gradient(135deg, #fff6f1 0%, #f0a8a0 40%, #d45f6c 85%);
+}
+
+.landing-tile h3 {
+  position: relative;
+  z-index: 1;
+  margin: 0.15rem 0 0;
+  font-family: var(--font-display);
+  font-weight: 560;
+  font-size: 1.28rem;
+  letter-spacing: -0.02em;
+  color: var(--rose-deep);
+}
+
+.landing-tile p {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  color: #6b5558;
+  font-size: 0.94rem;
+  line-height: 1.5;
+  flex: 1;
+}
+
+.landing-tile-link {
+  position: relative;
+  z-index: 1;
+  align-self: flex-start;
+  margin-top: 0.35rem;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--rose-deep);
+  font-weight: 700;
+  font-size: 0.88rem;
+  letter-spacing: 0.01em;
+}
+
+.landing-tile-link:hover {
+  text-decoration: underline;
+}
+
+.landing-price-card-wrap {
+  padding: 1.5rem clamp(1.25rem, 4vw, 3rem) 0.25rem;
+}
+
+.landing-price-card {
+  position: relative;
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: clamp(1.5rem, 3vw, 2.15rem) clamp(1.35rem, 3vw, 2.35rem);
+  border-radius: 24px;
+  background:
+    linear-gradient(145deg, rgba(255, 253, 251, 0.98), rgba(255, 232, 224, 0.9)),
+    radial-gradient(circle at 92% 8%, rgba(212, 95, 108, 0.22), transparent 42%);
+  border: 1px solid rgba(212, 95, 108, 0.36);
+  box-shadow:
+    0 22px 56px rgba(162, 61, 76, 0.14),
+    0 1px 0 rgba(255, 255, 255, 0.85) inset;
+  overflow: hidden;
+}
+
+.landing-price-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: var(--grad-rose);
+}
+
+.landing-price-card-eyebrow {
+  margin: 0 0 0.45rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--rose-deep);
+}
+
+.landing-price-card h2 {
+  font-family: var(--font-display);
+  font-weight: 560;
+  font-size: clamp(1.85rem, 4vw, 2.55rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin: 0;
+  color: var(--rose-deep);
+}
+
+.landing-price-card-inclusions {
+  margin: 0.55rem 0 0;
+  font-size: 1.05rem;
+  font-weight: 650;
+  color: var(--ink-on-light);
+  letter-spacing: -0.01em;
+}
+
+.landing-price-inclusions {
+  list-style: none;
+  margin: 1.15rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.landing-price-inclusions li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.12rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(224, 146, 104, 0.32);
+}
+
+.landing-price-inclusions strong {
+  font-size: 0.95rem;
+  color: var(--rose-deep);
+}
+
+.landing-price-inclusions span {
+  font-size: 0.88rem;
+  color: #6b5558;
+}
+
+@media (max-width: 900px) {
+  .landing-tile-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 901px) and (max-width: 1100px) {
+  .landing-tile-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
 
 /* ---- Soft-launch Studio Bundle hero + export buy nudge ---- */
 

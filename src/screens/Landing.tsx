@@ -17,31 +17,21 @@ type Props = {
   onOpenTerms: () => void;
 };
 
-const BULLETS = [
+const TILES = [
   {
-    title: "Scan → Grammar → Format/Export",
-    blurb: "OCR typed pages, catch fiction notes, then print PDF and EPUB.",
+    id: "scan",
+    title: "Scan",
+    blurb: "OCR typed pages into clean manuscript text — ready for craft, not stuck as photos.",
   },
   {
-    title: "Editing board",
-    blurb: "Four-pass status board from developmental through proof.",
+    id: "edit",
+    title: "Edit craft",
+    blurb: "Fiction-aware notes and a four-pass board from developmental through proof.",
   },
   {
-    title: "Studio packages",
-    blurb: "Full Edit, Cover, Marketing, or Bundle when you want a hand up.",
-  },
-] as const;
-
-const PACKAGES = [
-  { name: "Full Edit", price: "$249" },
-  { name: "Cover", price: "$179" },
-  { name: "Marketing", price: "$129" },
-  {
-    name: "Bundle",
-    price: formatSoftBundlePrice(),
-    was: formatCatalogBundlePrice(),
-    soft: true,
-    note: SOFT_LAUNCH.couponCode,
+    id: "format",
+    title: "Format→export",
+    blurb: "Print PDF and EPUB with front matter, chapters, and publish-ready files.",
   },
 ] as const;
 
@@ -78,6 +68,10 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
     window.setTimeout(() => document.getElementById("waitlist-email")?.focus(), 350);
   }
 
+  function scrollToBundle() {
+    document.getElementById("landing-price")?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+
   return (
     <div className="landing">
       <header className="landing-top">
@@ -90,62 +84,31 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
         </button>
       </header>
 
-      <section className="landing-bundle-hero" aria-labelledby="bundle-hero-heading">
-        <div className="landing-bundle-card">
-          <p className="landing-bundle-eyebrow">Soft launch · early access</p>
-          <h1 id="bundle-hero-heading">Studio Bundle</h1>
-          <p className="landing-bundle-tag">
-            Full Edit + Cover Design + Marketing — one unlock for writers taking a book to market.
-          </p>
-          <div className="landing-bundle-price-row">
-            <span className="landing-bundle-soft">{formatSoftBundlePrice()}</span>
-            <span className="landing-bundle-was">{formatCatalogBundlePrice()}</span>
-            <span className="landing-bundle-save">${SOFT_LAUNCH.discountDollars} off</span>
-          </div>
-          <p className="landing-bundle-window">
-            Soft-launch pricing {SOFT_LAUNCH.softLaunchThrough}. Save your spot for early access.
-            Studio Bundle Checkout applies code <strong>{SOFT_LAUNCH.couponCode}</strong>{" "}
-            automatically ({formatCatalogBundlePrice()} → {formatSoftBundlePrice()}).
-          </p>
-          <div className="landing-bundle-actions">
-            <button className="btn btn-primary" type="button" onClick={scrollToWaitlist}>
-              Save my spot
-            </button>
-            <button className="btn btn-ghost landing-cta-secondary" type="button" onClick={scrollToSignIn}>
-              Try the bench free
-            </button>
-          </div>
-        </div>
-      </section>
-
       <section className="landing-hero" aria-labelledby="landing-headline">
         <div className="landing-hero-copy">
           <p className="landing-eyebrow">Book production for writers</p>
-          <h2 id="landing-headline">From typed pages to publish-ready files</h2>
+          <h1 id="landing-headline">Write free. Ship pro.</h1>
           <p className="landing-lede">
-            One rose-gold bench for Write, Scan, Grammar, Editing, Formatting, and Publishing — start free on
-            this device.
+            One rose-gold bench for Write, Scan, Grammar, Editing, Formatting, and Publishing —
+            start free on this device, unlock Studio when you are ready.
           </p>
-          <ul className="landing-bullets">
-            {BULLETS.map((b) => (
-              <li key={b.title}>
-                <span className="landing-bullet-mark" aria-hidden="true" />
-                <div>
-                  <strong>{b.title}</strong>
-                  <span>{b.blurb}</span>
-                </div>
-              </li>
-            ))}
-          </ul>
           <div className="landing-cta-row">
-            <button className="btn btn-primary landing-cta-primary" type="button" onClick={onScanStart}>
-              Scan a page
-            </button>
-            <button className="btn btn-ghost landing-cta-secondary" type="button" onClick={() => onSignedIn(signInDemo())}>
+            <button
+              className="btn btn-primary landing-cta-primary"
+              type="button"
+              onClick={() => onSignedIn(signInDemo())}
+            >
               Continue as demo
             </button>
-            <button className="btn btn-ghost landing-cta-secondary" type="button" onClick={scrollToSignIn}>
-              Get started
+            <button
+              className="btn btn-ghost landing-cta-secondary landing-cta-bundle"
+              type="button"
+              onClick={scrollToBundle}
+            >
+              Bundle {formatSoftBundlePrice()} · {SOFT_LAUNCH.couponCode}
+            </button>
+            <button className="btn btn-ghost landing-cta-secondary" type="button" onClick={onScanStart}>
+              Scan a page
             </button>
           </div>
         </div>
@@ -154,27 +117,71 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
         </div>
       </section>
 
-      <section className="landing-price-strip" aria-label="Studio package prices">
-        <p className="landing-price-label">
-          Studio packages <span>· Stripe Checkout</span>
-        </p>
-        <ul>
-          {PACKAGES.map((p) => (
-            <li key={p.name}>
-              <span>{p.name}</span>
-              {"soft" in p && p.soft ? (
-                <strong className="landing-price-soft">
-                  <span className="landing-price-was">{p.was}</span> {p.price}
-                  {"note" in p && p.note ? (
-                    <span className="landing-price-code"> · {p.note}</span>
-                  ) : null}
-                </strong>
-              ) : (
-                <strong>{p.price}</strong>
-              )}
+      <section className="landing-tiles" aria-labelledby="landing-tiles-heading">
+        <div className="landing-tiles-head">
+          <p className="landing-tiles-eyebrow">From draft to files</p>
+          <h2 id="landing-tiles-heading">Built to the Atticus / Vellum / Reedsy bar</h2>
+        </div>
+        <ul className="landing-tile-grid">
+          {TILES.map((t) => (
+            <li key={t.id} className={`landing-tile landing-tile-${t.id}`}>
+              <span className="landing-tile-icon" aria-hidden="true" />
+              <h3>{t.title}</h3>
+              <p>{t.blurb}</p>
+              {t.id === "scan" ? (
+                <button className="landing-tile-link" type="button" onClick={onScanStart}>
+                  Scan a page →
+                </button>
+              ) : null}
             </li>
           ))}
         </ul>
+      </section>
+
+      <section className="landing-price-card-wrap" id="landing-price" aria-labelledby="price-card-heading">
+        <div className="landing-price-card">
+          <p className="landing-price-card-eyebrow">Soft launch · early access</p>
+          <h2 id="price-card-heading">Studio Bundle</h2>
+          <p className="landing-price-card-inclusions">
+            Full Edit + Cover + Marketing
+          </p>
+          <div className="landing-bundle-price-row">
+            <span className="landing-bundle-soft">{formatSoftBundlePrice()}</span>
+            <span className="landing-bundle-was">was {formatCatalogBundlePrice()}</span>
+            <span className="landing-bundle-save">{SOFT_LAUNCH.couponCode} auto</span>
+          </div>
+          <p className="landing-bundle-window">
+            Soft-launch pricing {SOFT_LAUNCH.softLaunchThrough}. Studio Bundle Checkout applies{" "}
+            <strong>{SOFT_LAUNCH.couponCode}</strong> automatically (
+            {formatCatalogBundlePrice()} → {formatSoftBundlePrice()}).
+          </p>
+          <ul className="landing-price-inclusions" aria-label="Studio Bundle includes">
+            <li>
+              <strong>Full Edit</strong>
+              <span>Four-pass craft board unlocked</span>
+            </li>
+            <li>
+              <strong>Cover</strong>
+              <span>Cover design package</span>
+            </li>
+            <li>
+              <strong>Marketing</strong>
+              <span>Launch checklist + assets</span>
+            </li>
+          </ul>
+          <div className="landing-bundle-actions">
+            <button className="btn btn-primary" type="button" onClick={scrollToWaitlist}>
+              Save my spot
+            </button>
+            <button
+              className="btn btn-ghost landing-cta-secondary"
+              type="button"
+              onClick={() => onSignedIn(signInDemo())}
+            >
+              Try the bench free
+            </button>
+          </div>
+        </div>
       </section>
 
       {/*
