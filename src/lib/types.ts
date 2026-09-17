@@ -49,4 +49,4 @@ export type Book = {
   updatedAt: string;
 };
 
-export type ModuleId = "grammar" | "editing" | "formatting" | "publishing";
+export type ModuleId = "write" | "grammar" | "editing" | "formatting" | "publishing";

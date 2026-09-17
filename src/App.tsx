@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import Toast from "./components/Toast";
 import { purchase, type PackageId } from "./lib/packages";
-import { getSession } from "./lib/store";
-import type { Session } from "./lib/types";
+import { createBook, getSession, listBooks, signInDemo } from "./lib/store";
+import type { ModuleId, Session } from "./lib/types";
 import Landing from "./screens/Landing";
 import Library from "./screens/Library";
 import Privacy from "./screens/Privacy";
@@ -14,7 +14,12 @@ type LegalPage = "privacy" | "terms";
 type Route =
   | { name: "landing" }
   | { name: "library" }
-  | { name: "workspace"; bookId: string }
+  | {
+      name: "workspace";
+      bookId: string;
+      initialModule?: ModuleId;
+      autoScan?: boolean;
+    }
   | { name: LegalPage };
 
 function readLegalFromUrl(): LegalPage | null {
@@ -79,6 +84,12 @@ function initialRoute(session: Session | null): Route {
   return { name: "library" };
 }
 
+function resolveBookForScan(session: Session): string {
+  const books = listBooks(session.userId);
+  if (books.length > 0) return books[0].id;
+  return createBook(session.userId, "Scanned pages").id;
+}
+
 export default function App() {
   const boot = useMemo(() => getSession(), []);
   const [session, setSession] = useState<Session | null>(boot);
@@ -97,6 +108,18 @@ export default function App() {
   function leaveLegal() {
     setLegalUrl(null);
     setRoute(session ? { name: "library" } : { name: "landing" });
+  }
+
+  function openScanWorkspace(next: Session) {
+    setSession(next);
+    setLegalUrl(null);
+    const bookId = resolveBookForScan(next);
+    setRoute({
+      name: "workspace",
+      bookId,
+      initialModule: "write",
+      autoScan: true,
+    });
   }
 
   const banner =
@@ -132,6 +155,10 @@ export default function App() {
             setLegalUrl(null);
             setRoute({ name: "library" });
           }}
+          onScanStart={() => {
+            const next = getSession() ?? signInDemo();
+            openScanWorkspace(next);
+          }}
           onOpenPrivacy={() => openLegal("privacy")}
           onOpenTerms={() => openLegal("terms")}
         />
@@ -146,6 +173,8 @@ export default function App() {
         <Workspace
           session={session}
           bookId={route.bookId}
+          initialModule={route.initialModule}
+          autoScan={route.autoScan}
           onBack={() => setRoute({ name: "library" })}
         />
       </>

@@ -21,6 +21,8 @@ import ExportBuyNudge from "../components/ExportBuyNudge";
 type Props = {
   session: Session;
   bookId: string;
+  initialModule?: ModuleId;
+  autoScan?: boolean;
   onBack: () => void;
 };
 
@@ -33,6 +35,7 @@ type MatterDraft = {
 };
 
 const MODULES: { id: ModuleId; label: string }[] = [
+  { id: "write", label: "Write" },
   { id: "grammar", label: "Grammar" },
   { id: "editing", label: "Editing" },
   { id: "formatting", label: "Formatting" },
@@ -103,7 +106,7 @@ function GrammarPanel({
         </p>
         <p className="grammar-voice">
           Dialect, fragments, and character speech are allowed. OCR / typewriter tidy sits in its
-          own group. Scan pages text from Formatting feeds this view.
+          own group. Scan pages or type in Write — that text feeds this view.
         </p>
         <div className="grammar-toolbar">
           <button
@@ -126,7 +129,7 @@ function GrammarPanel({
         <div className="grammar-empty">
           <p>No manuscript on this book yet.</p>
           <p>
-            Paste, drop, or Scan pages in Formatting — that text feeds this view.
+            Paste, drop, or Scan pages in Write — that text feeds this view.
           </p>
         </div>
       ) : issues.length === 0 ? (
@@ -178,10 +181,11 @@ function GrammarIssueRow({
   );
 }
 
-export default function Workspace({ bookId, onBack }: Props) {
+export default function Workspace({ bookId, initialModule, autoScan, onBack }: Props) {
   const initial = useMemo(() => getBook(bookId), [bookId]);
   const [book, setBook] = useState<Book | undefined>(initial);
-  const [module, setModule] = useState<ModuleId>("formatting");
+  const [module, setModule] = useState<ModuleId>(initialModule ?? "write");
+  const autoScanDone = useRef(false);
   const [toast, setToast] = useState<string | null>(null);
   const [exportTip, setExportTip] = useState(false);
   const [buyNudge, setBuyNudge] = useState(false);
@@ -340,6 +344,12 @@ export default function Workspace({ bookId, onBack }: Props) {
       return;
     }
     const name = file.name.toLowerCase();
+    if (file.type === "application/pdf" || name.endsWith(".pdf")) {
+      setToast(
+        "PDF isn’t in this version — photograph or export pages as PNG, JPEG, or WebP.",
+      );
+      return;
+    }
     if (!name.endsWith(".txt") && !name.endsWith(".md")) {
       setToast("Drop a .txt, .md, or page photo");
       return;
@@ -357,11 +367,28 @@ export default function Workspace({ bookId, onBack }: Props) {
     scanInputRef.current?.click();
   }
 
+  useEffect(() => {
+    if (!autoScan || autoScanDone.current) return;
+    autoScanDone.current = true;
+    setModule("write");
+    const id = window.setTimeout(() => openScan("append"), 120);
+    return () => window.clearTimeout(id);
+    // Intentionally once on mount for landing Scan click-path.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   async function scanPages(files: File[], mode: "append" | "replace") {
     if (files.length === 0 || scanning) return;
     const images = files.filter(isScanImage);
     if (images.length === 0) {
-      setToast("Use PNG, JPEG, or WebP photos of pages");
+      const hasPdf = files.some(
+        (f) => f.type === "application/pdf" || /\.pdf$/i.test(f.name),
+      );
+      setToast(
+        hasPdf
+          ? "PDF isn’t in this version — photograph or export pages as PNG, JPEG, or WebP."
+          : "Use PNG, JPEG, or WebP photos of pages",
+      );
       return;
     }
     scanModeRef.current = mode;
@@ -529,7 +556,112 @@ export default function Workspace({ bookId, onBack }: Props) {
         />
       </header>
 
-      {module === "grammar" ? (
+      <input
+        ref={scanInputRef}
+        type="file"
+        accept={SCAN_ACCEPT}
+        multiple
+        aria-label="Scan pages"
+        hidden
+        onChange={(e) => {
+          void onScanFiles(e.target.files);
+        }}
+      />
+
+      {module === "write" ? (
+        <div className="write-surface">
+          <header className="write-head">
+            <h2>Write</h2>
+            <p className="write-lede">
+              Type, paste, or scan pages into your manuscript. Changes save on this device.
+            </p>
+          </header>
+          <div
+            className={`write-editor drop-slot${dragging ? " over" : ""}`}
+            onDragEnter={(e) => {
+              e.preventDefault();
+              setDragging(true);
+            }}
+            onDragOver={(e) => e.preventDefault()}
+            onDragLeave={(e) => {
+              if (e.currentTarget === e.target) setDragging(false);
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              setDragging(false);
+              const files = Array.from(e.dataTransfer.files ?? []);
+              if (!files.length) return;
+              const images = files.filter(isScanImage);
+              if (images.length) {
+                void scanPages(images, "append");
+                return;
+              }
+              onFile(files[0]);
+            }}
+          >
+            <textarea
+              className="write-input ms-input"
+              value={draftText}
+              onChange={(e) => onTextChange(e.target.value)}
+              onBlur={() => {
+                if (msTimer.current) window.clearTimeout(msTimer.current);
+                persistManuscript(draftText);
+              }}
+              placeholder="Start writing, paste a chapter, or scan pages below."
+              spellCheck={false}
+              disabled={scanning}
+            />
+            <div className="ms-actions">
+              <button className="linkish" type="button" onClick={useSampleChapter}>
+                Use sample chapter
+              </button>
+              <span className="ms-hint">.txt or .md · PNG / JPEG / WebP pages</span>
+            </div>
+          </div>
+          <div className="scan-block write-scan">
+            <p className="scan-help">
+              Best for typewritten or printed pages. Photos in good light work. Handwriting is
+              hit-or-miss.
+            </p>
+            <p className="scan-formats">
+              PNG, JPEG, or WebP — as many pages as you want. PDF isn’t in this version;
+              photograph or export pages as images.
+            </p>
+            <label className="scan-option">
+              <input
+                type="checkbox"
+                checked={detectPage}
+                disabled={scanning}
+                onChange={(e) => setDetectPage(e.target.checked)}
+              />
+              <span>Detect page edges (crop hands &amp; background)</span>
+            </label>
+            <div className="scan-actions">
+              <button
+                className="btn-export primary"
+                type="button"
+                disabled={scanning}
+                onClick={() => openScan("append")}
+              >
+                {scanning ? scanStatus || "Reading…" : "Scan pages"}
+              </button>
+              <button
+                className="linkish scan-replace"
+                type="button"
+                disabled={scanning}
+                onClick={() => openScan("replace")}
+              >
+                Replace manuscript with scan
+              </button>
+            </div>
+            {scanStatus ? (
+              <p className="scan-status" role="status" aria-live="polite">
+                {scanStatus}
+              </p>
+            ) : null}
+          </div>
+        </div>
+      ) : module === "grammar" ? (
         <GrammarPanel bookId={book.id} text={draftText} onRescan={flushPending} />
       ) : module === "editing" ? (
         <EditingPanel
@@ -554,6 +686,7 @@ export default function Workspace({ bookId, onBack }: Props) {
           <aside className="rail">
             <div className="rail-block">
               <h3>Manuscript</h3>
+              <p className="rail-note">Same text as Write — edit here or open Write for a larger surface.</p>
               <div
                 className={`drop-slot${dragging ? " over" : ""}`}
                 onDragEnter={(e) => {
@@ -597,17 +730,6 @@ export default function Workspace({ bookId, onBack }: Props) {
                 </div>
               </div>
               <div className="scan-block">
-                <input
-                  ref={scanInputRef}
-                  type="file"
-                  accept={SCAN_ACCEPT}
-                  multiple
-                  aria-label="Scan pages"
-                  hidden
-                  onChange={(e) => {
-                    void onScanFiles(e.target.files);
-                  }}
-                />
                 <p className="scan-help">
                   Best for typewritten or printed pages. Photos in good light work. Handwriting is
                   hit-or-miss.

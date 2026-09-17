@@ -42,7 +42,12 @@ const STEPS: DemoStep[] = [
 
 const STEP_MS = 5200; // ~26s for 5 steps
 
-export default function ProductDemo() {
+type Props = {
+  /** Real Scan CTA — opens Workspace OCR, not just the decorative tour. */
+  onScanStart?: () => void;
+};
+
+export default function ProductDemo({ onScanStart }: Props) {
   const [step, setStep] = useState(0);
   const [playing, setPlaying] = useState(true);
 
@@ -59,6 +64,14 @@ export default function ProductDemo() {
   }, [playing]);
 
   const current = STEPS[step];
+
+  function selectStep(i: number) {
+    go(i);
+    setPlaying(false);
+    if (STEPS[i]?.id === "scan" && onScanStart) {
+      onScanStart();
+    }
+  }
 
   return (
     <aside className="product-demo" aria-label="Product walkthrough">
@@ -81,11 +94,8 @@ export default function ProductDemo() {
                 role="tab"
                 aria-selected={i === step}
                 className={"product-demo-dot" + (i === step ? " active" : "")}
-                onClick={() => {
-                  go(i);
-                  setPlaying(false);
-                }}
-                aria-label={s.label}
+                onClick={() => selectStep(i)}
+                aria-label={s.id === "scan" && onScanStart ? "Scan a page" : s.label}
               />
             ))}
           </div>
@@ -100,12 +110,31 @@ export default function ProductDemo() {
             </span>
             <span className="product-demo-window-label">Quillbench · {current.book}</span>
           </div>
-          <nav className="product-demo-tabs" aria-hidden="true">
-            {STEPS.map((s, i) => (
-              <span key={s.id} className={"product-demo-tab" + (i === step ? " active" : "")}>
-                {s.label}
-              </span>
-            ))}
+          <nav className="product-demo-tabs" aria-label="Tour modules">
+            {STEPS.map((s, i) =>
+              s.id === "scan" && onScanStart ? (
+                <button
+                  key={s.id}
+                  type="button"
+                  className={"product-demo-tab" + (i === step ? " active" : "")}
+                  onClick={() => selectStep(i)}
+                >
+                  {s.label}
+                </button>
+              ) : (
+                <button
+                  key={s.id}
+                  type="button"
+                  className={"product-demo-tab" + (i === step ? " active" : "")}
+                  onClick={() => {
+                    go(i);
+                    setPlaying(false);
+                  }}
+                >
+                  {s.label}
+                </button>
+              ),
+            )}
           </nav>
           <div className="product-demo-panel" key={current.id}>
             {current.id === "scan" && (
@@ -119,6 +148,15 @@ export default function ProductDemo() {
                   <li>12 pages</li>
                   <li>OCR ready</li>
                 </ul>
+                {onScanStart ? (
+                  <button
+                    type="button"
+                    className="btn btn-primary product-demo-scan-cta"
+                    onClick={() => onScanStart()}
+                  >
+                    Scan a page
+                  </button>
+                ) : null}
               </div>
             )}
             {current.id === "grammar" && (

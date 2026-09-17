@@ -71,7 +71,7 @@ export default function Library({ session, onOpenBook, onSignOut, onOpenPrivacy,
                 <img src="/art/open-book-motif.svg" alt="" width={80} height={64} />
               </span>
               <p className="library-tip-text">
-                Tip: open a book → Scan pages in Formatting, then Grammar → Editing → Publishing
+                Tip: open a book → Write (type or Scan pages), then Grammar → Editing → Publishing
                 packages.
               </p>
             </div>

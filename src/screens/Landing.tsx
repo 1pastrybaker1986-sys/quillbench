@@ -12,6 +12,7 @@ import ProductDemo from "../components/ProductDemo";
 
 type Props = {
   onSignedIn: (session: Session) => void;
+  onScanStart: () => void;
   onOpenPrivacy: () => void;
   onOpenTerms: () => void;
 };
@@ -44,7 +45,7 @@ const PACKAGES = [
   },
 ] as const;
 
-export default function Landing({ onSignedIn, onOpenPrivacy, onOpenTerms }: Props) {
+export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpenTerms }: Props) {
   const [email, setEmail] = useState("");
   const [waitlistEmail, setWaitlistEmail] = useState("");
   const [waitlistDone, setWaitlistDone] = useState(false);
@@ -122,7 +123,7 @@ export default function Landing({ onSignedIn, onOpenPrivacy, onOpenTerms }: Prop
           <p className="landing-eyebrow">Book production for writers</p>
           <h2 id="landing-headline">From typed pages to publish-ready files</h2>
           <p className="landing-lede">
-            One rose-gold bench for Scan, Grammar, Editing, Formatting, and Publishing — start free on
+            One rose-gold bench for Write, Scan, Grammar, Editing, Formatting, and Publishing — start free on
             this device.
           </p>
           <ul className="landing-bullets">
@@ -137,7 +138,10 @@ export default function Landing({ onSignedIn, onOpenPrivacy, onOpenTerms }: Prop
             ))}
           </ul>
           <div className="landing-cta-row">
-            <button className="btn btn-primary landing-cta-primary" type="button" onClick={() => onSignedIn(signInDemo())}>
+            <button className="btn btn-primary landing-cta-primary" type="button" onClick={onScanStart}>
+              Scan a page
+            </button>
+            <button className="btn btn-ghost landing-cta-secondary" type="button" onClick={() => onSignedIn(signInDemo())}>
               Continue as demo
             </button>
             <button className="btn btn-ghost landing-cta-secondary" type="button" onClick={scrollToSignIn}>
@@ -146,7 +150,7 @@ export default function Landing({ onSignedIn, onOpenPrivacy, onOpenTerms }: Prop
           </div>
         </div>
         <div className="landing-hero-aside">
-          <ProductDemo />
+          <ProductDemo onScanStart={onScanStart} />
         </div>
       </section>
 
