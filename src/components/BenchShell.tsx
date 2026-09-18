@@ -236,7 +236,11 @@ export default function BenchShell({
           {section === "settings" ? (
             <div className="bench-panel-settings">
               <h2 className="bench-panel-title">Settings</h2>
-              <p className="bench-panel-lede">Local on this device — cloud stays off for now.</p>
+              <p className="bench-panel-lede">
+                {isCloudSaveEnabled()
+                  ? "Cloud Save flag on (local dig). Identity is not Live — drafts stay on this device until Soft-PASS."
+                  : "Local on this device — cloud stays off for now."}
+              </p>
               <dl className="bench-settings-list">
                 <div>
                   <dt>Theme</dt>
@@ -248,7 +252,11 @@ export default function BenchShell({
                 </div>
                 <div>
                   <dt>Cloud Save</dt>
-                  <dd>Coming. Identity is not enabled — nothing syncs across devices yet.</dd>
+                  <dd>
+                    {isCloudSaveEnabled()
+                      ? "Flag on (dev) · Email magic link is wired. Identity is not enabled Live — nothing syncs across devices yet."
+                      : "Coming. Identity is not enabled — nothing syncs across devices yet."}
+                  </dd>
                 </div>
               </dl>
             </div>
