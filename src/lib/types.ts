@@ -1,6 +1,7 @@
 /**
  * Record shapes for the web shell.
  * Seam: keep these when swapping localStorage for real accounts + a cloud manuscript store.
+ * See `manuscriptStore.ts` + `VITE_CLOUD_SAVE` (default off).
  */
 
 export type Session = {

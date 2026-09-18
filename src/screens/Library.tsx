@@ -35,7 +35,11 @@ export default function Library({ session, onOpenBook, onSignOut, onOpenPrivacy,
     <div>
       <header className="topbar">
         <div className="topbar-left">
-          <AccountMenu session={session} onSignOut={onSignOut} />
+          <AccountMenu
+            session={session}
+            onSignOut={onSignOut}
+            onLibraryChanged={() => setBooks(listBooks(session.userId))}
+          />
         </div>
       </header>
 

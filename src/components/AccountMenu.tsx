@@ -1,15 +1,20 @@
 import { useEffect, useId, useRef, useState } from "react";
 import Nib from "./Nib";
 import { signOut } from "../lib/store";
+import { cloudSaveStatusLine } from "../lib/cloudSaveFlag";
+import { downloadWipBackup, pickAndRestoreWipBackup } from "../lib/wipBackup";
 import type { Session } from "../lib/types";
 
 type Props = {
   session: Session;
   onSignOut: () => void;
+  /** Optional: refresh Works in Progress after restore. */
+  onLibraryChanged?: () => void;
 };
 
-export default function AccountMenu({ session, onSignOut }: Props) {
+export default function AccountMenu({ session, onSignOut, onLibraryChanged }: Props) {
   const [open, setOpen] = useState(false);
+  const [note, setNote] = useState<string | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const menuId = useId();
 
@@ -39,6 +44,23 @@ export default function AccountMenu({ session, onSignOut }: Props) {
     onSignOut();
   }
 
+  function handleDownloadBackup() {
+    try {
+      const { bookCount } = downloadWipBackup(session);
+      setNote(`Downloaded backup (${bookCount} book${bookCount === 1 ? "" : "s"}).`);
+    } catch {
+      setNote("Could not download backup.");
+    }
+  }
+
+  async function handleRestoreBackup() {
+    const result = await pickAndRestoreWipBackup(session);
+    setNote(result.message);
+    if (result.ok) {
+      onLibraryChanged?.();
+    }
+  }
+
   return (
     <div className="account-menu" ref={rootRef}>
       <button
@@ -63,7 +85,29 @@ export default function AccountMenu({ session, onSignOut }: Props) {
             {session.email ? (
               <div className="account-menu-email">{session.email}</div>
             ) : null}
+            <div className="account-menu-save-hint">{cloudSaveStatusLine()}</div>
           </div>
+          <button
+            type="button"
+            className="account-menu-item"
+            role="menuitem"
+            onClick={handleDownloadBackup}
+          >
+            Download Works in Progress backup
+          </button>
+          <button
+            type="button"
+            className="account-menu-item"
+            role="menuitem"
+            onClick={() => void handleRestoreBackup()}
+          >
+            Restore backup
+          </button>
+          {note ? (
+            <div className="account-menu-note" role="status">
+              {note}
+            </div>
+          ) : null}
           <button
             type="button"
             className="account-menu-item"
