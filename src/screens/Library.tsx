@@ -1,7 +1,7 @@
 import { FormEvent, useState } from "react";
 import { createBook, listBooks } from "../lib/store";
 import type { Book, Session } from "../lib/types";
-import AccountMenu from "../components/AccountMenu";
+import BenchShell from "../components/BenchShell";
 
 type Props = {
   session: Session;
@@ -32,124 +32,128 @@ export default function Library({ session, onOpenBook, onSignOut, onOpenPrivacy,
   }
 
   return (
-    <div>
-      <header className="topbar">
-        <div className="topbar-left">
-          <AccountMenu
-            session={session}
-            onSignOut={onSignOut}
-            onLibraryChanged={() => setBooks(listBooks(session.userId))}
-          />
-        </div>
-      </header>
-
-      <main className="library">
-        <div className="library-orbs" aria-hidden="true">
-          <span className="orb orb-1" />
-          <span className="orb orb-2" />
-        </div>
-        <div className="library-head">
-          <div>
-            <h1>Works in Progress</h1>
-            <p>Books on this bench — not a shared shelf.</p>
-            <div className="library-tip">
-              <span className="library-tip-motif" aria-hidden="true">
-                <img src="/art/open-book-motif.svg" alt="" width={80} height={64} />
-              </span>
-              <p className="library-tip-text">
-                Tip: open a book → Write (type or Scan pages), then Grammar → Editing → Publishing
-                packages.
-              </p>
-            </div>
+    <BenchShell
+      session={session}
+      onSignOut={onSignOut}
+      onOpenBook={onOpenBook}
+      onLibraryChanged={() => setBooks(listBooks(session.userId))}
+      defaultSection="saved"
+    >
+      <div>
+        <header className="topbar">
+          <div className="topbar-left">
+            <span className="topbar-shelf-label">Works in Progress</span>
           </div>
-          <button className="btn-new" type="button" onClick={() => setCreating(true)}>
-            New book
-          </button>
-        </div>
+        </header>
 
-        <div className="library-ornament" aria-hidden="true">
-          <img src="/art/quill-flourish.svg" alt="" width={640} height={48} />
-        </div>
-
-        {books.length === 0 ? (
-          <div className="library-empty">
-            <p>No books in Works in Progress yet.</p>
-            <button className="btn-solid" type="button" onClick={() => setCreating(true)}>
-              Start a draft
+        <main className="library">
+          <div className="library-orbs" aria-hidden="true">
+            <span className="orb orb-1" />
+            <span className="orb orb-2" />
+          </div>
+          <div className="library-head">
+            <div>
+              <h1>Works in Progress</h1>
+              <p>Books on this bench — not a shared shelf.</p>
+              <div className="library-tip">
+                <span className="library-tip-motif" aria-hidden="true">
+                  <img src="/art/open-book-motif.svg" alt="" width={80} height={64} />
+                </span>
+                <p className="library-tip-text">
+                  Tip: open a book → Write (type or Scan pages), then Grammar → Editing → Publishing
+                  packages.
+                </p>
+              </div>
+            </div>
+            <button className="btn-new" type="button" onClick={() => setCreating(true)}>
+              New book
             </button>
           </div>
-        ) : (
-          <div className="book-grid">
-            {books.map((book) => (
-              <button
-                key={book.id}
-                className="book-card"
-                type="button"
-                onClick={() => onOpenBook(book.id)}
-              >
-                <div className="cover">
-                  {book.coverSrc ? (
-                    <img src={book.coverSrc} alt="" />
-                  ) : (
-                    <span className="cover-title">{book.title}</span>
-                  )}
-                </div>
-                <div className="book-meta">
-                  <h2>{book.title}</h2>
-                  <span className={`pill ${book.status}`}>{statusLabel[book.status]}</span>
-                </div>
-              </button>
-            ))}
+
+          <div className="library-ornament" aria-hidden="true">
+            <img src="/art/quill-flourish.svg" alt="" width={640} height={48} />
           </div>
-        )}
-      </main>
 
-      <footer className="library-foot">
-        <nav className="legal-links" aria-label="Legal and support">
-          <button className="legal-link" type="button" onClick={onOpenPrivacy}>
-            Privacy
-          </button>
-          <span aria-hidden="true">·</span>
-          <button className="legal-link" type="button" onClick={onOpenTerms}>
-            Terms
-          </button>
-          <span aria-hidden="true">·</span>
-          <a className="legal-link" href="mailto:hello@quillbench.app">
-            hello@quillbench.app
-          </a>
-        </nav>
-      </footer>
-
-      {creating && (
-        <div className="dialog-backdrop" onClick={() => setCreating(false)}>
-          <form
-            className="dialog"
-            onClick={(e) => e.stopPropagation()}
-            onSubmit={handleCreate}
-          >
-            <h2>New book</h2>
-            <label className="field" htmlFor="title">
-              Title
-            </label>
-            <input
-              id="title"
-              type="text"
-              autoFocus
-              placeholder="Untitled manuscript"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-            <div className="dialog-actions">
-              <button className="btn-quiet" type="button" onClick={() => setCreating(false)}>
-                Cancel
-              </button>
-              <button className="btn-solid" type="submit">
-                Create draft
+          {books.length === 0 ? (
+            <div className="library-empty">
+              <p>No books in Works in Progress yet.</p>
+              <button className="btn-solid" type="button" onClick={() => setCreating(true)}>
+                Start a draft
               </button>
             </div>
-          </form>
-        </div>
-      )}
-    </div>
+          ) : (
+            <div className="book-grid">
+              {books.map((book) => (
+                <button
+                  key={book.id}
+                  className="book-card"
+                  type="button"
+                  onClick={() => onOpenBook(book.id)}
+                >
+                  <div className="cover">
+                    {book.coverSrc ? (
+                      <img src={book.coverSrc} alt="" />
+                    ) : (
+                      <span className="cover-title">{book.title}</span>
+                    )}
+                  </div>
+                  <div className="book-meta">
+                    <h2>{book.title}</h2>
+                    <span className={`pill ${book.status}`}>{statusLabel[book.status]}</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+        </main>
+
+        <footer className="library-foot">
+          <nav className="legal-links" aria-label="Legal and support">
+            <button className="legal-link" type="button" onClick={onOpenPrivacy}>
+              Privacy
+            </button>
+            <span aria-hidden="true">·</span>
+            <button className="legal-link" type="button" onClick={onOpenTerms}>
+              Terms
+            </button>
+            <span aria-hidden="true">·</span>
+            <a className="legal-link" href="mailto:hello@quillbench.app">
+              hello@quillbench.app
+            </a>
+          </nav>
+        </footer>
+
+        {creating && (
+          <div className="dialog-backdrop" onClick={() => setCreating(false)}>
+            <form
+              className="dialog"
+              onClick={(e) => e.stopPropagation()}
+              onSubmit={handleCreate}
+            >
+              <h2>New book</h2>
+              <label className="field" htmlFor="title">
+                Title
+              </label>
+              <input
+                id="title"
+                type="text"
+                autoFocus
+                placeholder="Untitled manuscript"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+              />
+              <div className="dialog-actions">
+                <button className="btn-quiet" type="button" onClick={() => setCreating(false)}>
+                  Cancel
+                </button>
+                <button className="btn-solid" type="submit">
+                  Create draft
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+      </div>
+    </BenchShell>
   );
 }

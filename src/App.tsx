@@ -198,11 +198,18 @@ export default function App() {
       <>
         {banner}
         <Workspace
+          key={route.bookId}
           session={session}
           bookId={route.bookId}
           initialModule={route.initialModule}
           autoScan={route.autoScan}
           onBack={() => setRoute({ name: "library" })}
+          onSignOut={() => {
+            setSession(null);
+            setLegalUrl(null);
+            setRoute({ name: "landing" });
+          }}
+          onOpenBook={(bookId) => setRoute({ name: "workspace", bookId })}
         />
       </>
     );

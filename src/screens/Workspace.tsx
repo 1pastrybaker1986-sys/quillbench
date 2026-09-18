@@ -17,6 +17,7 @@ import Toast from "../components/Toast";
 import EditingPanel from "../components/EditingPanel";
 import PublishingPanel from "../components/PublishingPanel";
 import ExportBuyNudge from "../components/ExportBuyNudge";
+import BenchShell from "../components/BenchShell";
 
 type Props = {
   session: Session;
@@ -24,7 +25,16 @@ type Props = {
   initialModule?: ModuleId;
   autoScan?: boolean;
   onBack: () => void;
+  onSignOut: () => void;
+  onOpenBook: (bookId: string) => void;
 };
+
+function exportFailToast(kind: string, err: unknown): string {
+  if (err instanceof Error && err.message.trim()) {
+    return `${kind} failed — ${err.message}`;
+  }
+  return `${kind} failed — check the manuscript and try again`;
+}
 
 type MatterDraft = {
   authorName: string;
@@ -181,7 +191,7 @@ function GrammarIssueRow({
   );
 }
 
-export default function Workspace({ bookId, initialModule, autoScan, onBack }: Props) {
+export default function Workspace({ session, bookId, initialModule, autoScan, onBack, onSignOut, onOpenBook }: Props) {
   const initial = useMemo(() => getBook(bookId), [bookId]);
   const [book, setBook] = useState<Book | undefined>(initial);
   const [module, setModule] = useState<ModuleId>(initialModule ?? "write");
@@ -461,8 +471,8 @@ export default function Workspace({ bookId, initialModule, autoScan, onBack }: P
       setToast(`Downloaded ${filename}`);
       setExportTip(true);
       setBuyNudge(true);
-    } catch {
-      setToast("Print PDF failed — try again");
+    } catch (err) {
+      setToast(exportFailToast("Print PDF", err));
     } finally {
       setExporting(false);
     }
@@ -484,8 +494,8 @@ export default function Workspace({ bookId, initialModule, autoScan, onBack }: P
       setToast(`Downloaded ${filename}`);
       setExportTip(true);
       setBuyNudge(true);
-    } catch {
-      setToast("EPUB failed — try again");
+    } catch (err) {
+      setToast(exportFailToast("EPUB", err));
     } finally {
       setExporting(false);
     }
@@ -497,6 +507,16 @@ export default function Workspace({ bookId, initialModule, autoScan, onBack }: P
   }
 
   return (
+    <BenchShell
+      session={session}
+      onSignOut={onSignOut}
+      onOpenBook={onOpenBook}
+      onLibraryHome={onBack}
+      activeBookId={bookId}
+      activeBookTitle={book.title}
+      manuscriptText={draftText}
+      defaultSection="files"
+    >
     <div className="workspace">
       <header className="work-head">
         <button className="back" type="button" onClick={onBack}>
@@ -995,5 +1015,6 @@ export default function Workspace({ bookId, initialModule, autoScan, onBack }: P
       ) : null}
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}
     </div>
+    </BenchShell>
   );
 }
