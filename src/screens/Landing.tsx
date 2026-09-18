@@ -103,7 +103,7 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
           <p className="landing-eyebrow">Book production for writers</p>
           <h1 id="landing-headline">Write free. Ship pro.</h1>
           <p className="landing-lede">
-            One rose-gold bench for Write, Scan, Grammar, Editing, Formatting, and Publishing —
+            One bench for Write, Scan, Grammar, Editing, Formatting, and Publishing —
             start free on this device, unlock Studio when you are ready.
           </p>
           <div className="landing-cta-row">
@@ -151,7 +151,7 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
       <section className="landing-tiles" aria-labelledby="landing-tiles-heading">
         <div className="landing-tiles-head">
           <p className="landing-tiles-eyebrow">From draft to files</p>
-          <h2 id="landing-tiles-heading">Built to the Atticus / Vellum / Reedsy bar</h2>
+          <h2 id="landing-tiles-heading">Built for writers who ship</h2>
         </div>
         <ul className="landing-tile-grid">
           {TILES.map((t) => (
