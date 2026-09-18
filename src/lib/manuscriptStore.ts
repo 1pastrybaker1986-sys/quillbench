@@ -30,7 +30,7 @@ let cached: ManuscriptStore | null = null;
 
 /**
  * Resolve the active store. Flag off → localStorage only (never Identity/Blobs).
- * Flag on (dev) → Netlify Identity + Blobs adapter (stub until Soft-PASS wiring).
+ * Flag on (dev) → Netlify Identity + Blobs adapter (real GoTrue + Function; Identity not Live).
  */
 export function getManuscriptStore(): ManuscriptStore {
   if (cached) return cached;

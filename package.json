@@ -9,6 +9,8 @@
     "preview": "vite preview --host"
   },
   "dependencies": {
+    "@netlify/blobs": "^10.7.13",
+    "gotrue-js": "^1.0.1",
     "jszip": "^3.10.1",
     "pdf-lib": "^1.17.1",
     "react": "^19.1.1",

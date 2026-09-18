@@ -48,6 +48,13 @@ export function getSession(): Session | null {
   return readJson<Session | null>(SESSION_KEY, null);
 }
 
+/** Persist a Session verbatim (Identity sub as userId, etc.). Seeds library if empty. */
+export function writeSession(session: Session): Session {
+  writeJson(SESSION_KEY, session);
+  ensureSeededLibrary(session.userId);
+  return session;
+}
+
 export function signInWithEmail(email: string): Session {
   const trimmed = email.trim().toLowerCase();
   const local = trimmed.split("@")[0] || "writer";
@@ -79,6 +86,24 @@ export function signInDemo(): Session {
 
 export function signOut() {
   localStorage.removeItem(SESSION_KEY);
+}
+
+/**
+ * Remap this-device WIP from legacy local owner `user_${email}` onto Identity sub
+ * so migrate-this-device uploads real manuscript rows after magic-link login.
+ * No-op if destination already has books or source is empty.
+ */
+export function reassignLocalWipOwner(fromOwnerId: string, toOwnerId: string): number {
+  if (!fromOwnerId || !toOwnerId || fromOwnerId === toOwnerId) return 0;
+  const books = allBooks();
+  let n = 0;
+  const next = books.map((b) => {
+    if (b.ownerId !== fromOwnerId) return b;
+    n += 1;
+    return { ...b, ownerId: toOwnerId, updatedAt: now() };
+  });
+  if (n > 0) saveBooks(next);
+  return n;
 }
 
 function allBooks(): Book[] {

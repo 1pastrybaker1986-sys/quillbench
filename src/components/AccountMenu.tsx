@@ -1,7 +1,8 @@
 import { useEffect, useId, useRef, useState } from "react";
 import Nib from "./Nib";
 import { signOut } from "../lib/store";
-import { cloudSaveStatusLine } from "../lib/cloudSaveFlag";
+import { cloudSaveStatusLine, isCloudSaveEnabled } from "../lib/cloudSaveFlag";
+import { identitySignOut } from "../lib/identityGoTrue";
 import { downloadWipBackup, pickAndRestoreWipBackup } from "../lib/wipBackup";
 import type { Session } from "../lib/types";
 
@@ -40,8 +41,12 @@ export default function AccountMenu({ session, onSignOut, onLibraryChanged }: Pr
 
   function handleSignOut() {
     setOpen(false);
-    signOut();
-    onSignOut();
+    if (isCloudSaveEnabled()) {
+      void identitySignOut().finally(() => onSignOut());
+    } else {
+      signOut();
+      onSignOut();
+    }
   }
 
   function handleDownloadBackup() {

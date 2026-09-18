@@ -1,6 +1,6 @@
 /**
  * v0 Cloud Save sync payload + migrate-this-device WIP.
- * Soft-FAIL: used by the Netlify Identity + Blobs adapter sketch; LS remains default.
+ * Soft-FAIL: used by the Netlify Identity + Blobs adapter; LS remains default when flag off.
  */
 
 import type { Book, Session } from "./types";
@@ -42,7 +42,6 @@ export type CloudSyncPayloadV0 = {
 
 export type MigrateThisDeviceResult =
   | { status: "not-enabled"; message: string }
-  | { status: "stub"; message: string; payload: CloudSyncPayloadV0 }
   | { status: "ok"; uploaded: number; message: string }
   | { status: "error"; message: string };
 
@@ -96,7 +95,7 @@ export function buildCloudSyncPayloadV0(
  *
  * Soft-FAIL behavior:
  * - Flag off → never touches Identity/Blobs; returns not-enabled.
- * - Flag on → builds payload and returns stub (real Blobs PUT lands after Soft-PASS + Identity enabled).
+ * - Flag on → builds payload and PUT via Netlify Function (requires Identity JWT).
  *
  * Call after Netlify Identity confirms a real user (not demo). Demo mode stays local-only.
  */
@@ -121,11 +120,22 @@ export async function migrateThisDeviceWip(
 
   const payload = buildCloudSyncPayloadV0(session);
 
-  // Stub: real path = Identity JWT → Netlify Function → Blobs key `owners/{sub}/library.v0.json`
-  return {
-    status: "stub",
-    message:
-      "Cloud Save flag ON — payload built. Blobs upload is stubbed until Identity is Soft-PASSed and enabled (not Live).",
-    payload,
-  };
+  // Dynamic import avoids circular dependency with netlifyCloudSave.ts
+  try {
+    const { pushCloudSyncPayload } = await import("./netlifyCloudSave");
+    const result = await pushCloudSyncPayload(session as Session, payload);
+    if (!result.ok) {
+      return { status: "error", message: result.message };
+    }
+    return {
+      status: "ok",
+      uploaded: payload.books.length,
+      message: result.message,
+    };
+  } catch (e) {
+    return {
+      status: "error",
+      message: e instanceof Error ? e.message : String(e),
+    };
+  }
 }

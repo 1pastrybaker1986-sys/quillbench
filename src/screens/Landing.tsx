@@ -1,5 +1,7 @@
 import { FormEvent, useState } from "react";
 import { signInDemo, signInWithEmail } from "../lib/store";
+import { isCloudSaveEnabled } from "../lib/cloudSaveFlag";
+import { identityMagicLink } from "../lib/netlifyCloudSave";
 import { submitWaitlist } from "../lib/waitlist";
 import {
   formatCatalogBundlePrice,
@@ -40,11 +42,23 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
   const [waitlistEmail, setWaitlistEmail] = useState("");
   const [waitlistDone, setWaitlistDone] = useState(false);
   const [waitlistBusy, setWaitlistBusy] = useState(false);
+  const [authNote, setAuthNote] = useState<string | null>(null);
+  const [authBusy, setAuthBusy] = useState(false);
+  const cloudOn = isCloudSaveEnabled();
 
-  function continueWithEmail(e: FormEvent) {
+  async function continueWithEmail(e: FormEvent) {
     e.preventDefault();
-    if (!email.trim()) return;
-    onSignedIn(signInWithEmail(email));
+    if (!email.trim() || authBusy) return;
+    setAuthNote(null);
+    if (!cloudOn) {
+      onSignedIn(signInWithEmail(email));
+      return;
+    }
+    // Flag ON: real GoTrue magic link (no local session until email click)
+    setAuthBusy(true);
+    const result = await identityMagicLink(email);
+    setAuthBusy(false);
+    setAuthNote(result.message);
   }
 
   async function joinWaitlist(e: FormEvent) {
@@ -267,7 +281,9 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
           </div>
           <h2>Get started</h2>
           <p className="lede">
-            Email sign-in stays on this device. Prefer a quick look? Use demo — same library and tools.
+            {cloudOn
+              ? "Cloud Save flag ON (dev) — magic link via Netlify Identity. Demo stays on this device. Identity is not Live."
+              : "Email sign-in stays on this device. Prefer a quick look? Use demo — same library and tools."}
           </p>
           <label className="field" htmlFor="email">
             Email
@@ -280,12 +296,17 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
-          <button className="btn btn-primary" type="submit">
-            Continue
+          <button className="btn btn-primary" type="submit" disabled={authBusy}>
+            {cloudOn ? (authBusy ? "Sending link…" : "Email magic link") : "Continue"}
           </button>
           <button className="btn btn-ghost" type="button" onClick={() => onSignedIn(signInDemo())}>
             Continue as demo writer
           </button>
+          {authNote ? (
+            <p className="landing-auth-note" role="status">
+              {authNote}
+            </p>
+          ) : null}
         </form>
       </section>
 

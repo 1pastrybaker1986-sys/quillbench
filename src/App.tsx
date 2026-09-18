@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import Toast from "./components/Toast";
 import { purchase, type PackageId } from "./lib/packages";
+import { isCloudSaveEnabled } from "./lib/cloudSaveFlag";
+import { finishIdentityLoginAndMigrate } from "./lib/netlifyCloudSave";
 import { createBook, getSession, listBooks, signInDemo } from "./lib/store";
 import type { ModuleId, Session } from "./lib/types";
 import Landing from "./screens/Landing";
@@ -98,6 +100,31 @@ export default function App() {
 
   useEffect(() => {
     setCheckoutBanner(consumeCheckoutReturn());
+  }, []);
+
+  // Flag ON only: complete Identity magic-link / recover tokens, then migrate-this-device WIP.
+  useEffect(() => {
+    if (!isCloudSaveEnabled()) return;
+    let cancelled = false;
+    void (async () => {
+      try {
+        const { session: next, migrateMessage } = await finishIdentityLoginAndMigrate();
+        if (cancelled || !next) return;
+        setSession(next);
+        setLegalUrl(null);
+        setRoute({ name: "library" });
+        if (migrateMessage) setCheckoutBanner(migrateMessage);
+      } catch (e) {
+        if (!cancelled) {
+          setCheckoutBanner(
+            e instanceof Error ? e.message : "Identity handshake failed (not Live).",
+          );
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   function openLegal(page: LegalPage) {
