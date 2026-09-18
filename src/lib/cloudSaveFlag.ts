@@ -17,7 +17,7 @@ export function isCloudSaveEnabled(): boolean {
 /** Honest UI line while cloud is off (or not Soft-PASSed Live). */
 export function cloudSaveStatusLine(): string {
   if (isCloudSaveEnabled()) {
-    return "Cloud Save flag ON (dev) · Identity not Live";
+    return "Cloud Save on for this build · drafts stay on this device";
   }
   return "Saved on this device · Cloud Save coming";
 }

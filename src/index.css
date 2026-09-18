@@ -4258,11 +4258,11 @@ a.legal-link {
 }
 
 /* ---- Finished-product bench shell (signed-in) ---- */
-/* Zoom-safe: fixed flex basis + min-width so the rail never collapses away. */
+/* Drawer overlay: writing area stays full-width; menu slides over on demand. */
 
 .bench-shell {
-  display: flex;
-  align-items: stretch;
+  position: relative;
+  display: block;
   min-height: 100vh;
   min-width: 640px;
   width: 100%;
@@ -4272,19 +4272,89 @@ a.legal-link {
     var(--paper);
 }
 
+.bench-drawer-toggle {
+  position: fixed;
+  top: 0.85rem;
+  left: 0.85rem;
+  z-index: 60;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.65rem 0.4rem 0.45rem;
+  border-radius: 12px;
+  border: 1px solid rgba(162, 61, 76, 0.28);
+  background:
+    linear-gradient(165deg, #fffdfb 0%, #faf0ea 70%, #f5e2da 100%);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.85) inset,
+    0 6px 18px rgba(90, 46, 52, 0.1);
+  color: var(--ink);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.bench-drawer-toggle:hover,
+.bench-drawer-toggle:focus-visible {
+  outline: none;
+  border-color: rgba(162, 61, 76, 0.45);
+  background: linear-gradient(165deg, #fffdfb 0%, #f8e8e1 100%);
+}
+
+.bench-drawer-toggle:focus-visible {
+  box-shadow: 0 0 0 2px rgba(212, 95, 108, 0.35);
+}
+
+.bench-drawer-toggle .wordmark {
+  font-size: 0.98rem;
+}
+
+.bench-drawer-toggle .nib {
+  width: 1.15rem;
+  height: 1.15rem;
+  filter: drop-shadow(0 1px 0 rgba(240, 208, 196, 0.9));
+}
+
+.bench-drawer-hamburger {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+  width: 1.05rem;
+  flex-shrink: 0;
+}
+
+.bench-drawer-hamburger span {
+  display: block;
+  height: 2px;
+  width: 100%;
+  border-radius: 1px;
+  background: var(--rose-deep);
+}
+
+.bench-shell.drawer-open .bench-drawer-toggle {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.bench-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  background: rgba(40, 24, 28, 0.28);
+  backdrop-filter: blur(1px);
+}
+
 .bench-sidebar {
-  flex: 0 0 240px;
-  width: 240px;
-  min-width: 220px;
-  max-width: 280px;
-  position: sticky;
+  position: fixed;
   top: 0;
-  align-self: flex-start;
+  left: 0;
+  width: min(288px, 88vw);
+  max-width: 320px;
   height: 100vh;
   height: 100dvh;
   overflow-x: hidden;
   overflow-y: auto;
-  z-index: 20;
+  z-index: 50;
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
@@ -4294,8 +4364,24 @@ a.legal-link {
   border-right: 1px solid rgba(162, 61, 76, 0.28);
   box-shadow:
     1px 0 0 rgba(240, 208, 196, 0.85),
-    8px 0 28px rgba(90, 46, 52, 0.06),
+    16px 0 40px rgba(90, 46, 52, 0.18),
     inset -1px 0 0 rgba(255, 255, 255, 0.65);
+  transform: translateX(-105%);
+  visibility: hidden;
+  transition: transform 0.22s ease, visibility 0.22s ease;
+  pointer-events: none;
+}
+
+.bench-sidebar.open {
+  transform: translateX(0);
+  visibility: visible;
+  pointer-events: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bench-sidebar {
+    transition: none;
+  }
 }
 
 .bench-sidebar-brand {
@@ -4304,6 +4390,27 @@ a.legal-link {
   gap: 0.55rem;
   padding: 0.35rem 0.45rem 0.55rem;
   border-bottom: 1px solid rgba(212, 95, 108, 0.22);
+}
+
+.bench-drawer-close {
+  margin-left: auto;
+  appearance: none;
+  border: 0;
+  background: rgba(255, 253, 251, 0.7);
+  width: 2rem;
+  height: 2rem;
+  border-radius: 10px;
+  font-size: 1.35rem;
+  line-height: 1;
+  color: var(--rose-deep);
+  cursor: pointer;
+}
+
+.bench-drawer-close:hover,
+.bench-drawer-close:focus-visible {
+  outline: none;
+  background: rgba(212, 95, 108, 0.12);
+  color: var(--ink);
 }
 
 .bench-sidebar-brand .wordmark {
@@ -4575,9 +4682,15 @@ a.legal-link {
 }
 
 .bench-main {
-  flex: 1 1 auto;
   min-width: 0;
+  width: 100%;
   position: relative;
+}
+
+/* Leave room for the fixed Account / hamburger toggle */
+.bench-shell .topbar,
+.bench-shell .work-head {
+  padding-left: 12.5rem;
 }
 
 /* Tighten ink + metal accents on signed-in chrome inside the shell */

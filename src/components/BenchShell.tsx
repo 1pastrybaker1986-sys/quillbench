@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
 import Nib from "./Nib";
 import { signOut, listBooks } from "../lib/store";
 import { cloudSaveStatusLine, isCloudSaveEnabled } from "../lib/cloudSaveFlag";
@@ -54,8 +54,13 @@ export default function BenchShell({
 }: Props) {
   const inferredDefault: BenchSection = defaultSection ?? (activeBookId ? "files" : "saved");
   const [section, setSection] = useState<BenchSection>(inferredDefault);
+  /** Drawer starts closed so Write / Scan / editor keep the full writing area. */
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [note, setNote] = useState<string | null>(null);
   const [books, setBooks] = useState<Book[]>(() => listBooks(session.userId));
+  const sidebarRef = useRef<HTMLElement>(null);
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  const sidebarId = useId();
 
   useEffect(() => {
     setSection(inferredDefault);
@@ -64,6 +69,33 @@ export default function BenchShell({
   useEffect(() => {
     setBooks(listBooks(session.userId));
   }, [session.userId, activeBookId]);
+
+  /** Close when book context changes (entering Write / Scan / editor). */
+  useEffect(() => {
+    setDrawerOpen(false);
+  }, [activeBookId]);
+
+  useEffect(() => {
+    if (!drawerOpen) return;
+
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") setDrawerOpen(false);
+    }
+
+    function onPointerDown(e: PointerEvent) {
+      const t = e.target as Node;
+      if (sidebarRef.current?.contains(t)) return;
+      if (toggleRef.current?.contains(t)) return;
+      setDrawerOpen(false);
+    }
+
+    document.addEventListener("keydown", onKeyDown);
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      document.removeEventListener("pointerdown", onPointerDown);
+    };
+  }, [drawerOpen]);
 
   const chapters = useMemo(() => {
     const parsed = parseManuscript(manuscriptText ?? "");
@@ -107,12 +139,63 @@ export default function BenchShell({
     if (result.ok) refreshBooks();
   }
 
+  function openBookAndClose(bookId: string) {
+    setDrawerOpen(false);
+    onOpenBook(bookId);
+  }
+
+  function libraryHomeAndClose() {
+    setDrawerOpen(false);
+    onLibraryHome?.();
+  }
+
   return (
-    <div className="bench-shell">
-      <aside className="bench-sidebar" aria-label="Bench">
+    <div className={"bench-shell" + (drawerOpen ? " drawer-open" : "")}>
+      <button
+        ref={toggleRef}
+        type="button"
+        className="bench-drawer-toggle"
+        aria-expanded={drawerOpen}
+        aria-controls={sidebarId}
+        aria-label={drawerOpen ? "Close menu" : "Open menu"}
+        onClick={() => setDrawerOpen((v) => !v)}
+      >
+        <span className="bench-drawer-hamburger" aria-hidden="true">
+          <span />
+          <span />
+          <span />
+        </span>
+        <Nib className="nib" />
+        <span className="wordmark">Quillbench</span>
+      </button>
+
+      {drawerOpen ? (
+        <div
+          className="bench-drawer-backdrop"
+          aria-hidden="true"
+          onClick={() => setDrawerOpen(false)}
+        />
+      ) : null}
+
+      <aside
+        ref={sidebarRef}
+        id={sidebarId}
+        className={"bench-sidebar" + (drawerOpen ? " open" : "")}
+        aria-label="Bench"
+        aria-hidden={!drawerOpen}
+        inert={!drawerOpen ? true : undefined}
+      >
         <div className="bench-sidebar-brand">
           <Nib className="nib" />
           <span className="wordmark">Quillbench</span>
+          <button
+            type="button"
+            className="bench-drawer-close"
+            aria-label="Close menu"
+            onClick={() => setDrawerOpen(false)}
+          >
+            ×
+          </button>
         </div>
 
         <nav className="bench-sidebar-nav" aria-label="Bench sections">
@@ -122,6 +205,7 @@ export default function BenchShell({
               type="button"
               className={"bench-nav-item" + (section === s.id ? " active" : "")}
               aria-current={section === s.id ? "page" : undefined}
+              tabIndex={drawerOpen ? undefined : -1}
               onClick={() => setSection(s.id)}
             >
               {s.label}
@@ -192,7 +276,7 @@ export default function BenchShell({
                     Open a book to see its chapter list. Quillbench works one book at a time.
                   </p>
                   {onLibraryHome ? (
-                    <button type="button" className="bench-panel-action" onClick={onLibraryHome}>
+                    <button type="button" className="bench-panel-action" onClick={libraryHomeAndClose}>
                       Works in Progress
                     </button>
                   ) : null}
@@ -216,7 +300,7 @@ export default function BenchShell({
                         className={
                           "bench-saved-item" + (book.id === activeBookId ? " current" : "")
                         }
-                        onClick={() => onOpenBook(book.id)}
+                        onClick={() => openBookAndClose(book.id)}
                       >
                         <span className="bench-saved-title">{book.title}</span>
                         <span className={`pill ${book.status}`}>{statusLabel(book.status)}</span>
@@ -226,7 +310,7 @@ export default function BenchShell({
                 </ul>
               )}
               {onLibraryHome && activeBookId ? (
-                <button type="button" className="bench-panel-action" onClick={onLibraryHome}>
+                <button type="button" className="bench-panel-action" onClick={libraryHomeAndClose}>
                   ← Works in Progress
                 </button>
               ) : null}
@@ -238,7 +322,7 @@ export default function BenchShell({
               <h2 className="bench-panel-title">Settings</h2>
               <p className="bench-panel-lede">
                 {isCloudSaveEnabled()
-                  ? "Cloud Save flag on (local dig). Identity is not Live — drafts stay on this device until Soft-PASS."
+                  ? "Cloud Save is on for this build. Drafts stay on this device for now."
                   : "Local on this device — cloud stays off for now."}
               </p>
               <dl className="bench-settings-list">
@@ -254,8 +338,8 @@ export default function BenchShell({
                   <dt>Cloud Save</dt>
                   <dd>
                     {isCloudSaveEnabled()
-                      ? "Flag on (dev) · Email magic link is wired. Identity is not enabled Live — nothing syncs across devices yet."
-                      : "Coming. Identity is not enabled — nothing syncs across devices yet."}
+                      ? "On for this build · Email magic link is wired. Nothing syncs across devices yet."
+                      : "Coming. Nothing syncs across devices yet."}
                   </dd>
                 </div>
               </dl>
