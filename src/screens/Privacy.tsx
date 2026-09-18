@@ -47,8 +47,8 @@ export default function Privacy({ onBack }: Props) {
           <h2>What we don’t collect here</h2>
           <p>
             This soft-launch build has no Quillbench account backend and no manuscript upload
-            pipeline. Demo and email sign-in are local placeholders so you can use the bench
-            offline on one device. Waitlist emails stay in localStorage until a remote form is
+            pipeline. Local and email sign-in stay on this device so you can use the bench
+            offline. Waitlist emails stay in localStorage until a remote form is
             wired (see deploy notes).
           </p>
         </section>

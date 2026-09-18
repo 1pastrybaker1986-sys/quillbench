@@ -4,7 +4,7 @@
  */
 
 import type { Book, Session } from "./types";
-import { listBooks } from "./store";
+import { isLocalOnlyUserId, listBooks } from "./store";
 import { getBoard } from "./editingBoard";
 import { getPriorityReview } from "./priorityReview";
 import { isCloudSaveEnabled } from "./cloudSaveFlag";
@@ -97,16 +97,16 @@ export function buildCloudSyncPayloadV0(
  * - Flag off → never touches Identity/Blobs; returns not-enabled.
  * - Flag on → builds payload and PUT via Netlify Function (requires Identity JWT).
  *
- * Call after Netlify Identity confirms a real user (not demo). Demo mode stays local-only.
+ * Call after Netlify Identity confirms a real user (not local-only guest). Local sessions stay device-only.
  */
 export async function migrateThisDeviceWip(
   session: Pick<Session, "userId" | "displayName" | "email">,
   opts?: { isDemo?: boolean },
 ): Promise<MigrateThisDeviceResult> {
-  if (opts?.isDemo || session.userId === "user_demo") {
+  if (opts?.isDemo || isLocalOnlyUserId(session.userId)) {
     return {
       status: "not-enabled",
-      message: "Demo mode stays on this device — migrate-this-device skipped.",
+      message: "Local sessions stay on this device — migrate-this-device skipped.",
     };
   }
 

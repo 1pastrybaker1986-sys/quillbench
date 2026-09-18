@@ -3,7 +3,7 @@ import Toast from "./components/Toast";
 import { purchase, type PackageId } from "./lib/packages";
 import { isCloudSaveEnabled } from "./lib/cloudSaveFlag";
 import { finishIdentityLoginAndMigrate } from "./lib/netlifyCloudSave";
-import { createBook, getSession, listBooks, signInDemo } from "./lib/store";
+import { createBook, getSession, listBooks, startLocalSession } from "./lib/store";
 import type { ModuleId, Session } from "./lib/types";
 import Landing from "./screens/Landing";
 import Library from "./screens/Library";
@@ -183,7 +183,7 @@ export default function App() {
             setRoute({ name: "library" });
           }}
           onScanStart={() => {
-            const next = getSession() ?? signInDemo();
+            const next = getSession() ?? startLocalSession();
             openScanWorkspace(next);
           }}
           onOpenPrivacy={() => openLegal("privacy")}

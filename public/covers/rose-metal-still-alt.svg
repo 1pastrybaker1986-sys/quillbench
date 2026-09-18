@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900" viewBox="0 0 600 900" role="img" aria-label="Copper Thread cover">
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900" viewBox="0 0 600 900" role="img" aria-label="Rose-metal cover still">
   <defs>
     <linearGradient id="g2" x1="0" y1="1" x2="1" y2="0">
       <stop offset="0%" stop-color="#1a1012"/>
@@ -24,8 +24,8 @@
   <path d="M160 230 C250 185, 350 185, 440 230" fill="none" stroke="#ffe8df" stroke-width="1" opacity="0.35"/>
   <circle cx="300" cy="340" r="8" fill="#ffe8df" opacity="0.7"/>
   <line x1="300" y1="348" x2="300" y2="480" stroke="#e09268" stroke-opacity="0.45" stroke-width="1"/>
-  <text x="300" y="560" text-anchor="middle" fill="#fff6f2" font-family="Georgia, 'Times New Roman', serif" font-size="42" font-weight="600" letter-spacing="0.06em">Copper Thread</text>
-  <text x="300" y="610" text-anchor="middle" fill="#f0d0c4" font-family="system-ui, sans-serif" font-size="13" letter-spacing="0.32em">STORIES</text>
+  <text x="300" y="560" text-anchor="middle" fill="#fff6f2" font-family="Georgia, 'Times New Roman', serif" font-size="36" font-weight="600" letter-spacing="0.08em">Untitled</text>
+  <text x="300" y="610" text-anchor="middle" fill="#f0d0c4" font-family="system-ui, sans-serif" font-size="13" letter-spacing="0.32em">DRAFT</text>
   <line x1="220" y1="640" x2="380" y2="640" stroke="#ffe8df" stroke-opacity="0.4" stroke-width="1"/>
   <text x="300" y="820" text-anchor="middle" fill="#f0d0c4" font-family="system-ui, sans-serif" font-size="13" letter-spacing="0.2em" opacity="0.8">QUILLBENCH</text>
 </svg>

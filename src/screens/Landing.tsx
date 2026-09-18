@@ -1,5 +1,5 @@
 import { FormEvent, useState } from "react";
-import { signInDemo, signInWithEmail } from "../lib/store";
+import { startLocalSession, signInWithEmail } from "../lib/store";
 import { isCloudSaveEnabled } from "../lib/cloudSaveFlag";
 import { identityMagicLink } from "../lib/netlifyCloudSave";
 import { submitWaitlist } from "../lib/waitlist";
@@ -110,7 +110,7 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
             <button
               className="btn btn-primary landing-cta-primary"
               type="button"
-              onClick={() => onSignedIn(signInDemo())}
+              onClick={() => onSignedIn(startLocalSession())}
             >
               Start free
             </button>
@@ -282,8 +282,8 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
           <h2>Get started</h2>
           <p className="lede">
             {cloudOn
-              ? "Cloud Save flag ON (dev) — magic link via Netlify Identity. Demo stays on this device. Identity is not Live."
-              : "Email sign-in stays on this device. Prefer a quick look? Use demo — same library and tools."}
+              ? "Cloud Save flag ON (dev) — magic link via Netlify Identity. Local sessions stay on this device. Identity is not Live."
+              : "Email sign-in stays on this device. Or start free with an empty Works in Progress — same Write, Scan, and tools."}
           </p>
           <label className="field" htmlFor="email">
             Email
@@ -299,8 +299,8 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
           <button className="btn btn-primary" type="submit" disabled={authBusy}>
             {cloudOn ? (authBusy ? "Sending link…" : "Email magic link") : "Continue"}
           </button>
-          <button className="btn btn-ghost" type="button" onClick={() => onSignedIn(signInDemo())}>
-            Continue as demo writer
+          <button className="btn btn-ghost" type="button" onClick={() => onSignedIn(startLocalSession())}>
+            Start on this device
           </button>
           {authNote ? (
             <p className="landing-auth-note" role="status">

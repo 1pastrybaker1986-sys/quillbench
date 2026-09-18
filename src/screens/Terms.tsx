@@ -53,10 +53,11 @@ export default function Terms({ onBack }: Props) {
         </section>
 
         <section className="legal-section">
-          <h2>Eden’s Fall covers</h2>
+          <h2>Your covers</h2>
           <p>
-            Seeded Eden’s Fall cover art in the demo library belongs to you (the writer). The app
-            references the existing print pack as-is and does not rebuild or claim those covers.
+            Cover art you attach to a book belongs to you (the writer). When a print pack is already
+            attached to a manuscript, the app references it as-is and does not rebuild or claim
+            those covers.
           </p>
         </section>
 

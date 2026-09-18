@@ -10,7 +10,7 @@
  * 2. After JWT: Blobs JSON at owners/{identity.sub}/library.v0.json via Netlify Function.
  * 3. Payload = CloudSyncPayloadV0 (Book + manuscriptText + editingBoard + priorityReview).
  *
- * Demo mode stays LS-only even when the flag is on.
+ * Local guest sessions stay LS-only even when the flag is on.
  */
 
 import type { ManuscriptStore } from "./manuscriptStore";
@@ -20,7 +20,9 @@ import {
   getSession,
   listBooks,
   setTrim,
+  startLocalSession,
   signInDemo,
+  isLocalOnlyUserId,
   signOut as localSignOut,
   updateBook,
   writeSession,
@@ -215,7 +217,7 @@ export async function finishIdentityLoginAndMigrate(): Promise<{
 }> {
   if (!isCloudSaveEnabled()) return { session: getSession() };
   const session = (await completeIdentityFromUrl()) ?? (await sessionFromCurrentUser());
-  if (!session || session.userId === "user_demo") {
+  if (!session || isLocalOnlyUserId(session.userId)) {
     return { session };
   }
   const migrate = await migrateThisDeviceWip(session);
@@ -230,7 +232,8 @@ export const netlifyCloudManuscriptStore: ManuscriptStore = {
   id: "netlify-identity-blobs",
 
   getSession,
-  signInDemo, // public bench demo stays local-only even when flag is on
+  startLocalSession, // local bench stays device-only even when flag is on
+  signInDemo,
   async signOut() {
     await identitySignOut();
   },

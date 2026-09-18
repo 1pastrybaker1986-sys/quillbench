@@ -17,26 +17,26 @@ Open **http://127.0.0.1:5173/**
 
 Walk the path:
 
-1. Land on sign-in — email + continue, or **Continue as demo writer**
-2. See this writer’s library (seeded with *Eden’s Fall* and *Night Orchard*)
+1. Land on the marketing page — **Start free** / **Start on this device**, or email + continue
+2. See an empty **Works in Progress** (no tour seeds). Create a book, or use **Scan a page** to open Write on a new draft
 3. Open a book into the workspace
-4. Paste a chapter, drop a .txt/.md, or **Scan pages** (PNG/JPEG/WebP photos) in Formatting — the spread preview updates. Use sample chapter resets the seed text. Replace manuscript with scan overwrites the draft.
+4. Paste a chapter, drop a .txt/.md, or **Scan pages** (PNG/JPEG/WebP photos) in Write / Formatting — the spread preview updates. Optional: Use sample chapter fills starter text. Replace manuscript with scan overwrites the draft.
 5. Open the **Grammar** tab for a fiction-aware review of that manuscript (including scanned text). Accept / Keep as-is dismiss a note; Accept sticks across refresh. Re-scan manuscript re-runs the checks.
 6. Open **Editing** for the four-pass board (status + notes, passes 1–4). Unlock Full Edit for **Priority review** notes; payments coming soon — unlocks save on this device.
 7. Open **Publishing** for the readiness meter, KDP/Ingram checklist, Cover/Marketing payoffs, and studio packages shelf.
-8. Fill Matter (author, subtitle, dedication, copyright year, publisher line). Eden's Fall is seeded with author and year
+8. Fill Matter (author, subtitle, dedication, copyright year, publisher line)
 9. Pick trim 5.5×8.5 or 6×9 (preview reflows)
-10. Cover rail: attach a PNG/JPEG/WebP (data URL saved on the book). Library cards pick it up on return. Eden’s Fall keeps its seeded pack until you click Remove.
+10. Cover rail: attach a PNG/JPEG/WebP (data URL saved on the book). Library cards pick it up on return.
 11. Print PDF downloads a real interior PDF. EPUB downloads a real ebook. Each success is logged in the Export locker (last 10). Export again re-runs that kind.
 
-Refresh keeps the demo session, matter/manuscript, cover, and locker. Sign out from the library header.
+Refresh keeps the local session, matter/manuscript, cover, and locker. Quillbench mark dropdown = account (identity / sign out).
 
 ## What this build is
 
 - Web first (Vite + React)
 - PWA-lite: public/manifest.webmanifest + icons + theme-color (no service worker)
 - Auth **placeholder** — local session in `localStorage`, no identity provider
-- Book records in `localStorage` (seeded per writer), including optional `manuscriptText`, matter, `coverSrc`, and `exports`. Shape is ready to swap for a cloud store
+- Book records in `localStorage` (empty until the writer creates), including optional `manuscriptText`, matter, `coverSrc`, and `exports`. Shape is ready to swap for a cloud store
 - Print interior PDF via `pdf-lib` (title, copyright, dedication if any, then body)
 - EPUB 3 via `jszip` (same matter/body; cover embedded when available)
 - Scan pages via `tesseract.js` (English OCR in the browser; images stay on this device)
@@ -78,10 +78,10 @@ Refresh keeps the demo session, matter/manuscript, cover, and locker. Sign out f
 | `src/components/PublishingPanel.tsx` | Readiness meter + Cover/Marketing payoffs + packages |
 | `src/lib/sampleManuscript.ts` | Sample chapter + chapter-title parse |
 | `src/lib/waitlist.ts` | Payments waitlist emails (`quillbench.waitlist.v1`) |
-| `src/screens/Landing.tsx` | Marketing landing + waitlist + demo/sign-in CTAs |
+| `src/screens/Landing.tsx` | Marketing landing + waitlist + Start free / email CTAs |
 | `src/screens/Privacy.tsx` | Privacy policy (localStorage, OCR, Stripe later) |
 | `src/screens/Terms.tsx` | Terms of use (packages, unlock stub, as-is soft launch) |
-| `src/screens/SignIn.tsx` | Demo sign-in |
+| `src/screens/SignIn.tsx` | Deprecated re-export of Landing |
 | `src/screens/Library.tsx` | This writer’s book list (cover thumbs from `coverSrc`) |
 | `src/screens/Workspace.tsx` | Module switcher + book journey strip + Grammar / Editing / Formatting / Publishing |
 | `public/covers/edens-fall-front.png` | Eden’s Fall cover thumb (print pack already attached — do not rebuild) |

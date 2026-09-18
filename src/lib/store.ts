@@ -4,7 +4,24 @@ import { SAMPLE_CHAPTER } from "./sampleManuscript";
 const SESSION_KEY = "quillbench.session.v1";
 const BOOKS_KEY = "quillbench.books.v1";
 
-const DEMO_USER_ID = "user_demo";
+/** Local-only bench identity (not labeled Demo). Legacy `user_demo` still recognized. */
+export const LOCAL_USER_ID = "user_local";
+const LEGACY_DEMO_USER_ID = "user_demo";
+
+const TOUR_SEED_SUFFIXES = [
+  "_glass-harbor",
+  "_copper-thread",
+  "_edens-fall",
+  "_night-orchard",
+];
+
+const TOUR_SEED_TITLES = new Set([
+  "The Glass Harbor",
+  "Copper Thread",
+  "Eden’s Fall",
+  "Eden's Fall",
+  "Night Orchard",
+]);
 
 export type BookPatch = Partial<
   Pick<
@@ -44,14 +61,59 @@ function writeJson(key: string, value: unknown) {
   localStorage.setItem(key, JSON.stringify(value));
 }
 
-export function getSession(): Session | null {
-  return readJson<Session | null>(SESSION_KEY, null);
+/** True for device-only guest sessions (never Cloud Save migrate). */
+export function isLocalOnlyUserId(userId: string): boolean {
+  return userId === LOCAL_USER_ID || userId === LEGACY_DEMO_USER_ID;
 }
 
-/** Persist a Session verbatim (Identity sub as userId, etc.). Seeds library if empty. */
+export function getSession(): Session | null {
+  const session = readJson<Session | null>(SESSION_KEY, null);
+  if (!session) return null;
+  return normalizeSessionIdentity(session);
+}
+
+/**
+ * Rewrite legacy "Demo Writer" / user_demo chrome into a quiet local Writer session.
+ * Purges tour seed books so first-run / returning demo users see an honest empty bench.
+ */
+function normalizeSessionIdentity(session: Session): Session {
+  const isLegacyDemo =
+    session.userId === LEGACY_DEMO_USER_ID ||
+    session.displayName === "Demo Writer" ||
+    (session.email || "").endsWith(".demo") ||
+    session.email === "writer@quillbench.demo";
+
+  if (!isLegacyDemo) {
+    return session;
+  }
+
+  const fromId = session.userId;
+  const next: Session = {
+    ...session,
+    userId: LOCAL_USER_ID,
+    displayName:
+      session.displayName === "Demo Writer" || !session.displayName.trim()
+        ? "Writer"
+        : session.displayName,
+    email:
+      !session.email ||
+      session.email.endsWith(".demo") ||
+      session.email === "writer@quillbench.demo"
+        ? ""
+        : session.email,
+  };
+
+  if (fromId !== LOCAL_USER_ID) {
+    reassignLocalWipOwner(fromId, LOCAL_USER_ID);
+  }
+  purgeTourSeedBooks(LOCAL_USER_ID);
+  writeJson(SESSION_KEY, next);
+  return next;
+}
+
+/** Persist a Session verbatim (Identity sub as userId, etc.). No library seed. */
 export function writeSession(session: Session): Session {
   writeJson(SESSION_KEY, session);
-  ensureSeededLibrary(session.userId);
   return session;
 }
 
@@ -68,20 +130,31 @@ export function signInWithEmail(email: string): Session {
     createdAt: now(),
   };
   writeJson(SESSION_KEY, session);
-  ensureSeededLibrary(session.userId);
   return session;
 }
 
-export function signInDemo(): Session {
+/**
+ * Start (or resume) a quiet local bench session — empty Works in Progress until the writer creates.
+ * Replaces the old "Demo Writer" / Continue-as-demo path.
+ */
+export function startLocalSession(): Session {
+  const existing = getSession();
+  if (existing && isLocalOnlyUserId(existing.userId)) {
+    return existing;
+  }
   const session: Session = {
-    userId: DEMO_USER_ID,
-    displayName: "Demo Writer",
-    email: "writer@quillbench.demo",
+    userId: LOCAL_USER_ID,
+    displayName: "Writer",
+    email: "",
     createdAt: now(),
   };
   writeJson(SESSION_KEY, session);
-  ensureSeededLibrary(session.userId);
   return session;
+}
+
+/** @deprecated Use startLocalSession — kept so ManuscriptStore / older imports resolve. */
+export function signInDemo(): Session {
+  return startLocalSession();
 }
 
 export function signOut() {
@@ -114,103 +187,28 @@ function saveBooks(books: Book[]) {
   writeJson(BOOKS_KEY, books);
 }
 
-function seedDemoBooks(ownerId: string): Book[] {
-  const t = now();
-  return [
-    {
-      id: `book_${ownerId}_glass-harbor`,
-      ownerId,
-      title: "The Glass Harbor",
-      status: "formatting",
-      trim: "5.5x8.5",
-      theme: "trade-paperback",
-      coverSrc: "/covers/demo-placeholder.svg",
-      coverPackNote: "Demo shelf cover — rose-gold still for the public bench.",
-      manuscriptText: SAMPLE_CHAPTER,
-      authorName: "Demo Writer",
-      copyrightYear: "2026",
-      createdAt: t,
-      updatedAt: t,
-    },
-    {
-      id: `book_${ownerId}_copper-thread`,
-      ownerId,
-      title: "Copper Thread",
-      status: "draft",
-      trim: "6x9",
-      theme: "trade-paperback",
-      coverSrc: "/covers/demo-placeholder-alt.svg",
-      coverPackNote: "Demo shelf cover — rose-gold still for the public bench.",
-      manuscriptText: SAMPLE_CHAPTER,
-      authorName: "Demo Writer",
-      copyrightYear: "2026",
-      createdAt: t,
-      updatedAt: t,
-    },
-  ];
+function isTourSeedBook(book: Book): boolean {
+  if (TOUR_SEED_SUFFIXES.some((s) => book.id.endsWith(s))) return true;
+  if (TOUR_SEED_TITLES.has(book.title)) return true;
+  if (
+    book.coverSrc === "/covers/demo-placeholder.svg" ||
+    book.coverSrc === "/covers/demo-placeholder-alt.svg" ||
+    book.coverSrc === "/covers/rose-metal-still.svg" ||
+    book.coverSrc === "/covers/rose-metal-still-alt.svg" ||
+    book.coverSrc === "/covers/edens-fall-front.png"
+  ) {
+    return true;
+  }
+  if (book.authorName === "Demo Writer") return true;
+  if (book.coverPackNote?.toLowerCase().includes("demo shelf")) return true;
+  return false;
 }
 
-/** Personal bench seed — real titles/covers for email sign-in only, never demo. */
-function seedWriterBooks(ownerId: string): Book[] {
-  const t = now();
-  return [
-    {
-      id: `book_${ownerId}_edens-fall`,
-      ownerId,
-      title: "Eden’s Fall",
-      status: "formatting",
-      trim: "5.5x8.5",
-      theme: "trade-paperback",
-      coverSrc: "/covers/edens-fall-front.png",
-      coverPackNote:
-        "Print pack already attached — front, back, 300 dpi, and combined PDF. Don’t rebuild.",
-      manuscriptText: SAMPLE_CHAPTER,
-      authorName: "Sarah Brundige",
-      copyrightYear: "2026",
-      createdAt: t,
-      updatedAt: t,
-    },
-    {
-      id: `book_${ownerId}_night-orchard`,
-      ownerId,
-      title: "Night Orchard",
-      status: "draft",
-      trim: "6x9",
-      theme: "trade-paperback",
-      manuscriptText: SAMPLE_CHAPTER,
-      createdAt: t,
-      updatedAt: t,
-    },
-  ];
-}
-
-const DEMO_LEGACY_SUFFIXES = ["_edens-fall", "_night-orchard"];
-
-/** Replace an older demo library that still showed real titles/covers. */
-function migrateDemoLibraryIfNeeded(ownerId: string) {
-  if (ownerId !== DEMO_USER_ID) return;
+/** Drop tour / sandbox seed manuscripts so WIP is empty until the writer creates. */
+function purgeTourSeedBooks(ownerId: string) {
   const books = allBooks();
-  const mine = books.filter((b) => b.ownerId === ownerId);
-  if (mine.length === 0) return;
-  const looksLegacy = mine.some(
-    (b) =>
-      DEMO_LEGACY_SUFFIXES.some((s) => b.id.endsWith(s)) ||
-      b.coverSrc === "/covers/edens-fall-front.png" ||
-      b.title === "Eden’s Fall" ||
-      b.title === "Night Orchard" ||
-      b.authorName === "Sarah Brundige",
-  );
-  if (!looksLegacy) return;
-  const others = books.filter((b) => b.ownerId !== ownerId);
-  saveBooks([...others, ...seedDemoBooks(ownerId)]);
-}
-
-function ensureSeededLibrary(ownerId: string) {
-  migrateDemoLibraryIfNeeded(ownerId);
-  const books = allBooks();
-  if (books.some((b) => b.ownerId === ownerId)) return;
-  const seed = ownerId === DEMO_USER_ID ? seedDemoBooks(ownerId) : seedWriterBooks(ownerId);
-  saveBooks([...books, ...seed]);
+  const kept = books.filter((b) => !(b.ownerId === ownerId && isTourSeedBook(b)));
+  if (kept.length !== books.length) saveBooks(kept);
 }
 
 const WRITER_COVER_NOTE =
@@ -250,7 +248,10 @@ function sanitizeBook(book: Book): Book {
 }
 
 export function listBooks(ownerId: string): Book[] {
-  ensureSeededLibrary(ownerId);
+  if (isLocalOnlyUserId(ownerId) || ownerId === LOCAL_USER_ID) {
+    purgeTourSeedBooks(ownerId);
+    if (ownerId === LEGACY_DEMO_USER_ID) purgeTourSeedBooks(LOCAL_USER_ID);
+  }
   return allBooks()
     .filter((b) => b.ownerId === ownerId)
     .map(sanitizeBook)

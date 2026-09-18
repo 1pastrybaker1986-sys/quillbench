@@ -11,32 +11,32 @@ const STEPS: DemoStep[] = [
   {
     id: "scan",
     label: "Scan",
-    caption: "OCR typed pages into editable manuscript text — Glass Harbor, page 12.",
-    book: "Glass Harbor",
+    caption: "OCR typed pages into editable manuscript text — ready for craft.",
+    book: "Untitled",
   },
   {
     id: "grammar",
     label: "Grammar",
-    caption: "Fiction-aware notes flag dialogue tags and tense drift on Copper Thread.",
-    book: "Copper Thread",
+    caption: "Fiction-aware notes flag dialogue tags and tense drift as you draft.",
+    book: "Untitled",
   },
   {
     id: "editing",
     label: "Editing",
     caption: "Four-pass board: developmental → line → copy → proof, status at a glance.",
-    book: "Glass Harbor",
+    book: "Untitled",
   },
   {
     id: "formatting",
     label: "Formatting",
     caption: "Print PDF + EPUB from one bench — front matter, chapters, export ready.",
-    book: "Copper Thread",
+    book: "Untitled",
   },
   {
     id: "publishing",
     label: "Publishing",
     caption: "Studio packages unlock cover, marketing, and launch checklists.",
-    book: "Glass Harbor",
+    book: "Untitled",
   },
 ];
 
@@ -76,17 +76,17 @@ export default function ProductDemo({ onScanStart }: Props) {
   return (
     <aside className="product-demo" aria-label="Product walkthrough">
       <div className="product-demo-chrome">
-        <p className="product-demo-eyebrow">Product tour</p>
+        <p className="product-demo-eyebrow">In the bench</p>
         <div className="product-demo-controls">
           <button
             type="button"
             className="product-demo-play"
             onClick={() => setPlaying((p) => !p)}
-            aria-label={playing ? "Pause tour" : "Play tour"}
+            aria-label={playing ? "Pause walkthrough" : "Play walkthrough"}
           >
             {playing ? "Pause" : "Play"}
           </button>
-          <div className="product-demo-dots" role="tablist" aria-label="Tour steps">
+          <div className="product-demo-dots" role="tablist" aria-label="Bench steps">
             {STEPS.map((s, i) => (
               <button
                 key={s.id}
@@ -110,7 +110,7 @@ export default function ProductDemo({ onScanStart }: Props) {
             </span>
             <span className="product-demo-window-label">Quillbench · {current.book}</span>
           </div>
-          <nav className="product-demo-tabs" aria-label="Tour modules">
+          <nav className="product-demo-tabs" aria-label="Bench modules">
             {STEPS.map((s, i) =>
               s.id === "scan" && onScanStart ? (
                 <button
@@ -141,12 +141,12 @@ export default function ProductDemo({ onScanStart }: Props) {
               <div className="pd-scan">
                 <div className="pd-scan-page">
                   <span className="pd-scan-beam" />
-                  <p>Chapter 3 — The Pier</p>
+                  <p>Your page</p>
                   <p className="pd-scan-lines">Typed lines resolve into clean manuscript text…</p>
                 </div>
                 <ul className="pd-scan-meta">
-                  <li>12 pages</li>
                   <li>OCR ready</li>
+                  <li>Stays on device</li>
                 </ul>
                 {onScanStart ? (
                   <button
@@ -185,8 +185,8 @@ export default function ProductDemo({ onScanStart }: Props) {
             {current.id === "formatting" && (
               <div className="pd-format">
                 <div className="pd-spread">
-                  <div className="pd-page"><small>Half-title</small><strong>Glass Harbor</strong></div>
-                  <div className="pd-page"><small>Ch. 1</small><p>Fog clung to the rails…</p></div>
+                  <div className="pd-page"><small>Half-title</small><strong>Untitled</strong></div>
+                  <div className="pd-page"><small>Ch. 1</small><p>Your opening line…</p></div>
                 </div>
                 <div className="pd-exports">
                   <span>PDF</span>

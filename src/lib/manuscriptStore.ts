@@ -16,6 +16,8 @@ export interface ManuscriptStore {
 
   getSession(): Session | null;
   signInWithEmail(email: string): Session | Promise<Session>;
+  startLocalSession(): Session;
+  /** @deprecated Use startLocalSession */
   signInDemo(): Session;
   signOut(): void | Promise<void>;
 
