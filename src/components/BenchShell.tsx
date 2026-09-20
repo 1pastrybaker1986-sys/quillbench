@@ -182,6 +182,7 @@ export default function BenchShell({
         aria-expanded={drawerOpen}
         aria-controls={sidebarId}
         aria-label={drawerOpen ? "Close menu" : "Open menu"}
+        title={drawerOpen ? "Close menu" : "Open menu"}
         onClick={() => setDrawerOpen((v) => !v)}
       >
         <span className="bench-drawer-hamburger" aria-hidden="true">
@@ -189,8 +190,7 @@ export default function BenchShell({
           <span />
           <span />
         </span>
-        <Nib className="nib" />
-        <span className="wordmark">Quillbench</span>
+        <span className="bench-drawer-label">Menu</span>
       </button>
 
       {drawerOpen ? (
