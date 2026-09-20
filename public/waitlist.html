@@ -3,17 +3,30 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Quillbench waitlist</title>
+    <meta name="color-scheme" content="light only" />
+    <meta name="theme-color" content="#F7F1EA" />
+    <meta name="robots" content="noindex" />
+    <title>Quillbench | You’re on the waitlist</title>
     <style>
+      html,body{background:#F7F1EA;color:#1C1917;color-scheme:light only}
       body {
         font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
         max-width: 28rem;
         margin: 3rem auto;
         padding: 0 1.25rem;
         line-height: 1.5;
-        color: #2a2426;
       }
-      a { color: #d45f6c; }
+      a { color: #b86a62; }
+      .btn {
+        display: inline-block;
+        margin-top: 1rem;
+        padding: 0.85rem 1.25rem;
+        border-radius: 0.65rem;
+        background: #1c1917;
+        color: #f7f1ea;
+        text-decoration: none;
+        font-weight: 600;
+      }
     </style>
   </head>
   <body>
@@ -22,6 +35,8 @@
       Thanks for joining the Quillbench soft-launch waitlist. We’ll be in touch
       at the email you shared.
     </p>
+    <p>Ready now? Soft-launch Studio Bundle is <strong>$449</strong> USD.</p>
+    <p><a class="btn" href="/pricing/bundle">Get Studio Bundle $449</a></p>
     <p><a href="/">Back to Quillbench</a></p>
 
     <!-- Netlify Forms: real static form (SPA POST target). Detection also in index.html. -->
@@ -38,14 +53,5 @@
       <input type="email" name="email" />
       <input type="text" name="source" />
     </form>
-
-    <script>
-      // Optional: send humans who land here back to the app after a beat
-      if (typeof location !== "undefined" && !location.search.includes("no-redirect")) {
-        setTimeout(function () {
-          location.replace("/");
-        }, 2500);
-      }
-    </script>
   </body>
 </html>

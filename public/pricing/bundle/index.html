@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light only" />
+    <meta name="theme-color" content="#F7F1EA" />
+    <meta name="description" content="Quillbench Studio Bundle soft launch — Full Edit + Cover + Marketing for $449 USD." />
+    <meta property="og:title" content="Quillbench Studio Bundle · $449" />
+    <meta property="og:description" content="Scan a page → clean file. Studio Bundle soft launch $449 with SOFTLAUNCH50." />
+    <meta property="og:image" content="https://quillbench.netlify.app/og-image.png" />
+    <meta property="og:url" content="https://quillbench.netlify.app/pricing/bundle" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <title>Quillbench | Studio Bundle $449 soft launch</title>
+    <style>
+      html,body{background:#F7F1EA;color:#1C1917;color-scheme:light only;margin:0}
+      body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;max-width:32rem;margin:3rem auto;padding:0 1.25rem;line-height:1.55}
+      h1{font-size:1.65rem;font-weight:650;margin:0 0 .5rem}
+      .price{font-size:2rem;font-weight:700;margin:.75rem 0}
+      .was{color:#6b5f56;text-decoration:line-through;font-size:1.1rem;margin-left:.35rem;font-weight:500}
+      ul{padding-left:1.2rem}
+      .btn{display:inline-block;margin-top:1rem;padding:.9rem 1.35rem;border-radius:.65rem;background:#1C1917;color:#F7F1EA;text-decoration:none;font-weight:600;border:0;cursor:pointer;font-size:1rem}
+      .btn:disabled{opacity:.6;cursor:wait}
+      a{color:#b86a62}
+      .err{color:#9b3b3b;margin-top:.75rem}
+      .eyebrow{letter-spacing:.04em;text-transform:uppercase;font-size:.75rem;color:#6b5f56;margin:0 0 .35rem}
+    </style>
+  </head>
+  <body>
+    <p class="eyebrow">Soft launch · through October 10</p>
+    <h1>Studio Bundle</h1>
+    <p>Full Edit + Cover Design + Marketing — the fastest path from draft pages to publish-ready files.</p>
+    <p class="price">$449 <span class="was">$499</span></p>
+    <p>SOFTLAUNCH50 applies automatically at Checkout ($50 off). Price is <strong>$449 USD</strong>, not $4.49.</p>
+    <ul>
+      <li>Full Edit board + priority review</li>
+      <li>Cover brief and deliverables</li>
+      <li>Marketing / launch kit</li>
+    </ul>
+    <button class="btn" id="buy" type="button">Get Studio Bundle $449</button>
+    <p id="err" class="err" hidden></p>
+    <p style="margin-top:1.75rem"><a href="/">Quillbench home</a> · <a href="/waitlist">Waitlist</a></p>
+    <script>
+      (function () {
+        var btn = document.getElementById("buy");
+        var err = document.getElementById("err");
+        btn.addEventListener("click", function () {
+          err.hidden = true;
+          btn.disabled = true;
+          btn.textContent = "Opening checkout…";
+          fetch("/.netlify/functions/create-checkout-session", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              packageId: "studio-bundle",
+              successUrl: location.origin + "/?checkout=success&pkg=studio-bundle",
+              cancelUrl: location.origin + "/pricing/bundle?checkout=cancel",
+            }),
+          })
+            .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+            .then(function (x) {
+              if (x.ok && x.d && x.d.url) {
+                location.assign(x.d.url);
+                return;
+              }
+              btn.disabled = false;
+              btn.textContent = "Get Studio Bundle $449";
+              err.textContent = (x.d && (x.d.error || x.d.reason)) || "Checkout failed. Try again or email hello@quillbench.app.";
+              err.hidden = false;
+            })
+            .catch(function () {
+              btn.disabled = false;
+              btn.textContent = "Get Studio Bundle $449";
+              err.textContent = "Could not reach checkout. Check your connection.";
+              err.hidden = false;
+            });
+        });
+      })();
+    </script>
+  </body>
+</html>

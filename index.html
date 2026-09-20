@@ -8,12 +8,35 @@
     <meta name="color-scheme" content="light only" />
     <meta name="theme-color" content="#F7F1EA" />
     <style>html,body{background:#F7F1EA;color:#1C1917;color-scheme:light only}</style>
-    <meta name="description" content="Quillbench — book production from draft to publish-ready files. Scan, grammar, format, publish." />
+    <meta
+      name="description"
+      content="Quillbench — scan a page into a clean file you can finish. Grammar, format, and publish-ready book production."
+    />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Quillbench" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <title>Quillbench</title>
+    <title>Quillbench | Scan a page → clean file you can finish</title>
+    <link rel="canonical" href="https://quillbench.netlify.app/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Quillbench" />
+    <meta property="og:title" content="Quillbench | Scan a page → clean file you can finish" />
+    <meta
+      property="og:description"
+      content="Book production from draft pages to publish-ready files. Soft-launch Studio Bundle $449."
+    />
+    <meta property="og:url" content="https://quillbench.netlify.app/" />
+    <meta property="og:image" content="https://quillbench.netlify.app/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Quillbench cream desk — scan a page into a clean file" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Quillbench | Scan a page → clean file you can finish" />
+    <meta
+      name="twitter:description"
+      content="Book production from draft pages to publish-ready files. Soft-launch Studio Bundle $449."
+    />
+    <meta name="twitter:image" content="https://quillbench.netlify.app/og-image.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -22,6 +45,12 @@
     />
   </head>
   <body>
+    <!-- Thin static crawler copy (outside React root) -->
+    <p id="qb-crawler" style="position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden">
+      Quillbench: Scan a page → clean file you can finish. Book production from draft to
+      publish-ready files — grammar, format, cover, and marketing. Soft-launch Studio Bundle $449.
+      <a href="/pricing/bundle">Studio Bundle pricing</a>. <a href="/waitlist">Join the waitlist</a>.
+    </p>
     <!-- Netlify Forms detection (SPA): enable notifications in Netlify → Forms → quillbench-waitlist -->
     <form name="quillbench-waitlist" netlify netlify-honeypot="bot-field" hidden>
       <input type="text" name="bot-field" />

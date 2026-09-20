@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { startLocalSession, signInWithEmail } from "../lib/store";
 import { isCloudSaveEnabled } from "../lib/cloudSaveFlag";
 import { identityMagicLink } from "../lib/netlifyCloudSave";
@@ -47,6 +47,33 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
   const [authNote, setAuthNote] = useState<string | null>(null);
   const [authBusy, setAuthBusy] = useState(false);
   const cloudOn = isCloudSaveEnabled();
+
+  // Deep links: /waitlist, /pricing, /pricing/bundle, ?buy=studio-bundle
+  useEffect(() => {
+    try {
+      const path = window.location.pathname.replace(/\/+$/, "") || "/";
+      const params = new URLSearchParams(window.location.search);
+      const wantBuy = params.get("buy") === "studio-bundle";
+      if (path === "/waitlist" || path.endsWith("/waitlist")) {
+        window.setTimeout(() => {
+          document.getElementById("landing-waitlist")?.scrollIntoView({ behavior: "smooth", block: "center" });
+        }, 80);
+      } else if (path.startsWith("/pricing")) {
+        window.setTimeout(() => {
+          document.getElementById("landing-price")?.scrollIntoView({ behavior: "smooth", block: "center" });
+        }, 80);
+      }
+      if (wantBuy) {
+        window.setTimeout(() => {
+          void buyStudioBundle();
+        }, 120);
+      }
+    } catch {
+      /* ignore */
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- boot deep-link once
+  }, []);
+
 
   async function continueWithEmail(e: FormEvent) {
     e.preventDefault();
@@ -161,9 +188,10 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
           <button
             className="btn btn-primary landing-bundle-ribbon-cta"
             type="button"
-            onClick={scrollToWaitlist}
+            disabled={checkoutBusy}
+            onClick={() => void buyStudioBundle()}
           >
-            Save my spot
+            {checkoutBusy ? "Opening checkout…" : `Get Studio Bundle ${formatSoftBundlePrice()}`}
           </button>
         </div>
       </section>
@@ -221,9 +249,20 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
             </li>
           </ul>
           <div className="landing-bundle-actions">
-            <button className="btn btn-primary" type="button" onClick={scrollToWaitlist}>
+            <button
+              className="btn btn-primary"
+              type="button"
+              disabled={checkoutBusy}
+              onClick={() => void buyStudioBundle()}
+            >
+              {checkoutBusy ? "Opening checkout…" : `Get Studio Bundle ${formatSoftBundlePrice()}`}
+            </button>
+            <button className="btn btn-ghost" type="button" onClick={scrollToWaitlist}>
               Save my spot
             </button>
+            {checkoutNote ? (
+              <p className="landing-waitlist-checkout-note">{checkoutNote}</p>
+            ) : null}
           </div>
         </div>
       </section>
