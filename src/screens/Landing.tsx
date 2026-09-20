@@ -65,7 +65,14 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
       }
       if (wantBuy) {
         window.setTimeout(() => {
-          void buyStudioBundle();
+          void (async () => {
+            if (checkoutBusy) return;
+            setCheckoutNote(null);
+            setCheckoutBusy(true);
+            const result = await startCheckout("studio-bundle");
+            setCheckoutBusy(false);
+            if (!result.ok) setCheckoutNote(result.reason);
+          })();
         }, 120);
       }
     } catch {
