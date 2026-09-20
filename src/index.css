@@ -3150,6 +3150,37 @@ input:focus {
   font-size: 0.95rem;
 }
 
+.landing-waitlist-next {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin-top: 0.35rem;
+}
+
+.landing-waitlist-next .landing-waitlist-thanks {
+  margin: 0;
+}
+
+.landing-waitlist-next-lede {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.45;
+  color: var(--ink-soft, #5a4a4e);
+  font-weight: 500;
+}
+
+.landing-waitlist-buy {
+  width: auto;
+  align-self: flex-start;
+  min-width: 12rem;
+}
+
+.landing-waitlist-checkout-note {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--rose-deep);
+}
+
 .landing-waitlist-support {
   margin: 0.9rem 0 0;
   font-size: 0.88rem;

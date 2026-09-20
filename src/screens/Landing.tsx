@@ -3,6 +3,7 @@ import { startLocalSession, signInWithEmail } from "../lib/store";
 import { isCloudSaveEnabled } from "../lib/cloudSaveFlag";
 import { identityMagicLink } from "../lib/netlifyCloudSave";
 import { submitWaitlist } from "../lib/waitlist";
+import { startCheckout } from "../lib/billing";
 import {
   formatCatalogBundlePrice,
   formatSoftBundlePrice,
@@ -41,6 +42,8 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
   const [waitlistEmail, setWaitlistEmail] = useState("");
   const [waitlistDone, setWaitlistDone] = useState(false);
   const [waitlistBusy, setWaitlistBusy] = useState(false);
+  const [checkoutBusy, setCheckoutBusy] = useState(false);
+  const [checkoutNote, setCheckoutNote] = useState<string | null>(null);
   const [authNote, setAuthNote] = useState<string | null>(null);
   const [authBusy, setAuthBusy] = useState(false);
   const cloudOn = isCloudSaveEnabled();
@@ -69,6 +72,19 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
     if (!ok) return;
     setWaitlistDone(true);
     setWaitlistEmail("");
+  }
+
+  async function buyStudioBundle() {
+    if (checkoutBusy) return;
+    setCheckoutNote(null);
+    setCheckoutBusy(true);
+    const result = await startCheckout("studio-bundle");
+    setCheckoutBusy(false);
+    if (!result.ok) {
+      setCheckoutNote(result.reason);
+      return;
+    }
+    // stripe redirects; stub unlocks locally — note stays quiet
   }
 
   function scrollToSignIn() {
@@ -229,10 +245,28 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
             {formatCatalogBundlePrice()}).
           </p>
           {waitlistDone ? (
-            <p className="landing-waitlist-thanks" role="status">
-              You’re on the list. We’ll email early-access notes. Studio Bundle Checkout already
-              includes {SOFT_LAUNCH.couponCode} ({formatSoftBundlePrice()}).
-            </p>
+            <div className="landing-waitlist-next" role="status">
+              <p className="landing-waitlist-thanks">
+                You’re on the list. We’ll email early-access notes.
+              </p>
+              <p className="landing-waitlist-next-lede">
+                Ready now? Studio Bundle Checkout is {formatSoftBundlePrice()} with{" "}
+                <strong>{SOFT_LAUNCH.couponCode}</strong> applied automatically.
+              </p>
+              <button
+                className="btn btn-primary landing-waitlist-buy"
+                type="button"
+                disabled={checkoutBusy}
+                onClick={() => void buyStudioBundle()}
+              >
+                {checkoutBusy
+                  ? "Opening checkout…"
+                  : `Get Studio Bundle ${formatSoftBundlePrice()}`}
+              </button>
+              {checkoutNote ? (
+                <p className="landing-waitlist-checkout-note">{checkoutNote}</p>
+              ) : null}
+            </div>
           ) : (
             <form
               className="landing-waitlist-form"
