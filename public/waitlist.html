@@ -25,11 +25,29 @@
   </head>
   <body>
     <h1>You’re on the list</h1>
-    <p>Thanks for joining the Quillbench soft-launch waitlist. We’ll be in touch at the email you shared.</p>
+    <p>
+      Thanks for joining the Quillbench soft-launch waitlist. We’ll be in touch
+      at the email you shared.
+    </p>
     <p class="note">Ready now? Soft-launch Studio Bundle is <strong>$449</strong> USD (SOFTLAUNCH50 applied at Checkout).</p>
     <button class="btn" id="buy" type="button">Get Studio Bundle $449</button>
     <p id="err" class="err" hidden></p>
     <p style="margin-top:1.5rem"><a href="/">Back to Quillbench</a> · <a href="/pricing/bundle">Pricing</a></p>
+
+    <!-- Netlify Forms: real static form (SPA POST target). Detection also in index.html. -->
+    <form
+      name="quillbench-waitlist"
+      method="POST"
+      data-netlify="true"
+      netlify
+      netlify-honeypot="bot-field"
+      hidden
+    >
+      <input type="hidden" name="form-name" value="quillbench-waitlist" />
+      <input type="text" name="bot-field" />
+      <input type="email" name="email" />
+      <input type="text" name="source" />
+    </form>
     <script>
       (function () {
         var btn = document.getElementById("buy");
@@ -67,13 +85,5 @@
         });
       })();
     </script>
-  
-    <!-- Netlify Forms: real static form (SPA POST target). Detection also in index.html. -->
-    <form name="quillbench-waitlist" method="POST" data-netlify="true" netlify netlify-honeypot="bot-field" hidden>
-      <input type="hidden" name="form-name" value="quillbench-waitlist" />
-      <input type="text" name="bot-field" />
-      <input type="email" name="email" />
-      <input type="text" name="source" />
-    </form>
   </body>
 </html>
