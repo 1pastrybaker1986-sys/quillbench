@@ -516,12 +516,17 @@ export default function Workspace({ session, bookId, initialModule, autoScan, on
       activeBookTitle={book.title}
       manuscriptText={draftText}
       defaultSection="files"
+      activeModule={module}
+      onModuleChange={(id) => {
+        flushPending();
+        setModule(id);
+      }}
+      onUseSample={useSampleChapter}
+      hasCover={Boolean(book.coverSrc)}
+      exportCount={(book.exports ?? []).length}
     >
     <div className="workspace">
-      <header className="work-head">
-        <button className="back" type="button" onClick={onBack}>
-          ← Works in Progress
-        </button>
+      <header className="work-head work-head-slim">
         <div className="work-title-row">
           <h1>{book.title}</h1>
           <span className={`pill ${book.status}`}>
@@ -548,32 +553,6 @@ export default function Workspace({ session, bookId, initialModule, autoScan, on
             </button>
           ))}
         </nav>
-        <nav className="journey" aria-label="Book journey">
-          {MODULES.map((m, i) => (
-            <span key={m.id} className="journey-step-wrap">
-              {i > 0 ? <span className="journey-arrow" aria-hidden="true">›</span> : null}
-              <button
-                type="button"
-                className={`journey-step${module === m.id ? " current" : ""}`}
-                onClick={() => {
-                  flushPending();
-                  setModule(m.id);
-                }}
-              >
-                <span className="journey-num" aria-hidden="true">{i + 1}</span>
-                {m.label}
-              </button>
-            </span>
-          ))}
-        </nav>
-        <img
-          className="work-flourish"
-          src="/art/quill-flourish.svg"
-          alt=""
-          width={640}
-          height={48}
-          aria-hidden="true"
-        />
       </header>
 
       <input
@@ -589,13 +568,7 @@ export default function Workspace({ session, bookId, initialModule, autoScan, on
       />
 
       {module === "write" ? (
-        <div className="write-surface">
-          <header className="write-head">
-            <h2>Write</h2>
-            <p className="write-lede">
-              Type, paste, or scan pages into your manuscript. Changes save on this device.
-            </p>
-          </header>
+        <div className="write-surface write-surface-calm">
           <div
             className={`write-editor drop-slot${dragging ? " over" : ""}`}
             onDragEnter={(e) => {
@@ -627,35 +600,13 @@ export default function Workspace({ session, bookId, initialModule, autoScan, on
                 if (msTimer.current) window.clearTimeout(msTimer.current);
                 persistManuscript(draftText);
               }}
-              placeholder="Start writing, paste a chapter, or scan pages below."
+              placeholder="Start writing, paste a chapter, or drop a page photo to Scan."
               spellCheck={false}
               disabled={scanning}
+              aria-label="Manuscript"
             />
-            <div className="ms-actions">
-              <button className="linkish" type="button" onClick={useSampleChapter}>
-                Use sample chapter
-              </button>
-              <span className="ms-hint">.txt or .md · PNG / JPEG / WebP pages</span>
-            </div>
           </div>
-          <div className="scan-block write-scan">
-            <p className="scan-help">
-              Best for typewritten or printed pages. Photos in good light work. Handwriting is
-              hit-or-miss.
-            </p>
-            <p className="scan-formats">
-              PNG, JPEG, or WebP — as many pages as you want. PDF isn’t in this version;
-              photograph or export pages as images.
-            </p>
-            <label className="scan-option">
-              <input
-                type="checkbox"
-                checked={detectPage}
-                disabled={scanning}
-                onChange={(e) => setDetectPage(e.target.checked)}
-              />
-              <span>Detect page edges (crop hands &amp; background)</span>
-            </label>
+          <div className="scan-block write-scan write-scan-parked">
             <div className="scan-actions">
               <button
                 className="btn-export primary"
@@ -665,6 +616,18 @@ export default function Workspace({ session, bookId, initialModule, autoScan, on
               >
                 {scanning ? scanStatus || "Reading…" : "Scan pages"}
               </button>
+            </div>
+            <details className="scan-more">
+              <summary>Scan options</summary>
+              <label className="scan-option">
+                <input
+                  type="checkbox"
+                  checked={detectPage}
+                  disabled={scanning}
+                  onChange={(e) => setDetectPage(e.target.checked)}
+                />
+                <span>Detect page edges</span>
+              </label>
               <button
                 className="linkish scan-replace"
                 type="button"
@@ -673,7 +636,7 @@ export default function Workspace({ session, bookId, initialModule, autoScan, on
               >
                 Replace manuscript with scan
               </button>
-            </div>
+            </details>
             {scanStatus ? (
               <p className="scan-status" role="status" aria-live="polite">
                 {scanStatus}
@@ -742,22 +705,11 @@ export default function Workspace({ session, bookId, initialModule, autoScan, on
                   spellCheck={false}
                   disabled={scanning}
                 />
-                <div className="ms-actions">
-                  <button className="linkish" type="button" onClick={useSampleChapter}>
-                    Use sample chapter
-                  </button>
-                  <span className="ms-hint">.txt or .md</span>
+                <div className="ms-actions ms-actions-quiet">
+                  <span className="ms-hint">.txt or .md · Scan below</span>
                 </div>
               </div>
               <div className="scan-block">
-                <p className="scan-help">
-                  Best for typewritten or printed pages. Photos in good light work. Handwriting is
-                  hit-or-miss.
-                </p>
-                <p className="scan-formats">
-                  PNG, JPEG, or WebP — as many pages as you want. PDF isn’t in this version;
-                  photograph or export pages as images.
-                </p>
                 <label className="scan-option">
                   <input
                     type="checkbox"
@@ -765,7 +717,7 @@ export default function Workspace({ session, bookId, initialModule, autoScan, on
                     disabled={scanning}
                     onChange={(e) => setDetectPage(e.target.checked)}
                   />
-                  <span>Detect page edges (crop hands &amp; background)</span>
+                  <span>Detect page edges</span>
                 </label>
                 <div className="scan-actions">
                   <button
@@ -782,7 +734,7 @@ export default function Workspace({ session, bookId, initialModule, autoScan, on
                     disabled={scanning}
                     onClick={() => openScan("replace")}
                   >
-                    Replace manuscript with scan
+                    Replace with scan
                   </button>
                 </div>
                 {scanStatus ? (
@@ -1004,7 +956,7 @@ export default function Workspace({ session, bookId, initialModule, autoScan, on
         </div>
       )}
 
-      {buyNudge ? (
+      {buyNudge && module !== "write" ? (
         <ExportBuyNudge
           onSeePackages={() => {
             setBuyNudge(false);

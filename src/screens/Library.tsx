@@ -38,45 +38,26 @@ export default function Library({ session, onOpenBook, onSignOut, onOpenPrivacy,
       onOpenBook={onOpenBook}
       onLibraryChanged={() => setBooks(listBooks(session.userId))}
       defaultSection="saved"
+      onNewBook={() => setCreating(true)}
     >
       <div>
-        <header className="topbar">
-          <div className="topbar-left">
-            <span className="topbar-shelf-label">Works in Progress</span>
-          </div>
-        </header>
-
-        <main className="library">
-          <div className="library-orbs" aria-hidden="true">
-            <span className="orb orb-1" />
-            <span className="orb orb-2" />
-          </div>
-          <div className="library-head">
-            <div>
-              <h1>Works in Progress</h1>
-              <p>Books on this bench — not a shared shelf.</p>
-              <div className="library-tip">
-                <span className="library-tip-motif" aria-hidden="true">
-                  <img src="/art/open-book-motif.svg" alt="" width={80} height={64} />
-                </span>
-                <p className="library-tip-text">
-                  Tip: open a book → Write (type or Scan pages), then Grammar → Editing → Publishing
-                  packages.
-                </p>
-              </div>
-            </div>
-            <button className="btn-new" type="button" onClick={() => setCreating(true)}>
-              New book
-            </button>
-          </div>
-
-          <div className="library-ornament" aria-hidden="true">
-            <img src="/art/quill-flourish.svg" alt="" width={640} height={48} />
+        <main className="library library-spacious">
+          <div className="library-head library-head-quiet">
+            {books.length > 0 ? (
+              <>
+                <p className="library-shelf-line">Books on this bench.</p>
+                <button className="btn-new" type="button" onClick={() => setCreating(true)}>
+                  New book
+                </button>
+              </>
+            ) : (
+              <p className="library-shelf-line sr-only">Works in Progress</p>
+            )}
           </div>
 
           {books.length === 0 ? (
-            <div className="library-empty">
-              <p>No books in Works in Progress yet.</p>
+            <div className="library-empty library-empty-nested">
+              <p>No books yet.</p>
               <button className="btn-solid" type="button" onClick={() => setCreating(true)}>
                 Start a draft
               </button>

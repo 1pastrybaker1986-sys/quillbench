@@ -5,9 +5,17 @@ import { cloudSaveStatusLine, isCloudSaveEnabled } from "../lib/cloudSaveFlag";
 import { identitySignOut } from "../lib/identityGoTrue";
 import { downloadWipBackup, pickAndRestoreWipBackup } from "../lib/wipBackup";
 import { chapterNavTitle, parseManuscript } from "../lib/sampleManuscript";
-import type { Book, Session } from "../lib/types";
+import type { Book, ModuleId, Session } from "../lib/types";
 
 export type BenchSection = "account" | "files" | "saved" | "settings";
+
+const MODULE_STEPS: { id: ModuleId; label: string }[] = [
+  { id: "write", label: "Write" },
+  { id: "grammar", label: "Grammar" },
+  { id: "editing", label: "Editing" },
+  { id: "formatting", label: "Formatting" },
+  { id: "publishing", label: "Publishing" },
+];
 
 type Props = {
   session: Session;
@@ -25,6 +33,16 @@ type Props = {
   onLibraryChanged?: () => void;
   /** Preferred sidebar section when context changes. */
   defaultSection?: BenchSection;
+  /** Active workspace module — journey lives in Files, not the main strip. */
+  activeModule?: ModuleId | null;
+  onModuleChange?: (id: ModuleId) => void;
+  /** Secondary: sample chapter (kept off Write/Scan surface). */
+  onUseSample?: () => void;
+  /** Secondary: start a new book from Saved pane. */
+  onNewBook?: () => void;
+  /** Cover / export summary for Files (Formatting owns the tools). */
+  hasCover?: boolean;
+  exportCount?: number;
 };
 
 const SECTIONS: { id: BenchSection; label: string }[] = [
@@ -51,6 +69,12 @@ export default function BenchShell({
   manuscriptText = "",
   onLibraryChanged,
   defaultSection,
+  activeModule = null,
+  onModuleChange,
+  onUseSample,
+  onNewBook,
+  hasCover = false,
+  exportCount = 0,
 }: Props) {
   const inferredDefault: BenchSection = defaultSection ?? (activeBookId ? "files" : "saved");
   const [section, setSection] = useState<BenchSection>(inferredDefault);
@@ -268,6 +292,71 @@ export default function BenchShell({
                       ))}
                     </ol>
                   )}
+
+                  {onModuleChange ? (
+                    <div className="bench-journey" aria-label="Book journey">
+                      <p className="bench-panel-kicker">Journey</p>
+                      <ol className="bench-journey-list">
+                        {MODULE_STEPS.map((step, i) => (
+                          <li key={step.id}>
+                            <button
+                              type="button"
+                              className={
+                                "bench-journey-step" +
+                                (activeModule === step.id ? " current" : "")
+                              }
+                              tabIndex={drawerOpen ? undefined : -1}
+                              onClick={() => {
+                                onModuleChange(step.id);
+                                setDrawerOpen(false);
+                              }}
+                            >
+                              <span className="bench-journey-num" aria-hidden="true">
+                                {i + 1}
+                              </span>
+                              <span>{step.label}</span>
+                            </button>
+                          </li>
+                        ))}
+                      </ol>
+                    </div>
+                  ) : null}
+
+                  <div className="bench-files-meta">
+                    <p className="bench-panel-kicker">Cover &amp; exports</p>
+                    <p className="bench-panel-empty">
+                      Cover: {hasCover ? "attached" : "none yet"}. Exports: {exportCount}.
+                      Open Formatting for cover and file downloads.
+                    </p>
+                    {onModuleChange ? (
+                      <button
+                        type="button"
+                        className="bench-panel-action"
+                        tabIndex={drawerOpen ? undefined : -1}
+                        onClick={() => {
+                          onModuleChange("formatting");
+                          setDrawerOpen(false);
+                        }}
+                      >
+                        Open Formatting
+                      </button>
+                    ) : null}
+                  </div>
+
+                  {onUseSample ? (
+                    <button
+                      type="button"
+                      className="bench-panel-action"
+                      tabIndex={drawerOpen ? undefined : -1}
+                      onClick={() => {
+                        onUseSample();
+                        setNote("Sample chapter loaded into the manuscript.");
+                        setDrawerOpen(false);
+                      }}
+                    >
+                      Use sample chapter
+                    </button>
+                  ) : null}
                 </>
               ) : (
                 <>
@@ -290,7 +379,22 @@ export default function BenchShell({
               <h2 className="bench-panel-title">Works in Progress</h2>
               <p className="bench-panel-lede">Books on this bench — not a shared shelf.</p>
               {books.length === 0 ? (
-                <p className="bench-panel-empty">No books in Works in Progress yet.</p>
+                <div className="bench-saved-empty">
+                  <p className="bench-panel-empty">No books yet.</p>
+                  {onNewBook ? (
+                    <button
+                      type="button"
+                      className="bench-panel-primary"
+                      tabIndex={drawerOpen ? undefined : -1}
+                      onClick={() => {
+                        onNewBook();
+                        setDrawerOpen(false);
+                      }}
+                    >
+                      Start a draft
+                    </button>
+                  ) : null}
+                </div>
               ) : (
                 <ul className="bench-saved-list">
                   {books.map((book) => (
@@ -309,6 +413,19 @@ export default function BenchShell({
                   ))}
                 </ul>
               )}
+              {onNewBook && books.length > 0 ? (
+                <button
+                  type="button"
+                  className="bench-panel-action"
+                  tabIndex={drawerOpen ? undefined : -1}
+                  onClick={() => {
+                    onNewBook();
+                    setDrawerOpen(false);
+                  }}
+                >
+                  New book
+                </button>
+              ) : null}
               {onLibraryHome && activeBookId ? (
                 <button type="button" className="bench-panel-action" onClick={libraryHomeAndClose}>
                   ← Works in Progress
@@ -322,7 +439,7 @@ export default function BenchShell({
               <h2 className="bench-panel-title">Settings</h2>
               <p className="bench-panel-lede">
                 {isCloudSaveEnabled()
-                  ? "Cloud Save is on for this build. Drafts stay on this device for now."
+                  ? "Cloud Save is on for this build. Signed-in works sync across devices."
                   : "Local on this device — cloud stays off for now."}
               </p>
               <dl className="bench-settings-list">
@@ -332,13 +449,17 @@ export default function BenchShell({
                 </div>
                 <div>
                   <dt>Device save</dt>
-                  <dd>Drafts and Works in Progress save in this browser. Use Account → backup to carry a file.</dd>
+                  <dd>
+                    {isCloudSaveEnabled()
+                      ? "Local cache on this browser. Signed-in library also syncs to your Quillbench account."
+                      : "Drafts and Works in Progress save in this browser. Use Account → backup to carry a file."}
+                  </dd>
                 </div>
                 <div>
                   <dt>Cloud Save</dt>
                   <dd>
                     {isCloudSaveEnabled()
-                      ? "On for this build · Email magic link is wired. Nothing syncs across devices yet."
+                      ? "On · Email magic link. Works in Progress sync via your account (Identity + Blobs)."
                       : "Coming. Nothing syncs across devices yet."}
                   </dd>
                 </div>

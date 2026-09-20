@@ -92,6 +92,12 @@ function resolveBookForScan(session: Session): string {
   return createBook(session.userId, "Scanned pages").id;
 }
 
+function isHostNoiseBanner(message: string): boolean {
+  return /blobs|identity jwt|identity is not enabled|identity handshake|not Live|GoTrue|magic-link login first/i.test(
+    message,
+  );
+}
+
 export default function App() {
   const boot = useMemo(() => getSession(), []);
   const [session, setSession] = useState<Session | null>(boot);
@@ -100,6 +106,31 @@ export default function App() {
 
   useEffect(() => {
     setCheckoutBanner(consumeCheckoutReturn());
+  }, []);
+
+  // If a magic-link hash arrives while the SPA is already open, finish Identity again.
+  useEffect(() => {
+    if (!isCloudSaveEnabled()) return;
+    function onHash() {
+      const h = window.location.hash || "";
+      if (!/(confirmation_token|recovery_token|invite_token|access_token)=/.test(h)) return;
+      void (async () => {
+        try {
+          const { session: next, migrateMessage } = await finishIdentityLoginAndMigrate();
+          if (!next) return;
+          setSession(next);
+          setLegalUrl(null);
+          setRoute({ name: "library" });
+          if (migrateMessage) setCheckoutBanner(migrateMessage);
+        } catch (e) {
+          setCheckoutBanner(
+            e instanceof Error ? e.message : "Identity handshake failed (not Live).",
+          );
+        }
+      })();
+    }
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
   }, []);
 
   // Flag ON only: complete Identity magic-link / recover tokens, then migrate-this-device WIP.
@@ -149,9 +180,11 @@ export default function App() {
     });
   }
 
+  const quietBanner =
+    checkoutBanner && !isHostNoiseBanner(checkoutBanner) ? checkoutBanner : null;
   const banner =
-    checkoutBanner && (
-      <Toast message={checkoutBanner} onDone={() => setCheckoutBanner(null)} />
+    quietBanner && (
+      <Toast message={quietBanner} onDone={() => setCheckoutBanner(null)} />
     );
 
   if (route.name === "privacy") {

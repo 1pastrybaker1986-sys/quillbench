@@ -3286,6 +3286,15 @@ input:focus {
   color: var(--rose-deep);
 }
 
+.legal-section ul {
+  margin: 0.55rem 0 0;
+  padding-left: 1.25rem;
+  color: var(--ink-soft, #4a4036);
+  line-height: 1.55;
+}
+.legal-section li {
+  margin: 0.35rem 0;
+}
 .legal-section p {
   margin: 0;
   color: var(--ink-soft);
@@ -4719,3 +4728,266 @@ a.legal-link {
 .bench-shell .library {
   position: relative;
 }
+
+
+/* ---- Soft-PASS declutter · No Publish (2026-09-20) ---- */
+
+.work-head-slim {
+  padding: 0.55rem 1.75rem 0.45rem;
+  box-shadow: 0 4px 14px rgba(90, 46, 52, 0.04);
+}
+
+.work-head-slim .work-title-row {
+  margin: 0 0 0.35rem;
+  gap: 0.55rem;
+}
+
+.work-head-slim .work-title-row h1 {
+  font-size: 1.35rem;
+  font-weight: 560;
+}
+
+.work-head-slim .modules {
+  gap: 0.15rem;
+}
+
+.work-head-slim .mod {
+  padding: 0.45rem 0.85rem 0.5rem;
+  font-size: 0.92rem;
+  border-radius: 8px 8px 0 0;
+}
+
+.bench-shell .work-head-slim {
+  padding-left: 12.5rem;
+}
+
+.write-surface {
+  gap: 1.35rem;
+  padding: 1.75rem clamp(1.75rem, 5vw, 3.25rem) 2.75rem;
+}
+
+.write-editor {
+  padding: 1.25rem 1.5rem 1rem;
+  min-height: 320px;
+}
+
+.write-input {
+  min-height: 280px;
+  padding: 0.35rem 0.15rem;
+  line-height: 1.72;
+}
+
+.ms-actions-quiet {
+  justify-content: flex-end;
+  border-top: 1px solid var(--rule-light);
+  padding-top: 0.55rem;
+  margin-top: 0.35rem;
+}
+
+.write-scan {
+  max-width: 28rem;
+  padding-top: 0.25rem;
+}
+
+.write-scan .scan-actions {
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.library-spacious {
+  padding: 3.25rem clamp(1.5rem, 4vw, 2.75rem) 4.5rem;
+  max-width: 960px;
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(240, 168, 160, 0.22), transparent 52%),
+    transparent;
+}
+
+.library-spacious .library-head {
+  margin-bottom: 2rem;
+}
+
+.library-empty-nested {
+  max-width: 22rem;
+  margin: 0.5rem 0 0;
+  padding: 1.35rem 1.25rem 1.45rem;
+  text-align: left;
+  border-style: solid;
+  border-color: rgba(162, 61, 76, 0.18);
+  border-radius: 14px;
+  background: rgba(255, 253, 251, 0.88);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.library-empty-nested p {
+  margin: 0 0 0.85rem;
+  font-size: 0.95rem;
+}
+
+.bench-journey {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--rule-light);
+}
+
+.bench-journey-list {
+  list-style: none;
+  margin: 0.35rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.bench-journey-step {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  text-align: left;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  padding: 0.4rem 0.5rem;
+  background: transparent;
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.bench-journey-step:hover {
+  background: rgba(255, 253, 251, 0.85);
+  border-color: rgba(224, 146, 104, 0.35);
+  color: var(--ink);
+}
+
+.bench-journey-step.current {
+  background: linear-gradient(120deg, #fff8f4, #f8ddd4);
+  border-color: rgba(162, 61, 76, 0.35);
+  color: var(--ink);
+  box-shadow: inset 3px 0 0 var(--rose);
+}
+
+.bench-journey-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--rose-deep);
+  box-shadow: inset 0 0 0 1px rgba(196, 122, 132, 0.35);
+}
+
+.bench-files-meta {
+  margin-top: 0.85rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--rule-light);
+}
+
+.bench-saved-empty {
+  margin-top: 0.35rem;
+  padding: 0.65rem 0.55rem 0.75rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(212, 95, 108, 0.16);
+}
+
+.bench-panel-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.55rem;
+  padding: 0.55rem 0.95rem;
+  border: 0;
+  border-radius: 999px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: #1a1012;
+  cursor: pointer;
+  background: var(--grad-cta, linear-gradient(120deg, #f0a8a0, #d45f6c));
+  box-shadow: 0 8px 18px rgba(212, 95, 108, 0.28);
+}
+
+.bench-panel-primary:hover,
+.bench-panel-primary:focus-visible {
+  outline: none;
+  filter: brightness(1.03);
+}
+
+/* Hide legacy second journey strip if any remnant markup remains */
+.work-head .journey,
+.work-flourish {
+  display: none !important;
+}
+
+
+/* CoS lock · 3 polish only (2026-09-20) */
+
+.write-surface-calm {
+  gap: 1rem;
+  padding-top: 1.35rem;
+}
+
+.write-scan-parked {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem 1rem;
+  max-width: none;
+}
+
+.write-scan-parked .scan-actions {
+  margin: 0;
+}
+
+.scan-more {
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.scan-more > summary {
+  cursor: pointer;
+  color: var(--rose-deep);
+  font-weight: 600;
+  list-style: none;
+}
+
+.scan-more > summary::-webkit-details-marker {
+  display: none;
+}
+
+.scan-more[open] {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 0.45rem 0.65rem;
+  border-radius: 10px;
+  background: rgba(255, 253, 251, 0.75);
+  border: 1px solid rgba(212, 95, 108, 0.18);
+}
+
+.library-head-quiet {
+  margin-bottom: 1.25rem;
+  min-height: 0;
+}
+
+.library-shelf-line {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+}
+
+/* Hide Netlify host badge inside authenticated bench (landing may keep it). */
+body:has(.bench-shell) a[href="https://www.netlify.com"],
+body:has(.bench-shell) a[href="https://www.netlify.com/"] ,
+body:has(.bench-shell) #netlify-badge,
+body:has(.bench-shell) .netlify-badge,
+body:has(.bench-shell) [data-netlify-badge] {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
