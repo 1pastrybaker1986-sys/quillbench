@@ -57,6 +57,14 @@ export default function Library({ session, onOpenBook, onSignOut, onOpenPrivacy,
 
           {books.length === 0 ? (
             <div className="library-empty library-empty-nested">
+              <img
+                className="library-empty-art"
+                src="/art/paper-stack.svg"
+                alt=""
+                width={180}
+                height={135}
+                aria-hidden="true"
+              />
               <p>No books yet.</p>
               <button className="btn-solid" type="button" onClick={() => setCreating(true)}>
                 Start a draft

@@ -10,7 +10,6 @@ import {
 } from "../lib/softLaunch";
 import type { Session } from "../lib/types";
 import Nib from "../components/Nib";
-import ProductDemo from "../components/ProductDemo";
 
 type Props = {
   onSignedIn: (session: Session) => void;
@@ -126,8 +125,13 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
             </button>
           </div>
         </div>
-        <div className="landing-hero-aside">
-          <ProductDemo onScanStart={onScanStart} />
+        <div className="landing-hero-aside landing-hero-still" aria-hidden="true">
+          <img
+            src="/art/calm-desk.svg"
+            alt=""
+            width={520}
+            height={390}
+          />
         </div>
       </section>
 
@@ -282,7 +286,7 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
           <h2>Get started</h2>
           <p className="lede">
             {cloudOn
-              ? "Cloud Save flag ON (dev) — magic link via Netlify Identity. Local sessions stay on this device. Identity is not Live."
+              ? "Cloud Save preview — email a magic link to sync Works in Progress across devices. Local-only start stays on this browser."
               : "Email sign-in stays on this device. Or start free with an empty Works in Progress — same Write, Scan, and tools."}
           </p>
           <label className="field" htmlFor="email">

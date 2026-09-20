@@ -607,6 +607,16 @@ export default function Workspace({ session, bookId, initialModule, autoScan, on
             />
           </div>
           <div className="scan-block write-scan write-scan-parked">
+            {!draftText.trim() ? (
+              <img
+                className="scan-empty-art"
+                src="/art/pages-desk.svg"
+                alt=""
+                width={260}
+                height={114}
+                aria-hidden="true"
+              />
+            ) : null}
             <div className="scan-actions">
               <button
                 className="btn-export primary"
