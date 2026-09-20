@@ -1,11 +1,11 @@
 {
   "name": "Quillbench",
   "short_name": "Quillbench",
-  "description": "Book production from draft to publish-ready files — scan, grammar, format, publish.",
+  "description": "Book production from draft to publish-ready files \u2014 scan, grammar, format, publish.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#fcf1eb",
-  "theme_color": "#d45f6c",
+  "background_color": "#F7F1EA",
+  "theme_color": "#F7F1EA",
   "lang": "en",
   "icons": [
     {
