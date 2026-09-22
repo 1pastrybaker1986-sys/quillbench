@@ -4690,7 +4690,15 @@ body:has(.bench-shell) [id*="nf-hud" i],
 body:has(.bench-shell) [class*="nf-hud" i],
 html:has(.bench-shell) body > a[href*="netlify.com"],
 html:has(.bench-shell) body > div[id*="netlify" i],
-html:has(.bench-shell) body > iframe[src*="netlify"] {
+html:has(.bench-shell) body > iframe[src*="netlify"],
+/* Live public HUD injects #nl-badge-frame (srcdoc iframe, no src=) */
+body:has(.bench-shell) #nl-badge-frame,
+html:has(.bench-shell) #nl-badge-frame,
+body:has(.bench-shell) iframe[title*="Powered by Netlify" i],
+body:has(.bench-shell) iframe[title*="Netlify" i],
+html:has(.bench-shell) body > iframe[id*="nl-badge" i],
+html:has(.bench-shell) body > iframe[srcdoc],
+body:has(.bench-shell) iframe[srcdoc] {
   display: none !important;
   visibility: hidden !important;
   opacity: 0 !important;
@@ -4703,6 +4711,7 @@ html:has(.bench-shell) body > iframe[src*="netlify"] {
   position: absolute !important;
   left: -9999px !important;
   clip: rect(0, 0, 0, 0) !important;
+  z-index: -1 !important;
 }
 
 
