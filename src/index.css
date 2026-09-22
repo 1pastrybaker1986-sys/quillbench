@@ -3472,17 +3472,29 @@ a.legal-link {
 .landing-tile-icon {
   position: relative;
   z-index: 1;
-  width: 2.4rem;
-  height: 2.4rem;
-  border-radius: 14px;
-  background: transparent;
-  box-shadow: inset 0 0 0 1px var(--metal);
+  display: block;
+  width: 100%;
+  max-width: 6.5rem;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #F7F1EA;
+  box-shadow: inset 0 0 0 1px var(--rule);
+}
+
+.landing-tile-icon img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
 }
 
 .landing-tile-scan .landing-tile-icon,
 .landing-tile-edit .landing-tile-icon,
 .landing-tile-format .landing-tile-icon {
-  background: transparent;
+  background: #F7F1EA;
 }
 
 .landing-tile h3 {
@@ -4468,9 +4480,9 @@ a.legal-link {
 }
 
 .library-empty-nested {
-  max-width: 22rem;
+  max-width: 26rem;
   margin: 0.5rem 0 0;
-  padding: 1.35rem 1.25rem 1.45rem;
+  padding: 1.5rem 1.35rem 1.55rem;
   text-align: left;
   border-style: solid;
   border-color: rgba(162, 61, 76, 0.18);
@@ -4660,15 +4672,37 @@ a.legal-link {
   color: var(--ink-soft);
 }
 
-/* Hide Netlify host badge inside authenticated bench (landing may keep it). */
+/* Hide Netlify host HUD inside authenticated bench (.bench-shell on WIP/Write).
+   Landing may keep the public badge; Live injects iframe / #netlify-waiver / .nf-badge. */
 body:has(.bench-shell) a[href="https://www.netlify.com"],
-body:has(.bench-shell) a[href="https://www.netlify.com/"] ,
+body:has(.bench-shell) a[href="https://www.netlify.com/"],
+body:has(.bench-shell) a[href*="netlify.com"][target="_blank"],
 body:has(.bench-shell) #netlify-badge,
 body:has(.bench-shell) .netlify-badge,
-body:has(.bench-shell) [data-netlify-badge] {
+body:has(.bench-shell) [data-netlify-badge],
+body:has(.bench-shell) #netlify-waiver,
+body:has(.bench-shell) .nf-badge,
+body:has(.bench-shell) iframe[src*="netlify"],
+body:has(.bench-shell) iframe[src*="/.netlify/"],
+body:has(.bench-shell) div[id*="netlify" i],
+body:has(.bench-shell) div[class*="netlify" i],
+body:has(.bench-shell) [id*="nf-hud" i],
+body:has(.bench-shell) [class*="nf-hud" i],
+html:has(.bench-shell) body > a[href*="netlify.com"],
+html:has(.bench-shell) body > div[id*="netlify" i],
+html:has(.bench-shell) body > iframe[src*="netlify"] {
   display: none !important;
   visibility: hidden !important;
+  opacity: 0 !important;
   pointer-events: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  max-width: 0 !important;
+  max-height: 0 !important;
+  overflow: hidden !important;
+  position: absolute !important;
+  left: -9999px !important;
+  clip: rect(0, 0, 0, 0) !important;
 }
 
 
@@ -4741,9 +4775,10 @@ body:has(.bench-shell) [data-netlify-badge] {
 
 .library-empty-art {
   display: block;
-  width: min(100%, 180px);
-  margin: 0 auto 0.85rem;
-  opacity: 0.12;
+  width: min(100%, 320px);
+  height: auto;
+  margin: 0 auto 1rem;
+  opacity: 0.42;
   pointer-events: none;
 }
 
@@ -4870,3 +4905,10 @@ body:has(.bench-shell) [data-netlify-badge] {
   box-shadow: none !important;
 }
 
+
+
+.bench-settings-help {
+  margin-top: 1.15rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--rule-light);
+}

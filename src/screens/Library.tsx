@@ -64,8 +64,8 @@ export default function Library({ session, onOpenBook, onSignOut, onOpenPrivacy,
                 className="library-empty-art"
                 src="/art/paper-stack.svg"
                 alt=""
-                width={180}
-                height={135}
+                width={320}
+                height={240}
                 aria-hidden="true"
               />
               <p>No books yet.</p>

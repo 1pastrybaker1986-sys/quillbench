@@ -36,7 +36,7 @@ type Props = {
   /** Active workspace module — journey lives in Files, not the main strip. */
   activeModule?: ModuleId | null;
   onModuleChange?: (id: ModuleId) => void;
-  /** Secondary: practice text (kept off Write/Scan surface). */
+  /** Settings help only: practice text (kept off Files primary + Write/Scan). */
   onUseSample?: () => void;
   /** Secondary: start a new book from Saved pane. */
   onNewBook?: () => void;
@@ -346,20 +346,6 @@ export default function BenchShell({
                     ) : null}
                   </div>
 
-                  {onUseSample ? (
-                    <button
-                      type="button"
-                      className="bench-panel-action"
-                      tabIndex={drawerOpen ? undefined : -1}
-                      onClick={() => {
-                        onUseSample();
-                        setNote("Practice text loaded into the manuscript.");
-                        setDrawerOpen(false);
-                      }}
-                    >
-                      Load practice text
-                    </button>
-                  ) : null}
                 </>
               ) : (
                 <>
@@ -482,6 +468,26 @@ export default function BenchShell({
                   </dd>
                 </div>
               </dl>
+              {onUseSample && activeBookId ? (
+                <div className="bench-settings-help">
+                  <p className="bench-panel-kicker">Help</p>
+                  <p className="bench-panel-empty">
+                    Need a short chapter to try Formatting? Load practice text into the open book.
+                  </p>
+                  <button
+                    type="button"
+                    className="bench-panel-action"
+                    tabIndex={drawerOpen ? undefined : -1}
+                    onClick={() => {
+                      onUseSample();
+                      setNote("Practice text loaded into the manuscript.");
+                      setDrawerOpen(false);
+                    }}
+                  >
+                    Load practice text
+                  </button>
+                </div>
+              ) : null}
             </div>
           ) : null}
         </div>

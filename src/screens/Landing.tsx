@@ -24,16 +24,19 @@ const TILES = [
     id: "scan",
     title: "Scan",
     blurb: "OCR typed pages into clean manuscript text — ready for craft, not stuck as photos.",
+    art: "/art/pages-desk.svg",
   },
   {
     id: "edit",
     title: "Edit craft",
     blurb: "Fiction-aware notes and a four-pass board from developmental through proof.",
+    art: "/art/hero-manuscript.svg",
   },
   {
     id: "format",
     title: "Format→export",
     blurb: "Print PDF and EPUB with front matter, chapters, and publish-ready files.",
+    art: "/art/paper-stack.svg",
   },
 ] as const;
 
@@ -214,7 +217,9 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
         <ul className="landing-tile-grid">
           {TILES.map((t) => (
             <li key={t.id} className={`landing-tile landing-tile-${t.id}`}>
-              <span className="landing-tile-icon" aria-hidden="true" />
+              <span className="landing-tile-icon" aria-hidden="true">
+                <img src={t.art} alt="" width={96} height={72} />
+              </span>
               <h3>{t.title}</h3>
               <p>{t.blurb}</p>
               {t.id === "scan" ? (
