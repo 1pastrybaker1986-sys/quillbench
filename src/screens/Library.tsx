@@ -9,6 +9,8 @@ type Props = {
   onSignOut: () => void;
   onOpenPrivacy: () => void;
   onOpenTerms: () => void;
+  /** Secondary: empty shelf → Scan a page (Write + picker). */
+  onScanStart?: () => void;
 };
 
 const statusLabel: Record<Book["status"], string> = {
@@ -17,7 +19,7 @@ const statusLabel: Record<Book["status"], string> = {
   proof: "Proof",
 };
 
-export default function Library({ session, onOpenBook, onSignOut, onOpenPrivacy, onOpenTerms }: Props) {
+export default function Library({ session, onOpenBook, onSignOut, onOpenPrivacy, onOpenTerms, onScanStart }: Props) {
   const [books, setBooks] = useState<Book[]>(() => listBooks(session.userId));
   const [creating, setCreating] = useState(false);
   const [title, setTitle] = useState("");
@@ -39,6 +41,7 @@ export default function Library({ session, onOpenBook, onSignOut, onOpenPrivacy,
       onLibraryChanged={() => setBooks(listBooks(session.userId))}
       defaultSection="saved"
       onNewBook={() => setCreating(true)}
+      onScanStart={onScanStart}
     >
       <div>
         <main className="library library-spacious">
@@ -66,9 +69,16 @@ export default function Library({ session, onOpenBook, onSignOut, onOpenPrivacy,
                 aria-hidden="true"
               />
               <p>No books yet.</p>
-              <button className="btn-solid" type="button" onClick={() => setCreating(true)}>
-                Start a draft
-              </button>
+              <div className="library-empty-actions">
+                <button className="btn-solid" type="button" onClick={() => setCreating(true)}>
+                  Start a draft
+                </button>
+                {onScanStart ? (
+                  <button className="btn-quiet" type="button" onClick={onScanStart}>
+                    Scan a page
+                  </button>
+                ) : null}
+              </div>
             </div>
           ) : (
             <div className="book-grid">

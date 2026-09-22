@@ -36,10 +36,12 @@ type Props = {
   /** Active workspace module — journey lives in Files, not the main strip. */
   activeModule?: ModuleId | null;
   onModuleChange?: (id: ModuleId) => void;
-  /** Secondary: sample chapter (kept off Write/Scan surface). */
+  /** Secondary: practice text (kept off Write/Scan surface). */
   onUseSample?: () => void;
   /** Secondary: start a new book from Saved pane. */
   onNewBook?: () => void;
+  /** Secondary: Scan a page from empty Works in Progress. */
+  onScanStart?: () => void;
   /** Cover / export summary for Files (Formatting owns the tools). */
   hasCover?: boolean;
   exportCount?: number;
@@ -73,6 +75,7 @@ export default function BenchShell({
   onModuleChange,
   onUseSample,
   onNewBook,
+  onScanStart,
   hasCover = false,
   exportCount = 0,
 }: Props) {
@@ -350,11 +353,11 @@ export default function BenchShell({
                       tabIndex={drawerOpen ? undefined : -1}
                       onClick={() => {
                         onUseSample();
-                        setNote("Sample chapter loaded into the manuscript.");
+                        setNote("Practice text loaded into the manuscript.");
                         setDrawerOpen(false);
                       }}
                     >
-                      Use sample chapter
+                      Load practice text
                     </button>
                   ) : null}
                 </>
@@ -381,19 +384,34 @@ export default function BenchShell({
               {books.length === 0 ? (
                 <div className="bench-saved-empty">
                   <p className="bench-panel-empty">No books yet.</p>
-                  {onNewBook ? (
-                    <button
-                      type="button"
-                      className="bench-panel-primary"
-                      tabIndex={drawerOpen ? undefined : -1}
-                      onClick={() => {
-                        onNewBook();
-                        setDrawerOpen(false);
-                      }}
-                    >
-                      Start a draft
-                    </button>
-                  ) : null}
+                  <div className="bench-saved-empty-actions">
+                    {onNewBook ? (
+                      <button
+                        type="button"
+                        className="bench-panel-primary"
+                        tabIndex={drawerOpen ? undefined : -1}
+                        onClick={() => {
+                          onNewBook();
+                          setDrawerOpen(false);
+                        }}
+                      >
+                        Start a draft
+                      </button>
+                    ) : null}
+                    {onScanStart ? (
+                      <button
+                        type="button"
+                        className="bench-panel-action"
+                        tabIndex={drawerOpen ? undefined : -1}
+                        onClick={() => {
+                          onScanStart();
+                          setDrawerOpen(false);
+                        }}
+                      >
+                        Scan a page
+                      </button>
+                    ) : null}
+                  </div>
                 </div>
               ) : (
                 <ul className="bench-saved-list">

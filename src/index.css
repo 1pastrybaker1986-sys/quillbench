@@ -4484,6 +4484,25 @@ a.legal-link {
   font-size: 0.95rem;
 }
 
+.library-empty-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem 0.75rem;
+}
+
+.bench-saved-empty-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem 0.65rem;
+  margin-top: 0.15rem;
+}
+
+.bench-saved-empty-actions .bench-panel-primary {
+  margin-top: 0;
+}
+
 .bench-journey {
   margin-top: 1rem;
   padding-top: 0.75rem;

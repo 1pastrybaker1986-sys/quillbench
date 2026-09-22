@@ -261,6 +261,7 @@ export default function App() {
         }}
         onOpenPrivacy={() => openLegal("privacy")}
         onOpenTerms={() => openLegal("terms")}
+        onScanStart={() => openScanWorkspace(session)}
       />
     </>
   );
