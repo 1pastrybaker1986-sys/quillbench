@@ -325,7 +325,7 @@ export default function PublishingPanel({ bookId, bookSignals, onToast }: Props)
                   Unlock Cover Design · $179
                 </button>
                 <button className="btn-export" type="button" onClick={() => unlock("studio-bundle")}>
-                  Studio Bundle · $449 soft launch
+                  Get Studio Bundle $449
                 </button>
               </div>
             </div>
@@ -417,7 +417,7 @@ export default function PublishingPanel({ bookId, bookSignals, onToast }: Props)
                   Unlock Marketing · $129
                 </button>
                 <button className="btn-export" type="button" onClick={() => unlock("studio-bundle")}>
-                  Studio Bundle · $449 soft launch
+                  Get Studio Bundle $449
                 </button>
               </div>
             </div>
@@ -428,10 +428,11 @@ export default function PublishingPanel({ bookId, bookSignals, onToast }: Props)
       <section className="pub-section">
         <h3>Studio packages</h3>
         <p className="pub-stub-note">
-          Soft launch: Studio Bundle Checkout opens at {formatSoftBundlePrice()} with{" "}
-          <strong>{SOFT_LAUNCH.couponCode}</strong> auto-applied (${SOFT_LAUNCH.discountDollars} off{" "}
-          {formatCatalogBundlePrice()}). Unlocks save on this device until accounts sync across
-          phones and computers.
+          Soft launch: Studio Bundle Checkout opens at {formatSoftBundlePrice()}{" "}
+          <strong>USD</strong> with <strong>{SOFT_LAUNCH.couponCode}</strong> auto-applied ($
+          {SOFT_LAUNCH.discountDollars} off {formatCatalogBundlePrice()}). Price is{" "}
+          {formatSoftBundlePrice()} USD, not $4.49. Unlocks save on this device until accounts sync
+          across phones and computers.
         </p>
         <ul className="pkg-grid">
           {packages.map((pkg) => {
@@ -467,7 +468,9 @@ export default function PublishingPanel({ bookId, bookSignals, onToast }: Props)
                     type="button"
                     onClick={() => unlock(pkg.id)}
                   >
-                    Unlock
+                    {pkg.id === "studio-bundle"
+                      ? `Get Studio Bundle ${formatSoftBundlePrice()}`
+                      : `Unlock · ${formatPrice(pkg.price)}`}
                   </button>
                 )}
               </li>

@@ -2833,6 +2833,15 @@ input:focus {
   margin-top: 1.6rem;
 }
 
+.landing-cta-hint {
+  margin: 0.65rem 0 0;
+  max-width: 28rem;
+  color: #6b5f56;
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+
 .landing-cta-primary {
   width: auto;
   min-width: 12rem;
@@ -3867,6 +3876,13 @@ a.legal-link {
 }
 
 @media (max-width: 640px) {
+.export-buy-nudge-note {
+  margin: 0.65rem 0 0;
+  color: #9b3b3b;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
   .export-buy-nudge {
     left: 1rem;
     right: 1rem;

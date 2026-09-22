@@ -174,6 +174,9 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
               Scan a page
             </button>
           </div>
+          <p className="landing-cta-hint">
+            Scan a page — photo in, text in Write. PNG, JPEG, or WebP (no PDF in this version).
+          </p>
         </div>
         <div className="landing-hero-aside landing-hero-still" aria-hidden="true">
           <img
@@ -239,7 +242,8 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
           <p className="landing-bundle-window">
             Soft-launch pricing {SOFT_LAUNCH.softLaunchThrough}. Studio Bundle Checkout applies{" "}
             <strong>{SOFT_LAUNCH.couponCode}</strong> automatically (
-            {formatCatalogBundlePrice()} → {formatSoftBundlePrice()}).
+            {formatCatalogBundlePrice()} → {formatSoftBundlePrice()} USD). Price is{" "}
+            {formatSoftBundlePrice()} USD, not $4.49.
           </p>
           <ul className="landing-price-inclusions" aria-label="Studio Bundle includes">
             <li>
@@ -281,14 +285,12 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
       <section className="landing-waitlist" id="landing-waitlist" aria-labelledby="waitlist-heading">
         <div className="landing-waitlist-card">
           <p className="landing-waitlist-eyebrow">Early access</p>
-          <h2 id="waitlist-heading">
-            Early access + ${SOFT_LAUNCH.discountDollars} off the Studio Bundle
-          </h2>
+          <h2 id="waitlist-heading">Save your spot — or buy the Bundle now</h2>
           <p className="landing-waitlist-lede">
-            Soft launch {SOFT_LAUNCH.softLaunchThrough}. Leave your email to save your spot. Studio
-            Bundle Checkout is already {formatSoftBundlePrice()} with{" "}
+            Soft launch {SOFT_LAUNCH.softLaunchThrough}. Leave your email for early-access notes.
+            Ready to finish? Studio Bundle Checkout is already {formatSoftBundlePrice()} USD with{" "}
             <strong>{SOFT_LAUNCH.couponCode}</strong> applied (${SOFT_LAUNCH.discountDollars} off{" "}
-            {formatCatalogBundlePrice()}).
+            {formatCatalogBundlePrice()}) — no waitlist required.
           </p>
           {waitlistDone ? (
             <div className="landing-waitlist-next" role="status">
@@ -296,8 +298,8 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
                 You’re on the list. We’ll email early-access notes.
               </p>
               <p className="landing-waitlist-next-lede">
-                Ready now? Studio Bundle Checkout is {formatSoftBundlePrice()} with{" "}
-                <strong>{SOFT_LAUNCH.couponCode}</strong> applied automatically.
+                Ready now? Studio Bundle Checkout is {formatSoftBundlePrice()} USD with{" "}
+                <strong>{SOFT_LAUNCH.couponCode}</strong> applied automatically (not $4.49).
               </p>
               <button
                 className="btn btn-primary landing-waitlist-buy"
