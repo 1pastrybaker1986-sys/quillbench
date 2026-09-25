@@ -5065,3 +5065,29 @@ body:has(.bench-shell) iframe[srcdoc] {
     text-overflow: clip;
   }
 }
+
+/* ---- Crit draft e pack (2026-09-25) ---- */
+.title-toggle { overflow: visible; text-overflow: clip; }
+.title-toggle .title-text { display: block; overflow: hidden; text-overflow: ellipsis; white-space: inherit; }
+.title-toggle:focus-visible { outline: none; box-shadow: inset 0 0 0 2px var(--rose); border-radius: 4px; }
+@media (max-width: 720px) {
+  .work-title-row h1,
+  .work-head-slim .work-title-row h1 { overflow: visible; }
+  .title-toggle { white-space: nowrap; padding: 2px 4px; margin: -2px -4px; }
+  .work-title-row h1.title-open .title-toggle,
+  .work-head-slim .work-title-row h1.title-open .title-toggle { white-space: normal; }
+  .work-title-row h1.title-open .title-text { overflow: visible; text-overflow: clip; white-space: normal; }
+  /* Fully solid 44px arrow backing; any fade sits outside it. */
+  .tab-chevron-right,
+  .tab-chevron-left { background: rgb(250, 243, 239); }
+  .tab-chevron-right::before,
+  .tab-chevron-left::before {
+    content: none;
+  }
+  .tab-chevron-right::before { right: 100%; background: linear-gradient(90deg, rgba(250, 243, 239, 0), rgb(250, 243, 239)); }
+  .tab-chevron-left::before { left: 100%; background: linear-gradient(270deg, rgba(250, 243, 239, 0), rgb(250, 243, 239)); }
+  /* Clip the tab row to the space between visible arrows so nothing can show through. */
+  .modules-wrap.more-left .modules { clip-path: inset(0 0 0 44px); }
+  .modules-wrap.more-right .modules { clip-path: inset(0 44px 0 0); }
+  .modules-wrap.more-left.more-right .modules { clip-path: inset(0 44px 0 44px); }
+}

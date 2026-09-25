@@ -334,17 +334,36 @@ export default function Workspace({ session, bookId, initialModule, autoScan, on
     const viewR = viewL + nav.clientWidth;
     let target = viewL;
     if (dir === 1) {
-      // First tab not fully clear of the right arrow: bring its left edge just past the left arrow.
+      // First tab not fully clear of the right arrow: end it exactly at the right arrow's edge.
       const next = tabs.find((t) => t.right > viewR - CHEVRON_W + 1);
-      target = next ? next.left - CHEVRON_W : max;
+      target = next ? next.right - (nav.clientWidth - CHEVRON_W) : max;
+      if (max - target < CHEVRON_W) target = max;
     } else {
-      // Last tab not fully clear of the left arrow: bring its right edge just inside the right arrow.
+      // Last tab not fully clear of the left arrow: start it exactly at the left arrow's edge.
       const prev = [...tabs].reverse().find((t) => t.left < viewL + CHEVRON_W - 1);
-      target = prev ? prev.right - nav.clientWidth + CHEVRON_W : 0;
-      // If that leaves the first tab partly hidden, go all the way to the start.
-      if (target < tabs[0].right) target = 0;
+      target = prev ? prev.left - CHEVRON_W : 0;
+      if (target < CHEVRON_W) target = 0;
     }
-    if (dir === 1 && max - target < CHEVRON_W) target = max;
+    nav.scrollTo({ left: Math.min(max, Math.max(0, target)), behavior: "smooth" });
+  };
+  const revealTab = (el: HTMLElement) => {
+    const nav = modulesRef.current;
+    if (!nav) return;
+    const navBox = nav.getBoundingClientRect();
+    const r = el.getBoundingClientRect();
+    const left = r.left - navBox.left + nav.scrollLeft;
+    const right = left + r.width;
+    const max = nav.scrollWidth - nav.clientWidth;
+    const viewL = nav.scrollLeft;
+    const viewR = viewL + nav.clientWidth;
+    let target = viewL;
+    const padL = viewL > 2 ? CHEVRON_W : 0;
+    const padR = max - viewL > 2 ? CHEVRON_W : 0;
+    if (left < viewL + padL) target = left - CHEVRON_W;
+    else if (right > viewR - padR) target = right - (nav.clientWidth - CHEVRON_W);
+    else return;
+    if (target < CHEVRON_W) target = 0;
+    if (max - target < CHEVRON_W) target = max;
     nav.scrollTo({ left: Math.min(max, Math.max(0, target)), behavior: "smooth" });
   };
   const titleRef = useRef<HTMLHeadingElement | null>(null);
@@ -618,7 +637,7 @@ export default function Workspace({ session, bookId, initialModule, autoScan, on
               aria-label={titleOpen ? `${book.title} (collapse title)` : `${book.title} (show full title)`}
               onClick={() => setTitleOpen((v) => !v)}
             >
-              {book.title}
+              <span className="title-text">{book.title}</span>
             </button>
           </h1>
           <span className={`pill ${book.status}`}>
@@ -648,6 +667,7 @@ export default function Workspace({ session, bookId, initialModule, autoScan, on
               key={m.id}
               type="button"
               aria-current={module === m.id ? "page" : undefined}
+              onFocus={(e) => revealTab(e.currentTarget)}
               data-module={m.id}
               className={`mod${module === m.id ? " active" : ""}`}
               onClick={() => {
