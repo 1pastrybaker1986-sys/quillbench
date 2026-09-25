@@ -319,11 +319,53 @@ export default function Workspace({ session, bookId, initialModule, autoScan, on
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
   }, []);
+  const CHEVRON_W = 44;
   const nudgeTabs = (dir: 1 | -1) => {
     const nav = modulesRef.current;
     if (!nav) return;
-    nav.scrollBy({ left: dir * Math.max(120, nav.clientWidth * 0.6), behavior: "smooth" });
+    const navBox = nav.getBoundingClientRect();
+    const tabs = Array.from(nav.querySelectorAll<HTMLElement>(".mod")).map((t) => {
+      const r = t.getBoundingClientRect();
+      const left = r.left - navBox.left + nav.scrollLeft;
+      return { left, right: left + r.width };
+    });
+    const max = nav.scrollWidth - nav.clientWidth;
+    const viewL = nav.scrollLeft;
+    const viewR = viewL + nav.clientWidth;
+    let target = viewL;
+    if (dir === 1) {
+      // First tab not fully clear of the right arrow: bring its left edge just past the left arrow.
+      const next = tabs.find((t) => t.right > viewR - CHEVRON_W + 1);
+      target = next ? next.left - CHEVRON_W : max;
+    } else {
+      // Last tab not fully clear of the left arrow: bring its right edge just inside the right arrow.
+      const prev = [...tabs].reverse().find((t) => t.left < viewL + CHEVRON_W - 1);
+      target = prev ? prev.right - nav.clientWidth + CHEVRON_W : 0;
+      // If that leaves the first tab partly hidden, go all the way to the start.
+      if (target < tabs[0].right) target = 0;
+    }
+    if (dir === 1 && max - target < CHEVRON_W) target = max;
+    nav.scrollTo({ left: Math.min(max, Math.max(0, target)), behavior: "smooth" });
   };
+  const titleRef = useRef<HTMLHeadingElement | null>(null);
+  useEffect(() => {
+    setTitleOpen(false);
+  }, [module]);
+  useEffect(() => {
+    if (!titleOpen) return;
+    const onDown = (e: PointerEvent) => {
+      if (titleRef.current && !titleRef.current.contains(e.target as Node)) setTitleOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setTitleOpen(false);
+    };
+    document.addEventListener("pointerdown", onDown, true);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onDown, true);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [titleOpen]);
   const scanInputRef = useRef<HTMLInputElement | null>(null);
   const scanModeRef = useRef<"append" | "replace">("append");
 
@@ -567,12 +609,17 @@ export default function Workspace({ session, bookId, initialModule, autoScan, on
     <div className="workspace">
       <header className="work-head work-head-slim">
         <div className="work-title-row">
-          <h1
-            className={titleOpen ? "title-open" : undefined}
-            title={book.title}
-            onClick={() => setTitleOpen((v) => !v)}
-          >
-            {book.title}
+          <h1 ref={titleRef} className={titleOpen ? "title-open" : undefined}>
+            <button
+              type="button"
+              className="title-toggle"
+              title={book.title}
+              aria-expanded={titleOpen}
+              aria-label={titleOpen ? `${book.title} (collapse title)` : `${book.title} (show full title)`}
+              onClick={() => setTitleOpen((v) => !v)}
+            >
+              {book.title}
+            </button>
           </h1>
           <span className={`pill ${book.status}`}>
             {book.status === "draft"
@@ -593,7 +640,7 @@ export default function Workspace({ session, bookId, initialModule, autoScan, on
           aria-hidden={!tabScroll.left}
           onClick={() => nudgeTabs(-1)}
         >
-          ‹
+          <svg viewBox="0 0 22 22" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M13 4 L7 11 L13 18" /></svg>
         </button>
         <nav className="modules" aria-label="Modules" ref={modulesRef} onScroll={syncTabScroll}>
           {MODULES.map((m) => (
@@ -620,7 +667,7 @@ export default function Workspace({ session, bookId, initialModule, autoScan, on
           aria-hidden={!tabScroll.right}
           onClick={() => nudgeTabs(1)}
         >
-          ›
+          <svg viewBox="0 0 22 22" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M9 4 L15 11 L9 18" /></svg>
         </button>
         </div>
       </header>

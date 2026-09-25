@@ -5027,3 +5027,41 @@ body:has(.bench-shell) iframe[srcdoc] {
     text-overflow: clip;
   }
 }
+
+/* ---- Crit draft d pack (2026-09-25) ---- */
+.title-toggle {
+  all: unset;
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: inherit;
+  cursor: default;
+  font: inherit;
+  color: inherit;
+}
+.title-toggle:focus-visible { outline: 2px solid var(--rose); outline-offset: 2px; border-radius: 4px; }
+@media (max-width: 720px) {
+  .title-toggle { cursor: pointer; }
+  .work-head-slim .mod {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    box-sizing: border-box;
+  }
+  .tab-chevron {
+    top: 0;
+    bottom: 0;
+    width: 44px;
+    min-height: 44px;
+  }
+  .tab-chevron svg { width: 22px; height: 22px; display: block; }
+  .tab-chevron-right { padding-right: 2px; background: linear-gradient(90deg, rgba(250, 243, 239, 0), rgba(250, 243, 239, 1) 35%); }
+  .tab-chevron-left { padding-left: 2px; background: linear-gradient(270deg, rgba(250, 243, 239, 0), rgba(250, 243, 239, 1) 35%); }
+  .work-title-row h1.title-open .title-toggle,
+  .work-head-slim .work-title-row h1.title-open .title-toggle {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+  }
+}
