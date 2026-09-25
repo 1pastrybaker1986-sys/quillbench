@@ -5130,3 +5130,6 @@ body:has(.bench-shell) iframe[srcdoc] {
   .work-head-slim .modules .mod { font-size: 0.78rem; padding-left: 0.2rem; padding-right: 0.2rem; }
   .bench-shell .work-head-slim { padding-left: 0.5rem; padding-right: 0.5rem; }
 }
+@media (max-width: 350px) {
+  .bench-shell .work-head-slim .work-title-row { padding-left: 6.35rem; }
+}
