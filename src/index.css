@@ -5104,3 +5104,29 @@ body:has(.bench-shell) iframe[srcdoc] {
   /* Backdrop blur composited with the clipped row drew a lighter box; the phone header does not need it. */
   .work-head-slim { -webkit-backdrop-filter: none; backdrop-filter: none; }
 }
+
+/* ---- Crit draft f pack (2026-09-25): phone tabs fit without scrolling ---- */
+@media (max-width: 720px) {
+  .modules .mod[data-offrow] { pointer-events: none; }
+  .bench-shell .work-head-slim { padding-left: 0.75rem; padding-right: 0.75rem; }
+  .bench-shell .work-head-slim .work-title-row {
+    padding-left: 6rem;
+    min-height: 44px;
+    align-items: center;
+    margin-bottom: 0.3rem;
+  }
+  .work-head-slim .modules-wrap { margin-top: 0.35rem; }
+  .work-head-slim .modules { gap: 0; justify-content: space-between; }
+  .work-head-slim .modules .mod {
+    flex: 1 1 auto;
+    justify-content: center;
+    padding-left: 0.3rem;
+    padding-right: 0.3rem;
+    font-size: 0.86rem;
+    letter-spacing: 0;
+  }
+}
+@media (max-width: 350px) {
+  .work-head-slim .modules .mod { font-size: 0.78rem; padding-left: 0.2rem; padding-right: 0.2rem; }
+  .bench-shell .work-head-slim { padding-left: 0.5rem; padding-right: 0.5rem; }
+}

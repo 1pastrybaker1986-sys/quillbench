@@ -356,6 +356,19 @@ export default function Workspace({ session, bookId, initialModule, autoScan, on
       target = prev ? prev.left - CHEVRON_W : 0;
       if (target < CHEVRON_W) target = 0;
     }
+    // Never hide the active tab with an arrow tap: clamp so it stays fully between the arrows.
+    const activeEl = nav.querySelector<HTMLElement>(".mod.active");
+    if (activeEl) {
+      const ar = activeEl.getBoundingClientRect();
+      const aL = ar.left - navBox.left + nav.scrollLeft;
+      const aR = aL + ar.width;
+      const clampT = Math.min(max, Math.max(0, target));
+      const winL = clampT + (clampT > 2 ? CHEVRON_W : 0);
+      const winR = clampT + nav.clientWidth - (max - clampT > 2 ? CHEVRON_W : 0);
+      if (aL < winL) target = aL - CHEVRON_W;
+      else if (aR > winR) target = aR - (nav.clientWidth - CHEVRON_W);
+      if (target < CHEVRON_W) target = 0;
+    }
     nav.scrollTo({ left: Math.min(max, Math.max(0, target)), behavior: "smooth" });
   };
   const revealTab = (el: HTMLElement) => {
