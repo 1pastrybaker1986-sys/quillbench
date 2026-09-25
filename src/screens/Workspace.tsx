@@ -293,6 +293,18 @@ export default function Workspace({ session, bookId, initialModule, autoScan, on
     if (!nav) return;
     const max = nav.scrollWidth - nav.clientWidth;
     const next = { left: nav.scrollLeft > 2, right: max - nav.scrollLeft > 2 };
+    // Hide any tab that is only partly inside the space between visible arrows,
+    // so no letter, dot, or underline fragment can ever show at an edge.
+    const narrow = window.matchMedia("(max-width: 720px)").matches;
+    const navBox = nav.getBoundingClientRect();
+    const winL = navBox.left + (next.left ? 44 : 0);
+    const winR = navBox.right - (next.right ? 44 : 0);
+    nav.querySelectorAll<HTMLElement>(".mod").forEach((t) => {
+      const r = t.getBoundingClientRect();
+      const partial = narrow && (r.left < winL - 0.5 || r.right > winR + 0.5);
+      if (partial) t.setAttribute("data-offrow", "");
+      else t.removeAttribute("data-offrow");
+    });
     setTabScroll((prev) => (prev.left === next.left && prev.right === next.right ? prev : next));
   };
   useEffect(() => {

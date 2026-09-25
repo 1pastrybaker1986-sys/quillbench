@@ -5091,3 +5091,9 @@ body:has(.bench-shell) iframe[srcdoc] {
   .modules-wrap.more-right .modules { clip-path: inset(0 44px 0 0); }
   .modules-wrap.more-left.more-right .modules { clip-path: inset(0 44px 0 44px); }
 }
+
+@media (max-width: 720px) {
+  .modules .mod { transition: opacity 0.12s ease; }
+  .modules .mod[data-offrow] { opacity: 0; }
+  .modules .mod[data-offrow]:focus-visible { opacity: 1; }
+}
