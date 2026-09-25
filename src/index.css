@@ -5097,3 +5097,10 @@ body:has(.bench-shell) iframe[srcdoc] {
   .modules .mod[data-offrow] { opacity: 0; }
   .modules .mod[data-offrow]:focus-visible { opacity: 1; }
 }
+@media (max-width: 720px) {
+  /* Tabs are clipped to the space between arrows, so arrows need no backing; avoids tinted boxes on the header gradient. */
+  .tab-chevron-right,
+  .tab-chevron-left { background: transparent; }
+  /* Backdrop blur composited with the clipped row drew a lighter box; the phone header does not need it. */
+  .work-head-slim { -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
