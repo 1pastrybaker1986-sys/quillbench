@@ -4921,3 +4921,27 @@ body:has(.bench-shell) iframe[srcdoc] {
   padding-top: 0.85rem;
   border-top: 1px solid var(--rule-light);
 }
+
+/* ---- Crit live polish pack (2026-09-25) ---- */
+.mod-icon { display: none !important; }
+
+@media (max-width: 720px) {
+  .work-head-slim .modules,
+  .modules {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    max-width: 100%;
+  }
+  .modules::-webkit-scrollbar { display: none; }
+  .modules .mod { flex: 0 0 auto; white-space: nowrap; }
+}
+
+.library-empty-nested {
+  margin: 0.5rem auto 0;
+  text-align: center;
+}
+.library-empty-nested .library-empty-art { margin-left: auto; margin-right: auto; }
+.library-empty-nested .library-empty-actions { justify-content: center; }
