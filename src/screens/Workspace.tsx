@@ -286,14 +286,44 @@ export default function Workspace({ session, bookId, initialModule, autoScan, on
 
   const coverInputRef = useRef<HTMLInputElement | null>(null);
   const modulesRef = useRef<HTMLElement | null>(null);
+  const [tabScroll, setTabScroll] = useState({ left: false, right: false });
+  const [titleOpen, setTitleOpen] = useState(false);
+  const syncTabScroll = () => {
+    const nav = modulesRef.current;
+    if (!nav) return;
+    const max = nav.scrollWidth - nav.clientWidth;
+    const next = { left: nav.scrollLeft > 2, right: max - nav.scrollLeft > 2 };
+    setTabScroll((prev) => (prev.left === next.left && prev.right === next.right ? prev : next));
+  };
   useEffect(() => {
     const nav = modulesRef.current;
     if (!nav) return;
     const active = nav.querySelector<HTMLElement>(".mod.active");
-    if (!active) return;
-    const left = active.offsetLeft - (nav.clientWidth - active.offsetWidth) / 2;
-    nav.scrollTo({ left: Math.max(0, left), behavior: "smooth" });
+    const first = nav.querySelector<HTMLElement>(".mod");
+    if (!active || active === first) {
+      nav.scrollTo({ left: 0, behavior: "smooth" });
+    } else {
+      // Measure against the tab row itself, not an offset parent.
+      const navBox = nav.getBoundingClientRect();
+      const tabBox = active.getBoundingClientRect();
+      const tabLeftInRow = tabBox.left - navBox.left + nav.scrollLeft;
+      const target = tabLeftInRow - (nav.clientWidth - tabBox.width) / 2;
+      const max = nav.scrollWidth - nav.clientWidth;
+      nav.scrollTo({ left: Math.min(max, Math.max(0, target)), behavior: "smooth" });
+    }
+    window.setTimeout(syncTabScroll, 350);
   }, [module]);
+  useEffect(() => {
+    syncTabScroll();
+    const onResize = () => syncTabScroll();
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+  const nudgeTabs = (dir: 1 | -1) => {
+    const nav = modulesRef.current;
+    if (!nav) return;
+    nav.scrollBy({ left: dir * Math.max(120, nav.clientWidth * 0.6), behavior: "smooth" });
+  };
   const scanInputRef = useRef<HTMLInputElement | null>(null);
   const scanModeRef = useRef<"append" | "replace">("append");
 
@@ -537,7 +567,13 @@ export default function Workspace({ session, bookId, initialModule, autoScan, on
     <div className="workspace">
       <header className="work-head work-head-slim">
         <div className="work-title-row">
-          <h1>{book.title}</h1>
+          <h1
+            className={titleOpen ? "title-open" : undefined}
+            title={book.title}
+            onClick={() => setTitleOpen((v) => !v)}
+          >
+            {book.title}
+          </h1>
           <span className={`pill ${book.status}`}>
             {book.status === "draft"
               ? "Draft"
@@ -546,7 +582,20 @@ export default function Workspace({ session, bookId, initialModule, autoScan, on
                 : "Proof"}
           </span>
         </div>
-        <nav className="modules" aria-label="Modules" ref={modulesRef}>
+        <div
+          className={`modules-wrap${tabScroll.left ? " more-left" : ""}${tabScroll.right ? " more-right" : ""}`}
+        >
+        <button
+          type="button"
+          className="tab-chevron tab-chevron-left"
+          aria-label="Show earlier tabs"
+          tabIndex={tabScroll.left ? 0 : -1}
+          aria-hidden={!tabScroll.left}
+          onClick={() => nudgeTabs(-1)}
+        >
+          ‹
+        </button>
+        <nav className="modules" aria-label="Modules" ref={modulesRef} onScroll={syncTabScroll}>
           {MODULES.map((m) => (
             <button
               key={m.id}
@@ -563,6 +612,17 @@ export default function Workspace({ session, bookId, initialModule, autoScan, on
             </button>
           ))}
         </nav>
+        <button
+          type="button"
+          className="tab-chevron tab-chevron-right"
+          aria-label="Show more tabs"
+          tabIndex={tabScroll.right ? 0 : -1}
+          aria-hidden={!tabScroll.right}
+          onClick={() => nudgeTabs(1)}
+        >
+          ›
+        </button>
+        </div>
       </header>
 
       <input

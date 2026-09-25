@@ -4967,3 +4967,63 @@ body:has(.bench-shell) iframe[srcdoc] {
   }
   .work-title-row .pill { flex: 0 0 auto; }
 }
+
+/* ---- Crit draft c pack (2026-09-25) ---- */
+.modules { position: relative; }
+.work-head-slim .mod,
+.mod { color: #6b6460; }
+.modules-wrap { position: relative; min-width: 0; }
+.tab-chevron { display: none; }
+
+@media (max-width: 720px) {
+  .work-head-slim .modules,
+  .modules {
+    -webkit-mask-image: none;
+    mask-image: none;
+    padding-right: 0;
+  }
+  .tab-chevron {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    bottom: 3px;
+    width: 34px;
+    z-index: 2;
+    border: 0;
+    padding: 0;
+    font-size: 1.5rem;
+    line-height: 1;
+    font-weight: 600;
+    color: var(--ink);
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+  }
+  .tab-chevron-right {
+    right: 0;
+    justify-content: flex-end;
+    padding-right: 4px;
+    background: linear-gradient(90deg, rgba(250, 243, 239, 0), rgba(250, 243, 239, 0.96) 45%);
+  }
+  .tab-chevron-left {
+    left: 0;
+    justify-content: flex-start;
+    padding-left: 4px;
+    background: linear-gradient(270deg, rgba(250, 243, 239, 0), rgba(250, 243, 239, 0.96) 45%);
+  }
+  .modules-wrap.more-right .tab-chevron-right,
+  .modules-wrap.more-left .tab-chevron-left {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .work-title-row h1 { cursor: pointer; }
+  .work-title-row h1.title-open,
+  .work-head-slim .work-title-row h1.title-open {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+  }
+}
