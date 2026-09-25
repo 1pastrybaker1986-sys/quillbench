@@ -8,3 +8,5 @@ createRoot(document.getElementById("root")!).render(
     <App />
   </StrictMode>,
 );
+
+(window as unknown as { __QB_BUILD__?: string }).__QB_BUILD__ = __QB_BUILD__;

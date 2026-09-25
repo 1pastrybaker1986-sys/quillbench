@@ -285,6 +285,15 @@ export default function Workspace({ session, bookId, initialModule, autoScan, on
 
 
   const coverInputRef = useRef<HTMLInputElement | null>(null);
+  const modulesRef = useRef<HTMLElement | null>(null);
+  useEffect(() => {
+    const nav = modulesRef.current;
+    if (!nav) return;
+    const active = nav.querySelector<HTMLElement>(".mod.active");
+    if (!active) return;
+    const left = active.offsetLeft - (nav.clientWidth - active.offsetWidth) / 2;
+    nav.scrollTo({ left: Math.max(0, left), behavior: "smooth" });
+  }, [module]);
   const scanInputRef = useRef<HTMLInputElement | null>(null);
   const scanModeRef = useRef<"append" | "replace">("append");
 
@@ -537,11 +546,13 @@ export default function Workspace({ session, bookId, initialModule, autoScan, on
                 : "Proof"}
           </span>
         </div>
-        <nav className="modules" aria-label="Modules">
+        <nav className="modules" aria-label="Modules" ref={modulesRef}>
           {MODULES.map((m) => (
             <button
               key={m.id}
               type="button"
+              aria-current={module === m.id ? "page" : undefined}
+              data-module={m.id}
               className={`mod${module === m.id ? " active" : ""}`}
               onClick={() => {
                 flushPending();
