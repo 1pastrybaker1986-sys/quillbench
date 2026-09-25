@@ -5133,3 +5133,74 @@ body:has(.bench-shell) iframe[srcdoc] {
 @media (max-width: 350px) {
   .bench-shell .work-head-slim .work-title-row { padding-left: 6.35rem; }
 }
+
+/* ---- Crit draft g pack (2026-09-25): no scroller, title clears Menu, Formatting fits phones ---- */
+.tab-chevron { display: none !important; }
+@media (max-width: 720px) {
+  /* Tabs never scroll: they share one line, and wrap to two rows only on very narrow screens. */
+  .work-head-slim .modules,
+  .modules {
+    flex-wrap: wrap;
+    overflow: visible;
+    clip-path: none !important;
+    justify-content: center;
+    row-gap: 0;
+  }
+  .modules-wrap.more-left .modules,
+  .modules-wrap.more-right .modules { clip-path: none; }
+  .modules .mod[data-offrow] { opacity: 1; pointer-events: auto; }
+  .work-head-slim .modules .mod {
+    flex: 1 1 auto;
+    max-width: 8.5rem;
+    min-width: 44px;
+  }
+  /* Active tab: heavier than the underline alone. */
+  .work-head-slim .modules .mod.active {
+    color: var(--ink);
+    font-weight: 750;
+    background: rgba(255, 255, 255, 0.7);
+    box-shadow: inset 0 -3px 0 var(--metal);
+    border-radius: 8px 8px 0 0;
+  }
+  /* Title keeps at least 4px clear of the Menu button; no negative side margin. */
+  .title-toggle { margin: -2px 0; padding: 2px 4px; }
+  .bench-shell .work-head-slim .work-title-row { padding-left: 6.25rem; }
+  /* Formatting side column fits the screen instead of its content width. */
+  .bench { grid-template-columns: minmax(0, 1fr); }
+  .bench > * { min-width: 0; }
+  .rail { min-width: 0; max-width: 100%; box-sizing: border-box; }
+  .rail * { max-width: 100%; box-sizing: border-box; }
+  .rail .scan-actions,
+  .rail .matter-fields,
+  .rail .matter-label { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 350px) {
+  .bench-shell .work-head-slim .work-title-row { padding-left: 6.6rem; }
+}
+@media (max-width: 290px) {
+  .work-head-slim .modules .mod { flex: 1 1 30%; max-width: none; font-size: 0.8rem; }
+}
+@media (max-width: 720px) {
+  /* Print spread: scale with zoom (changes layout size) so it never pushes the page sideways. */
+  .spread { transform: none; zoom: 0.72; }
+  .preview-wrap { padding-left: 12px; padding-right: 12px; overflow-x: clip; }
+  .editing-board { grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); }
+  .editing, .publishing { padding-left: 1rem; padding-right: 1rem; }
+}
+@media (max-width: 460px) { .spread { zoom: 0.6; } }
+@media (max-width: 366px) { .spread { zoom: 0.52; } }
+@media (max-width: 320px) { .spread { zoom: 0.46; } }
+@media (max-width: 300px) { .spread { zoom: 0.42; } }
+/* Tablet widths: tabs keep their natural size, left-aligned like desktop, instead of stretching. */
+@media (min-width: 481px) and (max-width: 720px) {
+  .work-head-slim .modules { justify-content: flex-start; gap: 0.25rem; }
+  .work-head-slim .modules .mod { flex: 0 0 auto; max-width: none; padding-left: 0.85rem; padding-right: 0.85rem; font-size: 0.92rem; }
+}
+@media (max-width: 310px) {
+  .work-head-slim .modules .mod { font-size: 0.75rem; padding-left: 0.1rem; padding-right: 0.1rem; }
+}
+@media (max-width: 720px) {
+  .workspace > * { min-width: 0; max-width: 100%; }
+  .editing, .publishing { box-sizing: border-box; }
+  .editing *, .publishing * { min-width: 0; overflow-wrap: anywhere; }
+}

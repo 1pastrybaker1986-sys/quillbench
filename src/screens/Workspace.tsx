@@ -285,114 +285,7 @@ export default function Workspace({ session, bookId, initialModule, autoScan, on
 
 
   const coverInputRef = useRef<HTMLInputElement | null>(null);
-  const modulesRef = useRef<HTMLElement | null>(null);
-  const [tabScroll, setTabScroll] = useState({ left: false, right: false });
   const [titleOpen, setTitleOpen] = useState(false);
-  const syncTabScroll = () => {
-    const nav = modulesRef.current;
-    if (!nav) return;
-    const max = nav.scrollWidth - nav.clientWidth;
-    const next = { left: nav.scrollLeft > 2, right: max - nav.scrollLeft > 2 };
-    // Hide any tab that is only partly inside the space between visible arrows,
-    // so no letter, dot, or underline fragment can ever show at an edge.
-    const narrow = window.matchMedia("(max-width: 720px)").matches;
-    const navBox = nav.getBoundingClientRect();
-    const winL = navBox.left + (next.left ? 44 : 0);
-    const winR = navBox.right - (next.right ? 44 : 0);
-    nav.querySelectorAll<HTMLElement>(".mod").forEach((t) => {
-      const r = t.getBoundingClientRect();
-      const partial = narrow && (r.left < winL - 0.5 || r.right > winR + 0.5);
-      if (partial) t.setAttribute("data-offrow", "");
-      else t.removeAttribute("data-offrow");
-    });
-    setTabScroll((prev) => (prev.left === next.left && prev.right === next.right ? prev : next));
-  };
-  useEffect(() => {
-    const nav = modulesRef.current;
-    if (!nav) return;
-    const active = nav.querySelector<HTMLElement>(".mod.active");
-    const first = nav.querySelector<HTMLElement>(".mod");
-    if (!active || active === first) {
-      nav.scrollTo({ left: 0, behavior: "smooth" });
-    } else {
-      // Measure against the tab row itself, not an offset parent.
-      const navBox = nav.getBoundingClientRect();
-      const tabBox = active.getBoundingClientRect();
-      const tabLeftInRow = tabBox.left - navBox.left + nav.scrollLeft;
-      const target = tabLeftInRow - (nav.clientWidth - tabBox.width) / 2;
-      const max = nav.scrollWidth - nav.clientWidth;
-      nav.scrollTo({ left: Math.min(max, Math.max(0, target)), behavior: "smooth" });
-    }
-    window.setTimeout(syncTabScroll, 350);
-  }, [module]);
-  useEffect(() => {
-    syncTabScroll();
-    const onResize = () => syncTabScroll();
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, []);
-  const CHEVRON_W = 44;
-  const nudgeTabs = (dir: 1 | -1) => {
-    const nav = modulesRef.current;
-    if (!nav) return;
-    const navBox = nav.getBoundingClientRect();
-    const tabs = Array.from(nav.querySelectorAll<HTMLElement>(".mod")).map((t) => {
-      const r = t.getBoundingClientRect();
-      const left = r.left - navBox.left + nav.scrollLeft;
-      return { left, right: left + r.width };
-    });
-    const max = nav.scrollWidth - nav.clientWidth;
-    const viewL = nav.scrollLeft;
-    const viewR = viewL + nav.clientWidth;
-    let target = viewL;
-    if (dir === 1) {
-      // First tab not fully clear of the right arrow: end it exactly at the right arrow's edge.
-      const next = tabs.find((t) => t.right > viewR - CHEVRON_W + 1);
-      target = next ? next.right - (nav.clientWidth - CHEVRON_W) : max;
-      if (max - target < CHEVRON_W) target = max;
-    } else {
-      // Last tab not fully clear of the left arrow: start it exactly at the left arrow's edge.
-      const prev = [...tabs].reverse().find((t) => t.left < viewL + CHEVRON_W - 1);
-      target = prev ? prev.left - CHEVRON_W : 0;
-      if (target < CHEVRON_W) target = 0;
-    }
-    // Never hide the active tab with an arrow tap: clamp so it stays fully between the arrows.
-    const activeEl = nav.querySelector<HTMLElement>(".mod.active");
-    if (activeEl) {
-      const ar = activeEl.getBoundingClientRect();
-      const aL = ar.left - navBox.left + nav.scrollLeft;
-      const aR = aL + ar.width;
-      const clampT = Math.min(max, Math.max(0, target));
-      const winL = clampT + (clampT > 2 ? CHEVRON_W : 0);
-      const winR = clampT + nav.clientWidth - (max - clampT > 2 ? CHEVRON_W : 0);
-      if (aL < winL) target = aL - CHEVRON_W;
-      else if (aR > winR) target = aR - (nav.clientWidth - CHEVRON_W);
-      if (target < CHEVRON_W) target = 0;
-    }
-    nav.scrollTo({ left: Math.min(max, Math.max(0, target)), behavior: "smooth" });
-  };
-  const revealTab = (el: HTMLElement) => {
-    const nav = modulesRef.current;
-    if (!nav) return;
-    const navBox = nav.getBoundingClientRect();
-    const r = el.getBoundingClientRect();
-    const left = r.left - navBox.left + nav.scrollLeft;
-    const right = left + r.width;
-    const max = nav.scrollWidth - nav.clientWidth;
-    const viewL = nav.scrollLeft;
-    const viewR = viewL + nav.clientWidth;
-    let target = viewL;
-    const padL = viewL > 2 ? CHEVRON_W : 0;
-    const padR = max - viewL > 2 ? CHEVRON_W : 0;
-    if (left < viewL + padL) {
-      target = left - CHEVRON_W;
-      if (target < CHEVRON_W) target = 0;
-    } else if (right > viewR - padR) {
-      target = right - (nav.clientWidth - CHEVRON_W);
-      if (max - target < CHEVRON_W) target = max;
-    } else return;
-    nav.scrollTo({ left: Math.min(max, Math.max(0, target)), behavior: "smooth" });
-  };
   const titleRef = useRef<HTMLHeadingElement | null>(null);
   useEffect(() => {
     setTitleOpen(false);
@@ -675,26 +568,13 @@ export default function Workspace({ session, bookId, initialModule, autoScan, on
                 : "Proof"}
           </span>
         </div>
-        <div
-          className={`modules-wrap${tabScroll.left ? " more-left" : ""}${tabScroll.right ? " more-right" : ""}`}
-        >
-        <button
-          type="button"
-          className="tab-chevron tab-chevron-left"
-          aria-label="Show earlier tabs"
-          tabIndex={tabScroll.left ? 0 : -1}
-          aria-hidden={!tabScroll.left}
-          onClick={() => nudgeTabs(-1)}
-        >
-          <svg viewBox="0 0 22 22" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M13 4 L7 11 L13 18" /></svg>
-        </button>
-        <nav className="modules" aria-label="Modules" ref={modulesRef} onScroll={syncTabScroll}>
+        <div className="modules-wrap">
+        <nav className="modules" aria-label="Modules">
           {MODULES.map((m) => (
             <button
               key={m.id}
               type="button"
               aria-current={module === m.id ? "page" : undefined}
-              onFocus={(e) => revealTab(e.currentTarget)}
               data-module={m.id}
               className={`mod${module === m.id ? " active" : ""}`}
               onClick={() => {
@@ -706,16 +586,6 @@ export default function Workspace({ session, bookId, initialModule, autoScan, on
             </button>
           ))}
         </nav>
-        <button
-          type="button"
-          className="tab-chevron tab-chevron-right"
-          aria-label="Show more tabs"
-          tabIndex={tabScroll.right ? 0 : -1}
-          aria-hidden={!tabScroll.right}
-          onClick={() => nudgeTabs(1)}
-        >
-          <svg viewBox="0 0 22 22" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M9 4 L15 11 L9 18" /></svg>
-        </button>
         </div>
       </header>
 
