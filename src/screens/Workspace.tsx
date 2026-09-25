@@ -371,11 +371,13 @@ export default function Workspace({ session, bookId, initialModule, autoScan, on
     let target = viewL;
     const padL = viewL > 2 ? CHEVRON_W : 0;
     const padR = max - viewL > 2 ? CHEVRON_W : 0;
-    if (left < viewL + padL) target = left - CHEVRON_W;
-    else if (right > viewR - padR) target = right - (nav.clientWidth - CHEVRON_W);
-    else return;
-    if (target < CHEVRON_W) target = 0;
-    if (max - target < CHEVRON_W) target = max;
+    if (left < viewL + padL) {
+      target = left - CHEVRON_W;
+      if (target < CHEVRON_W) target = 0;
+    } else if (right > viewR - padR) {
+      target = right - (nav.clientWidth - CHEVRON_W);
+      if (max - target < CHEVRON_W) target = max;
+    } else return;
     nav.scrollTo({ left: Math.min(max, Math.max(0, target)), behavior: "smooth" });
   };
   const titleRef = useRef<HTMLHeadingElement | null>(null);
