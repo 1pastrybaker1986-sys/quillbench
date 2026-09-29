@@ -322,7 +322,7 @@ export default function PublishingPanel({ bookId, bookSignals, onToast }: Props)
               </p>
               <div className="pkg-cta-actions">
                 <button className="btn-solid" type="button" onClick={() => unlock("cover-design")}>
-                  Unlock Cover Design · $179
+                  Unlock Cover Design · $99
                 </button>
                 <button className="btn-export" type="button" onClick={() => unlock("studio-bundle")}>
                   Get Studio Bundle $449

@@ -39,7 +39,7 @@ export const PACKAGES: StudioPackage[] = [
   {
     id: "cover-design",
     title: "Cover Design",
-    price: 179,
+    price: 99,
     blurb: "Cover brief with comps, do-nots, and front / spine / back / ebook deliverables. Attach finals in Formatting.",
     unlocks: ["cover-design"],
   },

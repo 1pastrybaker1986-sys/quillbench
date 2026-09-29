@@ -18,6 +18,8 @@ const PRICE_ENV_BY_PACKAGE = {
   "studio-bundle": "STRIPE_PRICE_STUDIO_BUNDLE",
 };
 
+const COVER_DESIGN_CENTS = 9900;
+
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "Content-Type",
@@ -122,7 +124,7 @@ export async function handler(event) {
     return json(400, { error: "successUrl and cancelUrl are required." });
   }
 
-  const priceId = resolvePriceId(packageId, clientPriceId);
+  const priceId = packageId === "cover-design" ? "price_inline" : resolvePriceId(packageId, clientPriceId);
   if (!priceId) {
     return json(503, {
       error: `No Stripe price configured for ${packageId}. Set ${PRICE_ENV_BY_PACKAGE[packageId]} on Netlify.`,
@@ -137,9 +139,22 @@ export async function handler(event) {
 
   try {
     const stripe = new Stripe(secretKey);
+    // Cover Design sells at a fixed server-side price ($99) set by Sarah on Sep 29 2026.
+    // Amount lives here, never taken from the client.
+    const lineItem =
+      packageId === "cover-design"
+        ? {
+            price_data: {
+              currency: "usd",
+              unit_amount: COVER_DESIGN_CENTS,
+              product_data: { name: "Cover Design" },
+            },
+            quantity: 1,
+          }
+        : { price: priceId, quantity: 1 };
     const fields = {
       mode: "payment",
-      line_items: [{ price: priceId, quantity: 1 }],
+      line_items: [lineItem],
       success_url: successUrl,
       cancel_url: cancelUrl,
       metadata: { packageId },

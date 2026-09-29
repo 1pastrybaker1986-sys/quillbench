@@ -51,6 +51,18 @@
   force = false
 
 [[redirects]]
+  from = "/pricing/cover"
+  to = "/pricing/cover/index.html"
+  status = 200
+  force = false
+
+[[redirects]]
+  from = "/pricing/cover/"
+  to = "/pricing/cover/index.html"
+  status = 200
+  force = false
+
+[[redirects]]
   from = "/pricing"
   to = "/pricing/index.html"
   status = 200
