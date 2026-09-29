@@ -49,6 +49,7 @@ export default async (req) => {
       if (path === "/app/cover-design") return "Cover Design $99 (in-app)";
       return `other (${path || "/"})`;
     }),
+    tool_events: tally(real.filter((r) => r.e.startsWith("tool_")), (r) => ({ tool_generate: "Cover Brief made", tool_copy: "Cover Brief copied/printed", tool_to_cover: "Cover Brief → Cover $99 click", tool_email: "Cover Brief email signup" })[r.e]),
     pages: tally(views, (r) => r.p),
     referrers: tally(views, (r) => r.ref || "(direct / none)"),
     utm: tally(views, (r) => (r.utm?.s ? `${r.utm.s}${r.utm.c ? " / " + r.utm.c : ""}` : "")),
@@ -61,7 +62,7 @@ export default async (req) => {
 <h1>Quillbench visits, last ${days} days (Central time)</h1>
 <div class=big><div>${out.totals.views}<span>page views</span></div><div>${out.totals.visitors}<span>daily unique visitors</span></div><div>${out.totals.checkout_clicks}<span>checkout clicks</span></div></div>
 <h2>By day</h2><table><tr><th>Day</th><th>Views</th><th>Visitors</th><th>Checkout clicks</th></tr>${dayRows}</table>
-${table("Checkout clicks by offer", out.checkout_clicks_by_offer)}${table("Pages", out.pages)}${table("Where visitors came from", out.referrers)}${table("Campaign tags (utm)", out.utm)}
+${table("Checkout clicks by offer", out.checkout_clicks_by_offer)}${table("Cover Brief tool", out.tool_events)}${table("Pages", out.pages)}${table("Where visitors came from", out.referrers)}${table("Campaign tags (utm)", out.utm)}
 <p style="color:#6b6460;font-size:13px">No cookies. Visitors are counted per day from a one-way hash, and IP addresses are never stored. Bots and test hits are left out (${out.totals.test_hits_excluded} test hits excluded).</p>`;
   return new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-store" } });
 };

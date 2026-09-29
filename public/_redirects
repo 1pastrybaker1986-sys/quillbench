@@ -5,6 +5,8 @@
 /waitlist.html        /waitlist.html        200
 /waitlist             /waitlist/index.html  200
 /waitlist/            /waitlist/index.html  200
+/tools/cover-brief    /tools/cover-brief/index.html  200
+/tools/cover-brief/   /tools/cover-brief/index.html  200
 /pricing/bundle       /pricing/bundle/index.html  200
 /pricing/bundle/      /pricing/bundle/index.html  200
 /pricing              /pricing/index.html   200

@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light only" />
+    <meta name="theme-color" content="#F7F1EA" />
+    <title>Free Book Cover Brief Generator + Spine Width Calculator | Quillbench</title>
+    <meta name="description" content="Free cover brief generator for self-published authors. Answer a few questions and get a designer-ready brief, deliverables checklist, and paperback spine and full-cover sizes. No signup." />
+    <meta property="og:title" content="Free Book Cover Brief Generator | Quillbench" />
+    <meta property="og:description" content="A designer-ready cover brief, deliverables checklist, and paperback spine size in two minutes. Free, no signup." />
+    <meta property="og:image" content="https://quillbench.netlify.app/og-image.png" />
+    <meta property="og:url" content="https://quillbench.netlify.app/tools/cover-brief" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="canonical" href="https://quillbench.netlify.app/tools/cover-brief" />
+    <style>
+      html,body{background:#F7F1EA;color:#1C1917;color-scheme:light only;margin:0}
+      body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;max-width:40rem;margin:2.5rem auto;padding:0 1.25rem;line-height:1.55}
+      h1{font-size:1.7rem;font-weight:650;margin:0 0 .4rem}
+      h2{font-size:1.15rem;margin:1.8rem 0 .5rem}
+      .eyebrow{letter-spacing:.04em;text-transform:uppercase;font-size:.75rem;color:#6b5f56;margin:0 0 .35rem}
+      label{display:block;font-weight:600;font-size:.92rem;margin:.9rem 0 .25rem}
+      .hint{font-weight:400;color:#6b5f56;font-size:.82rem}
+      input[type=text],input[type=number],input[type=email],select,textarea{width:100%;box-sizing:border-box;padding:.6rem .7rem;border:1px solid #d9cdc2;border-radius:.5rem;background:#fffdfa;font:inherit;color:inherit}
+      textarea{min-height:4.2rem;resize:vertical}
+      .row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+      .checks label{display:inline-flex;gap:.35rem;align-items:center;font-weight:500;margin-right:1rem}
+      .btn{display:inline-block;margin-top:1rem;padding:.85rem 1.3rem;border-radius:.65rem;background:#1C1917;color:#F7F1EA;text-decoration:none;font-weight:600;border:0;cursor:pointer;font-size:1rem}
+      .btn.ghost{background:transparent;color:#1C1917;border:1px solid #1C1917;margin-right:.5rem}
+      #out{background:#fffdfa;border:1px solid #e3d8cd;border-radius:.75rem;padding:1.1rem 1.25rem;margin-top:1.5rem;white-space:pre-wrap;font-size:.92rem}
+      .cta{background:#efe5da;border-radius:.75rem;padding:1.1rem 1.25rem;margin-top:1.25rem}
+      .small{font-size:.8rem;color:#6b5f56}
+      a{color:#9b5a53}
+      @media print{form,.cta,.noprint,.eyebrow,h1,.lede{display:none!important}#out{border:0;padding:0}}
+      @media (max-width:520px){.row{grid-template-columns:1fr}}
+    </style>
+    <script defer src="/js/qb-count.js"></script>
+  </head>
+  <body>
+    <p class="eyebrow">Free tool · no signup</p>
+    <h1>Book Cover Brief Generator</h1>
+    <p class="lede">Answer a few questions and get a brief you can hand to any cover designer, plus a deliverables checklist and your paperback spine and full-cover sizes.</p>
+
+    <form id="f" autocomplete="off">
+      <label>Book title <input type="text" name="title" required maxlength="140" /></label>
+      <div class="row">
+        <label>Subtitle <span class="hint">(optional)</span><input type="text" name="subtitle" maxlength="160" /></label>
+        <label>Author name as printed<input type="text" name="author" maxlength="80" /></label>
+      </div>
+      <div class="row">
+        <label>Genre
+          <select name="genre">
+            <option>Romance</option><option>Romantasy</option><option>Fantasy</option><option>Science fiction</option>
+            <option>Thriller / suspense</option><option>Mystery / cozy mystery</option><option>Horror</option>
+            <option>Literary / book club</option><option>Historical fiction</option><option>Young adult</option>
+            <option>Memoir</option><option>Nonfiction / how-to</option><option>Poetry</option><option>Other</option>
+          </select>
+        </label>
+        <label>Subgenre or trope <span class="hint">(e.g. enemies to lovers)</span><input type="text" name="sub" maxlength="100" /></label>
+      </div>
+      <label>Three words for the mood <span class="hint">(e.g. dark, lush, dangerous)</span><input type="text" name="mood" maxlength="100" /></label>
+      <label>Comparable titles <span class="hint">(2–3 recent books in your lane whose covers readers of yours would pick up)</span><textarea name="comps" maxlength="400"></textarea></label>
+      <label>Must-haves <span class="hint">(imagery, symbols, colours, series look)</span><textarea name="must" maxlength="500"></textarea></label>
+      <label>Do-nots <span class="hint">(anything you never want on the cover)</span><textarea name="donot" maxlength="500"></textarea></label>
+      <label>Formats</label>
+      <div class="checks">
+        <label><input type="checkbox" name="fmt" value="ebook" checked /> Ebook</label>
+        <label><input type="checkbox" name="fmt" value="paperback" checked /> Paperback</label>
+        <label><input type="checkbox" name="fmt" value="hardcover" /> Hardcover</label>
+        <label><input type="checkbox" name="fmt" value="audio" /> Audiobook</label>
+      </div>
+      <div class="row">
+        <label>Paperback trim size
+          <select name="trim">
+            <option value="5x8">5 × 8 in</option><option value="5.25x8">5.25 × 8 in</option>
+            <option value="5.5x8.5" selected>5.5 × 8.5 in</option><option value="6x9">6 × 9 in</option>
+          </select>
+        </label>
+        <label>Page count <span class="hint">(paperback interior)</span><input type="number" name="pages" min="24" max="828" value="300" /></label>
+      </div>
+      <label>Paper
+        <select name="paper">
+          <option value="white">Black ink, white paper</option>
+          <option value="cream">Black ink, cream paper</option>
+          <option value="color">Premium color, white paper</option>
+        </select>
+      </label>
+      <button class="btn" type="submit">Make my cover brief</button>
+    </form>
+
+    <div id="result" hidden>
+      <div id="out"></div>
+      <p class="noprint"><button class="btn ghost" id="copy" type="button">Copy brief</button><button class="btn ghost" id="print" type="button">Print / save PDF</button></p>
+      <div class="cta">
+        <strong>Want this brief turned into a finished cover?</strong>
+        <p style="margin:.4rem 0 .2rem">Quillbench Cover Design builds from this brief: comps, must-haves and do-nots, plus front, spine, back and ebook deliverables. One-time $99.</p>
+        <a class="btn" id="toCover" href="/pricing/cover/">See Cover Design $99</a>
+      </div>
+      <div class="cta noprint" style="background:transparent;border:1px solid #e3d8cd">
+        <strong>Get cover and launch tips by email</strong> <span class="small">(optional, unsubscribe anytime)</span>
+        <form id="em" style="display:flex;gap:.5rem;margin-top:.5rem">
+          <input type="email" name="email" required placeholder="you@example.com" />
+          <button class="btn" style="margin:0" type="submit">Join</button>
+        </form>
+        <p id="emok" class="small" hidden>Thanks, you're on the list.</p>
+      </div>
+    </div>
+
+    <form name="quillbench-waitlist" method="POST" data-netlify="true" netlify netlify-honeypot="bot-field" hidden>
+      <input type="hidden" name="form-name" value="quillbench-waitlist" />
+      <input type="text" name="bot-field" /><input type="email" name="email" /><input type="text" name="source" />
+    </form>
+
+    <p class="small" style="margin-top:2rem">Spine and full-cover sizes use Amazon KDP's published paperback formulas (0.002252 in per page for white paper, 0.0025 in for cream, 0.002347 in for premium color, plus 0.125 in bleed on each edge). Always confirm with your printer's own template before final files. Ebook size follows KDP's recommended 2,560 × 1,600 px (1.6:1); audiobook minimum is ACX's 2,400 × 2,400 px square.</p>
+    <p class="small"><a href="/">Quillbench home</a> · <a href="/pricing/cover/">Cover Design $99</a> · <a href="/pricing/bundle/">Studio Bundle</a></p>
+
+    <script>
+      (function () {
+        var count = function (e) { try { window.__qbCount && window.__qbCount(e); } catch (x) {} };
+        var PER = { white: 0.002252, cream: 0.0025, color: 0.002347 };
+        var f = document.getElementById("f"), out = document.getElementById("out"), res = document.getElementById("result");
+        // Carry the visitor's original utm tags to the Cover page so the channel gets credit.
+        var toCover = document.getElementById("toCover");
+        if (location.search) toCover.href = "/pricing/cover/" + location.search;
+        toCover.addEventListener("click", function () { count("tool_to_cover"); });
+        var v = function (n) { return (f.elements[n].value || "").trim(); };
+        var r3 = function (x) { return (Math.round(x * 1000) / 1000).toFixed(3); };
+        f.addEventListener("submit", function (ev) {
+          ev.preventDefault();
+          var fmts = [].slice.call(f.querySelectorAll('input[name=fmt]:checked')).map(function (c) { return c.value; });
+          var L = [];
+          L.push("COVER BRIEF: " + v("title") + (v("subtitle") ? ": " + v("subtitle") : ""));
+          if (v("author")) L.push("Author name on cover: " + v("author"));
+          L.push("Genre: " + v("genre") + (v("sub") ? " (" + v("sub") + ")" : ""));
+          if (v("mood")) L.push("Mood: " + v("mood"));
+          L.push("");
+          L.push("COMPARABLE COVERS");
+          L.push(v("comps") || "(Add 2–3 recent comps. Designers work fastest from real examples.)");
+          L.push("");
+          L.push("MUST-HAVES");
+          L.push(v("must") || "(none listed)");
+          L.push("");
+          L.push("DO-NOTS");
+          L.push(v("donot") || "(none listed)");
+          L.push("");
+          L.push("DESIGN NOTES");
+          L.push("- Title must read clearly at thumbnail size (store search results show covers small).");
+          L.push("- Match the look readers of the comps expect for this genre; stand out inside that lane, not outside it.");
+          L.push("");
+          L.push("DELIVERABLES");
+          if (fmts.indexOf("ebook") > -1) L.push("[ ] Ebook front cover, 2,560 × 1,600 px (1.6:1), RGB JPG");
+          if (fmts.indexOf("paperback") > -1) {
+            var t = v("trim").split("x"), w = parseFloat(t[0]), h = parseFloat(t[1]);
+            var pages = Math.max(24, Math.min(828, parseInt(v("pages"), 10) || 0));
+            var spine = pages * PER[v("paper")];
+            var fw = 0.125 + w + spine + w + 0.125, fh = h + 0.25;
+            L.push("[ ] Paperback full wrap (back + spine + front), single print-ready PDF, images 300 DPI+, CMYK");
+            L.push("    Trim " + w + " × " + h + " in, " + pages + " pages, " + f.elements.paper.selectedOptions[0].text.toLowerCase());
+            L.push("    Spine width: " + r3(spine) + " in");
+            L.push("    Full cover with bleed: " + r3(fw) + " × " + r3(fh) + " in");
+            L.push("    " + (pages > 79 ? "Spine text allowed (title + author)." : "Under 80 pages: KDP doesn't allow spine text; keep the spine plain."));
+            L.push("[ ] Back cover copy (blurb) and barcode area");
+          }
+          if (fmts.indexOf("hardcover") > -1) L.push("[ ] Hardcover case wrap: request the printer's template (hardcover sizes differ from paperback)");
+          if (fmts.indexOf("audio") > -1) L.push("[ ] Audiobook true square, at least 2,400 × 2,400 px, RGB, title + author on image (ACX minimum)");
+          L.push("[ ] 3D mockup + social/ad crops (optional)");
+          L.push("[ ] Source files and fonts licence notes");
+          out.textContent = L.join("\n");
+          res.hidden = false;
+          res.scrollIntoView({ behavior: "smooth" });
+          count("tool_generate");
+        });
+        document.getElementById("copy").addEventListener("click", function () {
+          navigator.clipboard && navigator.clipboard.writeText(out.textContent);
+          this.textContent = "Copied"; count("tool_copy");
+        });
+        document.getElementById("print").addEventListener("click", function () { count("tool_copy"); window.print(); });
+        document.getElementById("em").addEventListener("submit", function (ev) {
+          ev.preventDefault();
+          var body = new URLSearchParams({ "form-name": "quillbench-waitlist", email: this.elements.email.value, source: "cover-brief" + (location.search ? " " + location.search.slice(0, 120) : "") });
+          fetch("/", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: body.toString() })
+            .then(function () { document.getElementById("em").hidden = true; document.getElementById("emok").hidden = false; count("tool_email"); });
+        });
+      })();
+    </script>
+  </body>
+</html>

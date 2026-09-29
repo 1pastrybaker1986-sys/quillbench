@@ -13,7 +13,8 @@ export default async (req) => {
   let body = {};
   try { body = JSON.parse((await req.text()).slice(0, 2000)); } catch { return new Response("", { status: 400 }); }
   const path = String(body.p || "/").slice(0, 120);
-  const ev = body.e === "checkout_click" ? "checkout_click" : "view";
+  const EVENTS = new Set(["checkout_click", "tool_generate", "tool_copy", "tool_to_cover", "tool_email"]);
+  const ev = EVENTS.has(body.e) ? body.e : "view";
   let refHost = "";
   try { refHost = body.r ? new URL(body.r).hostname.replace(/^www\./, "") : ""; } catch {}
   const q = new URLSearchParams(String(body.q || ""));
