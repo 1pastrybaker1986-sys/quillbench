@@ -182,6 +182,9 @@ export async function handler(event) {
           allow_promotion_codes: true,
         });
       }
+    } else if (packageId === "cover-design") {
+      // Cover Design is a fixed $99; no promo-code field (Rook prod OK, Sep 29).
+      session = await createCheckoutSession(stripe, fields);
     } else {
       session = await createCheckoutSession(stripe, {
         ...fields,
