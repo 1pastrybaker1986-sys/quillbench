@@ -45,6 +45,8 @@ export default async (req) => {
       if (path === "/pricing/cover") return "Cover Design $99 (/pricing/cover)";
       if (path === "/pricing/bundle") return "Studio Bundle $449 (/pricing/bundle)";
       if (path === "/waitlist" || path === "/waitlist.html") return "Studio Bundle $449 (/waitlist)";
+      if (path === "/app/studio-bundle") return "Studio Bundle $449 (in-app)";
+      if (path === "/app/cover-design") return "Cover Design $99 (in-app)";
       return `other (${path || "/"})`;
     }),
     pages: tally(views, (r) => r.p),

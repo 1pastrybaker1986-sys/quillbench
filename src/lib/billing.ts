@@ -62,6 +62,14 @@ export async function startCheckout(packageId: PackageId): Promise<CheckoutResul
     return { ok: true, mode: "stub", owned };
   }
 
+  // Visit counter: record an in-app checkout click (no cookies, fire-and-forget, never blocks checkout).
+  try {
+    const hit = JSON.stringify({ p: `/app/${packageId}`, q: window.location.search.slice(0, 200), r: document.referrer.slice(0, 200), e: "checkout_click" });
+    if (navigator.sendBeacon) navigator.sendBeacon("/.netlify/functions/hit", new Blob([hit], { type: "text/plain" }));
+  } catch {
+    /* ignore */
+  }
+
   const priceId = STRIPE_CONFIG.priceIds[packageId] || undefined;
   const body: {
     packageId: PackageId;
