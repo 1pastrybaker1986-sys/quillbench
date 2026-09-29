@@ -9,7 +9,7 @@ const BOT = /bot|crawl|spider|slurp|headless|lighthouse|preview|facebookexternal
 export default async (req) => {
   if (req.method !== "POST") return new Response("", { status: 405 });
   const ua = req.headers.get("user-agent") || "";
-  if (BOT.test(ua) && !ua.includes("qb-verify")) return new Response("", { status: 204 });
+  if (BOT.test(ua) && !ua.includes("qb-verify")) return new Response(null, { status: 204 });
   let body = {};
   try { body = JSON.parse((await req.text()).slice(0, 2000)); } catch { return new Response("", { status: 400 }); }
   const path = String(body.p || "/").slice(0, 120);
@@ -27,5 +27,5 @@ export default async (req) => {
   const rec = { t: now.toISOString(), p: path, e: ev, ref: refHost, utm, v, test };
   const key = `hits/${day}/${now.getTime()}-${randomBytes(4).toString("hex")}`;
   await getStore("quillbench-visits").setJSON(key, rec);
-  return new Response("", { status: 204 });
+  return new Response(null, { status: 204 });
 };
