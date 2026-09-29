@@ -17,7 +17,7 @@ export default async (req) => {
       .filter((b) => parseInt(b.key.split("/")[2], 10) >= cutoff)
       .map(async (b) => { const r = await store.get(b.key, { type: "json" }); if (r) recs.push(r); }),
   );
-  const real = recs.filter((r) => !r.test);
+  const real = url.searchParams.get("include_test") === "1" ? recs : recs.filter((r) => !r.test);
   const tally = (arr, f) => arr.reduce((m, r) => { const k = f(r); if (k) m[k] = (m[k] || 0) + 1; return m; }, {});
   const views = real.filter((r) => r.e === "view");
   const byDay = {};
