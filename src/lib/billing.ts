@@ -78,7 +78,7 @@ export async function startCheckout(packageId: PackageId): Promise<CheckoutResul
     priceId?: string;
   } = {
     packageId,
-    successUrl: `${window.location.origin}?checkout=success&pkg=${packageId}`,
+    successUrl: `${window.location.origin}/thank-you/?pkg=${packageId}`,
     cancelUrl: `${window.location.origin}?checkout=cancel&pkg=${packageId}`,
   };
   if (priceId) body.priceId = priceId;

@@ -62,7 +62,7 @@
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               packageId: "studio-bundle",
-              successUrl: location.origin + "/?checkout=success&pkg=studio-bundle",
+              successUrl: location.origin + "/thank-you/?pkg=studio-bundle",
               cancelUrl: location.origin + "/waitlist?checkout=cancel",
             }),
           })

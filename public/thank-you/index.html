@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light only" />
+    <meta name="theme-color" content="#F7F1EA" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Quillbench | Thank you for your order</title>
+    <style>
+      html,body{background:#F7F1EA;color:#1C1917;color-scheme:light only;margin:0}
+      body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;max-width:34rem;margin:3rem auto;padding:0 1.25rem;line-height:1.6}
+      h1{font-size:1.65rem;font-weight:650;margin:0 0 .75rem}
+      h2{font-size:1.1rem;font-weight:650;margin:1.8rem 0 .4rem}
+      a{color:#b86a62}
+      .eyebrow{letter-spacing:.04em;text-transform:uppercase;font-size:.75rem;color:#6b5f56;margin:0 0 .35rem}
+      .card{background:#fffaf4;border:1px solid #e6dcd0;border-radius:.75rem;padding:1rem 1.1rem;margin:1rem 0}
+      label{display:block;font-weight:600;margin:1rem 0 .3rem}
+      .hint{font-weight:400;color:#6b5f56;font-size:.9rem}
+      input,select,textarea{width:100%;box-sizing:border-box;font:inherit;padding:.65rem .75rem;border:1px solid #cfc3b6;border-radius:.55rem;background:#fff;color:#1C1917}
+      textarea{min-height:9rem;resize:vertical}
+      .btn{display:inline-block;margin-top:1.25rem;padding:.9rem 1.35rem;border-radius:.65rem;background:#1C1917;color:#F7F1EA;font-weight:600;border:0;cursor:pointer;font-size:1rem}
+      .btn:disabled{opacity:.6;cursor:wait}
+      .ok{background:#eef5ea;border:1px solid #bcd3b0;border-radius:.65rem;padding:1rem;margin-top:1rem}
+      .err{color:#9b3b3b;margin-top:.75rem}
+      .hidden{display:none}
+      .foot{margin-top:2.5rem;font-size:.95rem}
+    </style>
+  </head>
+  <body>
+    <p class="eyebrow">Order received</p>
+    <h1>Thank you. Your payment went through.</h1>
+    <p id="pkg-line">Your package is unlocked in Quillbench on this device.</p>
+
+    <div class="card">
+      <p id="delivery" style="margin:0"><strong>Delivery:</strong> Cover Design within 5 business days of purchase. Studio Bundle within 14 business days of purchase.</p>
+      <p style="margin:.5rem 0 0">Business days are Monday to Friday, not counting US public holidays. The clock starts on the day your payment goes through.</p>
+    </div>
+
+    <h2>What to send</h2>
+    <ul id="send-list">
+      <li>The email you used at checkout, so we can match your order.</li>
+      <li>Your book title and author name as they should appear.</li>
+      <li>Your brief: genre, the feel you want, 2 or 3 books you like the look of, must-haves, and anything to avoid.</li>
+      <li>A link to your files (Google Drive, Dropbox, or similar), shared so anyone with the link can view.</li>
+    </ul>
+    <p>Use the form below. It goes straight to Sarah.</p>
+
+    <form id="intake" name="quillbench-intake" method="POST" data-netlify="true" netlify-honeypot="bot-field">
+      <input type="hidden" name="form-name" value="quillbench-intake" />
+      <p class="hidden"><label>Leave this empty <input name="bot-field" /></label></p>
+
+      <label for="f-email">Email used at checkout</label>
+      <input id="f-email" name="email" type="email" required autocomplete="email" />
+
+      <label for="f-pkg">Package</label>
+      <select id="f-pkg" name="package" required>
+        <option value="">Choose one</option>
+        <option value="Cover Design ($99)">Cover Design ($99)</option>
+        <option value="Studio Bundle ($449)">Studio Bundle ($449)</option>
+      </select>
+
+      <label for="f-title">Book title and author name</label>
+      <input id="f-title" name="book" type="text" required />
+
+      <label for="f-brief">Your brief <span class="hint">genre, feel, books you like the look of, must-haves, anything to avoid</span></label>
+      <textarea id="f-brief" name="brief" required></textarea>
+
+      <label for="f-files">Link to your files <span class="hint">manuscript and any images, shared so anyone with the link can view</span></label>
+      <input id="f-files" name="files_link" type="url" required placeholder="https://" />
+
+      <label for="f-notes">Anything else? <span class="hint">optional</span></label>
+      <textarea id="f-notes" name="notes" style="min-height:5rem"></textarea>
+
+      <button class="btn" id="submit" type="submit">Send to Sarah</button>
+      <p class="err hidden" id="err"></p>
+    </form>
+
+    <div class="ok hidden" id="ok">
+      <strong>Got it. Your details were sent to Sarah.</strong>
+      <p style="margin:.4rem 0 0">She'll reply to the email you gave within 1 to 2 business days if she needs anything else.</p>
+    </div>
+
+    <h2>Questions?</h2>
+    <p>Email <a href="mailto:sarah@brundigebusiness.com">sarah@brundigebusiness.com</a> or text <a href="sms:+19793184067">(979) 318-4067</a>. We usually reply within 1 to 2 business days.</p>
+
+    <p class="foot"><a href="/">Open Quillbench</a> · <a href="/refund/">Refunds</a> · <a href="/support/">Support</a></p>
+
+    <script>
+      (function () {
+        var NAMES = { "cover-design": "Cover Design ($99)", "studio-bundle": "Studio Bundle ($449)" };
+        var pkg = new URLSearchParams(location.search).get("pkg");
+        if (pkg && NAMES[pkg]) {
+          try {
+            var KEY = "quillbench.packages.v1";
+            var owned = JSON.parse(localStorage.getItem(KEY) || "[]");
+            if (!Array.isArray(owned)) owned = [];
+            var add = [pkg];
+            if (pkg === "studio-bundle") add.push("full-edit", "cover-design", "marketing");
+            add.forEach(function (id) { if (owned.indexOf(id) === -1) owned.push(id); });
+            localStorage.setItem(KEY, JSON.stringify(owned));
+          } catch (e) {}
+          document.getElementById("f-pkg").value = NAMES[pkg];
+          document.getElementById("pkg-line").textContent = "You bought " + NAMES[pkg] + ". It's unlocked in Quillbench on this device.";
+          document.getElementById("delivery").innerHTML = pkg === "cover-design"
+            ? "<strong>Delivery:</strong> within 5 business days of purchase."
+            : "<strong>Delivery:</strong> within 14 business days of purchase.";
+        }
+        var form = document.getElementById("intake");
+        var btn = document.getElementById("submit");
+        var err = document.getElementById("err");
+        form.addEventListener("submit", function (ev) {
+          ev.preventDefault();
+          err.classList.add("hidden");
+          btn.disabled = true;
+          btn.textContent = "Sending…";
+          var body = new URLSearchParams(new FormData(form)).toString();
+          fetch("/", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: body })
+            .then(function (r) {
+              if (!r.ok) throw new Error("status " + r.status);
+              form.classList.add("hidden");
+              document.getElementById("ok").classList.remove("hidden");
+            })
+            .catch(function () {
+              btn.disabled = false;
+              btn.textContent = "Send to Sarah";
+              err.textContent = "That didn't send. Try again, or email sarah@brundigebusiness.com.";
+              err.classList.remove("hidden");
+            });
+        });
+      })();
+    </script>
+  </body>
+</html>

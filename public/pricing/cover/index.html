@@ -55,7 +55,7 @@
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               packageId: "cover-design",
-              successUrl: location.origin + "/?checkout=success&pkg=cover-design",
+              successUrl: location.origin + "/thank-you/?pkg=cover-design",
               cancelUrl: location.origin + "/pricing/cover?checkout=cancel",
             }),
           })
