@@ -116,9 +116,9 @@ export default function Library({ session, onOpenBook, onSignOut, onOpenPrivacy,
               Terms
             </button>
             <span aria-hidden="true">·</span>
-            <a className="legal-link" href="mailto:hello@quillbench.app">
-              hello@quillbench.app
-            </a>
+            <a className="legal-link" href="/refund/">Refunds</a>
+            <span aria-hidden="true">·</span>
+            <a className="legal-link" href="/support/">Support</a>
           </nav>
         </footer>
 

@@ -67,7 +67,7 @@ export default function Privacy({ onBack }: Props) {
           <h2>Contact</h2>
           <p>
             Questions about privacy:{" "}
-            <a href="mailto:hello@quillbench.app">hello@quillbench.app</a>
+            <a href="mailto:sarah@brundigebusiness.com">sarah@brundigebusiness.com</a>
           </p>
         </section>
 
@@ -76,9 +76,9 @@ export default function Privacy({ onBack }: Props) {
 
       <footer className="legal-foot">
         <nav className="legal-links" aria-label="Support">
-          <a className="legal-link" href="mailto:hello@quillbench.app">
-            hello@quillbench.app
-          </a>
+          <a className="legal-link" href="/refund/">Refunds</a>
+          <span aria-hidden="true">·</span>
+          <a className="legal-link" href="/support/">Support</a>
         </nav>
       </footer>
     </div>

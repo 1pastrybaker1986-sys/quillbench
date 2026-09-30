@@ -285,7 +285,7 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
 
       {/*
         Waitlist: localStorage quillbench.waitlist.v1 + Netlify Forms `quillbench-waitlist`.
-        Sarah: Netlify → Forms → enable email notifications to her Gmail / hello@quillbench.app
+        Sarah: Netlify → Forms → enable email notifications to her Gmail / sarah@brundigebusiness.com
       */}
       <section className="landing-waitlist" id="landing-waitlist" aria-labelledby="waitlist-heading">
         <div className="landing-waitlist-card">
@@ -355,7 +355,7 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
           )}
           <p className="landing-waitlist-support">
             Questions?{" "}
-            <a href="mailto:hello@quillbench.app">hello@quillbench.app</a>
+            <a href="mailto:sarah@brundigebusiness.com">sarah@brundigebusiness.com</a>
           </p>
         </div>
       </section>
@@ -413,9 +413,9 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
             Terms
           </button>
           <span aria-hidden="true">·</span>
-          <a className="legal-link" href="mailto:hello@quillbench.app">
-            hello@quillbench.app
-          </a>
+          <a className="legal-link" href="/refund/">Refunds</a>
+          <span aria-hidden="true">·</span>
+          <a className="legal-link" href="/support/">Support</a>
         </nav>
       </footer>
     </div>

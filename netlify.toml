@@ -75,6 +75,30 @@
   force = false
 
 [[redirects]]
+  from = "/refund"
+  to = "/refund/index.html"
+  status = 200
+  force = false
+
+[[redirects]]
+  from = "/refund/"
+  to = "/refund/index.html"
+  status = 200
+  force = false
+
+[[redirects]]
+  from = "/support"
+  to = "/support/index.html"
+  status = 200
+  force = false
+
+[[redirects]]
+  from = "/support/"
+  to = "/support/index.html"
+  status = 200
+  force = false
+
+[[redirects]]
   from = "/pricing"
   to = "/pricing/index.html"
   status = 200

@@ -9,6 +9,10 @@
 /tools/cover-brief/   /tools/cover-brief/index.html  200
 /pricing/bundle       /pricing/bundle/index.html  200
 /pricing/bundle/      /pricing/bundle/index.html  200
+/refund               /refund/index.html    200
+/refund/              /refund/index.html    200
+/support              /support/index.html   200
+/support/             /support/index.html   200
 /pricing              /pricing/index.html   200
 /pricing/             /pricing/index.html   200
 /*                    /index.html           200
