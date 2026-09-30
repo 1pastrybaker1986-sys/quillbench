@@ -50,23 +50,9 @@ function resolveUser(event, context) {
       email: fromContext.email || fromContext?.user_metadata?.email || "",
     };
   }
-  // Fallback: decode JWT payload (no verify) when gateway did not populate clientContext
-  // (e.g. some local netlify dev paths). Production Soft-PASS should rely on Identity gateway.
-  const auth = event.headers?.authorization || event.headers?.Authorization || "";
-  const m = /^Bearer\s+(.+)$/i.exec(auth);
-  if (!m) return null;
-  try {
-    const payloadPart = m[1].split(".")[1];
-    if (!payloadPart) return null;
-    const jsonStr = Buffer.from(payloadPart.replace(/-/g, "+").replace(/_/g, "/"), "base64").toString(
-      "utf8",
-    );
-    const claims = JSON.parse(jsonStr);
-    if (!claims?.sub) return null;
-    return { sub: claims.sub, email: claims.email || "" };
-  } catch {
-    return null;
-  }
+  // Only trust the user Netlify Identity verified (signature checked by the gateway).
+  // Never decode an unverified Bearer token here.
+  return null;
 }
 
 function openStore(event) {
