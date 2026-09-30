@@ -46,8 +46,8 @@ export default function Terms({ onBack }: Props) {
         <section className="legal-section">
           <h2>Delivery and refunds</h2>
           <p>
-            Cover Design is delivered within 7 business days of purchase. The Studio Bundle is
-            delivered within 30 business days of purchase. You can get a full refund within 7 days
+            Cover Design is delivered within 5 business days of purchase. The Studio Bundle is
+            delivered within 14 business days of purchase. You can get a full refund within 7 days
             of purchase; see the <a href="/refund/">refund policy</a>.
           </p>
         </section>
