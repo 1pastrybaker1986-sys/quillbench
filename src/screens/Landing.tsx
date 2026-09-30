@@ -237,7 +237,7 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
           <p className="landing-price-card-eyebrow">Soft launch · early access</p>
           <h2 id="price-card-heading">Studio Bundle</h2>
           <p className="landing-price-card-inclusions">
-            Full Edit + Cover + Marketing
+            Cover, print wrap, proofread, blurb polish, and 6 promo graphics
           </p>
           <div className="landing-bundle-price-row">
             <span className="landing-bundle-soft">{formatSoftBundlePrice()}</span>
@@ -252,16 +252,16 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
           </p>
           <ul className="landing-price-inclusions" aria-label="Studio Bundle includes">
             <li>
-              <strong>Full Edit</strong>
-              <span>Four-pass craft board unlocked</span>
-            </li>
-            <li>
               <strong>Cover</strong>
-              <span>Cover design package</span>
+              <span>Ebook front, 2400x2400 audiobook, 3D mockup</span>
             </li>
             <li>
-              <strong>Marketing</strong>
-              <span>Launch checklist + assets</span>
+              <strong>Print wrap + proofread</strong>
+              <span>Spine and back; up to 40,000 words</span>
+            </li>
+            <li>
+              <strong>Blurb + graphics</strong>
+              <span>Blurb polish and 6 promo graphics</span>
             </li>
           </ul>
           <div className="landing-bundle-actions">

@@ -24,7 +24,7 @@ export const PACKAGES: StudioPackage[] = [
     title: "Studio Bundle",
     price: 499,
     blurb:
-      "Full Edit + Cover Design + Marketing in one unlock — best value for writers taking a book to market.",
+      "Cover, print wrap, proofread up to 40,000 words, blurb polish, and 6 promo graphics in one package.",
     unlocks: ["full-edit", "cover-design", "marketing"],
     featured: true,
   },
@@ -40,7 +40,7 @@ export const PACKAGES: StudioPackage[] = [
     id: "cover-design",
     title: "Cover Design",
     price: 99,
-    blurb: "Cover brief with comps, do-nots, and front / spine / back / ebook deliverables. Attach finals in Formatting.",
+    blurb: "One cover concept: ebook front cover, 2400x2400 audiobook cover, and a 3D book mockup. 2 rounds of changes included.",
     unlocks: ["cover-design"],
   },
   {

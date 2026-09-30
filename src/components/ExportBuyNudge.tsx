@@ -29,7 +29,7 @@ export default function ExportBuyNudge({ onSeePackages, onDismiss }: Props) {
       <p className="export-buy-nudge-eyebrow">Your files are ready</p>
       <h3 className="export-buy-nudge-title">Studio Bundle soft launch</h3>
       <p className="export-buy-nudge-lede">
-        Full Edit + Cover + Marketing for <strong>{soft} USD</strong>{" "}
+        Cover, print wrap, proofread, blurb polish, and 6 promo graphics for <strong>{soft} USD</strong>{" "}
         <span className="export-buy-nudge-was">(was {formatCatalogBundlePrice()})</span>{" "}
         {SOFT_LAUNCH.softLaunchThrough}. Checkout applies <strong>{SOFT_LAUNCH.couponCode}</strong>{" "}
         automatically — price is {soft} USD, not $4.49.

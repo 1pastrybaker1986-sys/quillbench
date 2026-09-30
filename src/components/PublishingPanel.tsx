@@ -318,8 +318,8 @@ export default function PublishingPanel({ bookId, bookSignals, onToast }: Props)
             <div className="pkg-cta-copy">
               <h4>Cover Design locked</h4>
               <p>
-                Unlock the brief: trim, comps, must-haves, do-nots, and a front / spine / back /
-                ebook checklist. Attach finals in Formatting.
+                One cover concept: ebook front cover, 2400x2400 audiobook cover, and a 3D book
+                mockup. 2 rounds of changes included.
               </p>
               <div className="pkg-cta-actions">
                 <button className="btn-solid" type="button" onClick={() => unlock("cover-design")}>
