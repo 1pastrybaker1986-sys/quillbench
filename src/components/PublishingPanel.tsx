@@ -431,10 +431,9 @@ export default function PublishingPanel({ bookId, bookSignals, onToast }: Props)
         <h3>Studio packages</h3>
         <p className="pub-stub-note">
           Soft launch: Studio Bundle Checkout opens at {formatSoftBundlePrice()}{" "}
-          <strong>USD</strong> with <strong>{SOFT_LAUNCH.couponCode}</strong> auto-applied ($
-          {SOFT_LAUNCH.discountDollars} off {formatCatalogBundlePrice()}). Price is{" "}
-          {formatSoftBundlePrice()} USD, not $4.49. Unlocks save on this device until accounts sync
-          across phones and computers.
+          <strong>USD</strong> with <strong>{SOFT_LAUNCH.couponCode}</strong> auto-applied through October 10, then{" "}
+          {formatCatalogBundlePrice()}. Price is {formatSoftBundlePrice()} USD, not $4.49. Unlocks
+          save on this device.
         </p>
         <ul className="pkg-grid">
           {packages.filter((pkg) => canBuy(pkg.id)).map((pkg) => {
@@ -453,7 +452,7 @@ export default function PublishingPanel({ bookId, bookSignals, onToast }: Props)
                     {pkg.featured ? (
                       <>
                         <span className="pkg-price-soft">{formatSoftBundlePrice()}</span>{" "}
-                        <span className="pkg-price-was">{formatPrice(pkg.price)}</span>
+                        <span className="pkg-price-then">through October 10, then {formatPrice(pkg.price)}</span>
                       </>
                     ) : (
                       formatPrice(pkg.price)

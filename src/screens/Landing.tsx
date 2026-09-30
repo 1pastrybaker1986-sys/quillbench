@@ -241,13 +241,12 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
           </p>
           <div className="landing-bundle-price-row">
             <span className="landing-bundle-soft">{formatSoftBundlePrice()}</span>
-            <span className="landing-bundle-was">was {formatCatalogBundlePrice()}</span>
+            <span className="landing-bundle-then">through October 10, then {formatCatalogBundlePrice()}</span>
             <span className="landing-bundle-save">{SOFT_LAUNCH.couponCode} auto</span>
           </div>
           <p className="landing-bundle-window">
-            Soft-launch pricing {SOFT_LAUNCH.softLaunchThrough}. Studio Bundle Checkout applies{" "}
-            <strong>{SOFT_LAUNCH.couponCode}</strong> automatically (
-            {formatCatalogBundlePrice()} → {formatSoftBundlePrice()} USD). Price is{" "}
+            <strong>{SOFT_LAUNCH.couponCode}</strong> is applied automatically at Checkout through
+            October 10. Price is{" "}
             {formatSoftBundlePrice()} USD, not $4.49.
           </p>
           <ul className="landing-price-inclusions" aria-label="Studio Bundle includes">
@@ -294,7 +293,7 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
           <p className="landing-waitlist-lede">
             Soft launch {SOFT_LAUNCH.softLaunchThrough}. Leave your email for early-access notes.
             Ready to finish? Studio Bundle Checkout is already {formatSoftBundlePrice()} USD with{" "}
-            <strong>{SOFT_LAUNCH.couponCode}</strong> applied (${SOFT_LAUNCH.discountDollars} off{" "}
+            <strong>{SOFT_LAUNCH.couponCode}</strong> applied through October 10 (then{" "}
             {formatCatalogBundlePrice()}) — no waitlist required.
           </p>
           {waitlistDone ? (

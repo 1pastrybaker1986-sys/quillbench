@@ -3728,10 +3728,9 @@ a.legal-link {
   letter-spacing: -0.02em;
 }
 
-.landing-bundle-was {
+.landing-bundle-then {
   font-size: 1.05rem;
   color: #9a7a7e;
-  text-decoration: line-through;
 }
 
 .landing-bundle-save {
@@ -3773,13 +3772,6 @@ a.legal-link {
   padding-inline: 1.25rem;
 }
 
-.landing-price-was {
-  margin-right: 0.35rem;
-  color: #9a7a7e;
-  font-weight: 500;
-  text-decoration: line-through;
-  font-size: 0.88em;
-}
 
 .landing-price-code {
   font-weight: 600;
@@ -3797,10 +3789,9 @@ a.legal-link {
   font-weight: 700;
 }
 
-.pkg-price-was {
+.pkg-price-then {
   color: #9a7a7e;
   font-weight: 500;
-  text-decoration: line-through;
   font-size: 0.85em;
 }
 
@@ -3854,10 +3845,6 @@ a.legal-link {
   color: #6b5558;
 }
 
-.export-buy-nudge-was {
-  text-decoration: line-through;
-  color: #9a7a7e;
-}
 
 .export-buy-nudge-actions {
   display: flex;
