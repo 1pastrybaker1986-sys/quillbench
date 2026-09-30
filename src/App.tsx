@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import Toast from "./components/Toast";
-import { purchase, type PackageId } from "./lib/packages";
 import { isCloudSaveEnabled } from "./lib/cloudSaveFlag";
 import { finishIdentityLoginAndMigrate } from "./lib/netlifyCloudSave";
 import { createBook, getSession, listBooks, startLocalSession } from "./lib/store";
@@ -63,9 +62,15 @@ function consumeCheckoutReturn(): string | null {
     const pkg = url.searchParams.get("pkg");
     let banner: string | null = null;
 
-    if (checkout === "success" && pkg && PACKAGE_IDS.has(pkg)) {
-      purchase(pkg as PackageId);
-      banner = "Payment successful — package unlocked on this device.";
+    if (checkout === "success") {
+      // No unverified unlocks (packet softlaunch-successurl v1 item c). Old links go to the
+      // thank-you page, which only unlocks after the server confirms a paid Stripe session.
+      const sid = url.searchParams.get("session_id") || "";
+      const q = new URLSearchParams();
+      if (pkg && PACKAGE_IDS.has(pkg)) q.set("pkg", pkg);
+      if (sid) q.set("session_id", sid);
+      window.location.replace("/thank-you/?" + q.toString());
+      return null;
     } else if (checkout === "cancel") {
       banner = "Checkout canceled — no charge was made.";
     }

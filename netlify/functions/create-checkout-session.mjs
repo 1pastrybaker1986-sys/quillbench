@@ -10,6 +10,26 @@ const ALLOWED_PACKAGES = new Set([
   "studio-bundle",
 ]);
 
+const PROD_ORIGIN = "https://quillbench.netlify.app";
+const ALLOWED_HOST = /^(quillbench\.netlify\.app|[a-z0-9-]+--quillbench\.netlify\.app)$/;
+
+/** Origin of the deploy that served this request (prod or a Netlify preview); anything else falls back to prod. */
+function siteOrigin(event) {
+  const h = event.headers || {};
+  const host = String(h["x-forwarded-host"] || h.host || "").toLowerCase().split(",")[0].trim();
+  return ALLOWED_HOST.test(host) ? `https://${host}` : PROD_ORIGIN;
+}
+
+/** Keep a client cancel URL only if it is on the same origin; otherwise use the fallback. */
+function sameOriginOr(candidate, origin, fallback) {
+  try {
+    if (candidate && new URL(candidate).origin === origin) return candidate;
+  } catch {
+    /* ignore */
+  }
+  return fallback;
+}
+
 const PRICE_ENV_BY_PACKAGE = {
   "full-edit": "STRIPE_PRICE_FULL_EDIT",
   "cover-design": "STRIPE_PRICE_COVER_DESIGN",
@@ -109,7 +129,6 @@ export async function handler(event) {
   }
 
   const packageId = typeof payload.packageId === "string" ? payload.packageId.trim() : "";
-  const successUrl = typeof payload.successUrl === "string" ? payload.successUrl.trim() : "";
   const cancelUrl = typeof payload.cancelUrl === "string" ? payload.cancelUrl.trim() : "";
   const clientPriceId = payload.priceId;
 
@@ -119,9 +138,11 @@ export async function handler(event) {
     });
   }
 
-  if (!successUrl || !cancelUrl) {
-    return json(400, { error: "successUrl and cancelUrl are required." });
-  }
+  // Success/cancel URLs are built on the server (packet softlaunch-successurl v1 item c, Rook 9:55 AM).
+  // The client's successUrl is ignored so no caller can redirect buyers elsewhere.
+  const origin = siteOrigin(event);
+  const serverSuccessUrl = `${origin}/thank-you/?pkg=${encodeURIComponent(packageId)}&session_id={CHECKOUT_SESSION_ID}`;
+  const serverCancelUrl = sameOriginOr(cancelUrl, origin, `${origin}/?checkout=cancel&pkg=${encodeURIComponent(packageId)}`);
 
   const priceId = packageId === "cover-design" ? "price_inline" : resolvePriceId(packageId, clientPriceId);
   if (!priceId) {
@@ -158,8 +179,8 @@ export async function handler(event) {
     const fields = {
       mode: "payment",
       line_items: [lineItem],
-      success_url: successUrl,
-      cancel_url: cancelUrl,
+      success_url: serverSuccessUrl,
+      cancel_url: serverCancelUrl,
       metadata: { packageId },
     };
     // Stripe forbids discounts + allow_promotion_codes on the same session.
