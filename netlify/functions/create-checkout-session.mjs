@@ -97,10 +97,7 @@ function resolvePriceId(packageId, clientPriceId) {
   const fromEnv = envName ? process.env[envName]?.trim() : "";
   // Prefer env only when it is a real Stripe Price id (price_…); ignore product ids etc.
   if (fromEnv && fromEnv.startsWith("price_")) return fromEnv;
-  if (typeof clientPriceId === "string") {
-    const fromClient = clientPriceId.trim();
-    if (fromClient.startsWith("price_")) return fromClient;
-  }
+  // Never accept a client-supplied price id: the amount must come from server config.
   return "";
 }
 
@@ -143,7 +140,7 @@ export async function handler(event) {
   const serverSuccessUrl = `${origin}/thank-you/?pkg=${encodeURIComponent(packageId)}&session_id={CHECKOUT_SESSION_ID}`;
   const serverCancelUrl = sameOriginOr(cancelUrl, origin, `${origin}/?checkout=cancel&pkg=${encodeURIComponent(packageId)}`);
 
-  const priceId = packageId === "cover-design" ? "price_inline" : resolvePriceId(packageId, clientPriceId);
+  const priceId = resolvePriceId(packageId, clientPriceId);
   if (!priceId) {
     return json(503, {
       error: `No Stripe price configured for ${packageId}. Set ${PRICE_ENV_BY_PACKAGE[packageId]} on Netlify.`,
