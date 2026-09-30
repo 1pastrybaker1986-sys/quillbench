@@ -210,7 +210,7 @@ export default function EditingPanel({ bookId, onSeePackages, onToast }: Props) 
       {hasFullEdit ? (
         <>
           <div className="pkg-owned-banner">
-            <span className="pkg-badge owned">Full Edit owned</span>
+            <span className="pkg-badge owned">Editing tools unlocked</span>
             <span className="pkg-chip priority">Priority review included</span>
             <button className="linkish" type="button" onClick={onSeePackages}>
               See all packages
@@ -220,10 +220,9 @@ export default function EditingPanel({ bookId, onSeePackages, onToast }: Props) 
           <section className="payoff-card" aria-label="Priority review">
             <div className="payoff-card-head">
               <h3>Priority review</h3>
-              <span className="pkg-chip priority">Full Edit</span>
             </div>
             <p className="payoff-lede">
-              Three prompts for your editor before the four-pass board locks — so the $249 is a
+              Three prompts to fill in before the four-pass board locks, so your notes start from a
               brief, not a blank box.
             </p>
             <label className="editing-field">
