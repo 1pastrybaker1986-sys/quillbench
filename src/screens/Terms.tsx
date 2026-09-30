@@ -46,9 +46,12 @@ export default function Terms({ onBack }: Props) {
         <section className="legal-section">
           <h2>Delivery and refunds</h2>
           <p>
-            Cover Design is delivered within 5 business days of purchase. The Studio Bundle is
-            delivered within 14 business days of purchase. You can get a full refund within 7 days
-            of purchase; see the <a href="/refund/">refund policy</a>.
+            Cover Design is delivered within 5 business days of your clock-start date. The Studio
+            Bundle is delivered within 14 business days of your clock-start date. Your clock starts
+            the day Sarah emails to confirm your brief is complete (all 5 fields filled in and your
+            files link opens), within 1 business day. If you owe a word-count invoice, your clock
+            starts when it's paid. Full refund any time before work starts; no refund after. Work
+            starts on your clock-start date. See the <a href="/refund/">refund policy</a>.
           </p>
         </section>
 

@@ -4,10 +4,9 @@
  */
 import Stripe from "stripe";
 
+// full-edit and marketing removed Sep 30 2026 (Sarah approved packet v2, 9:52 AM): deliverables undefined, archived.
 const ALLOWED_PACKAGES = new Set([
-  "full-edit",
   "cover-design",
-  "marketing",
   "studio-bundle",
 ]);
 
@@ -116,7 +115,7 @@ export async function handler(event) {
 
   if (!ALLOWED_PACKAGES.has(packageId)) {
     return json(400, {
-      error: "Invalid packageId. Allowed: full-edit, cover-design, marketing, studio-bundle.",
+      error: "Invalid packageId. Allowed: cover-design, studio-bundle.",
     });
   }
 
@@ -147,7 +146,11 @@ export async function handler(event) {
             price_data: {
               currency: "usd",
               unit_amount: COVER_DESIGN_CENTS,
-              product_data: { name: "Cover Design" },
+              product_data: {
+                name: "Cover Design",
+                description:
+                  "One cover concept for your book: ebook front cover, 2400x2400 audiobook cover, and a 3D book mockup. 2 rounds of changes included. Delivered within 5 business days of your clock-start date.",
+              },
             },
             quantity: 1,
           }
