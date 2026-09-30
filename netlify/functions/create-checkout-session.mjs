@@ -37,7 +37,6 @@ const PRICE_ENV_BY_PACKAGE = {
   "studio-bundle": "STRIPE_PRICE_STUDIO_BUNDLE",
 };
 
-const COVER_DESIGN_CENTS = 9900;
 
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
@@ -159,23 +158,9 @@ export async function handler(event) {
 
   try {
     const stripe = new Stripe(secretKey);
-    // Cover Design sells at a fixed server-side price ($99) set by Sarah on Sep 29 2026.
-    // Amount lives here, never taken from the client.
-    const lineItem =
-      packageId === "cover-design"
-        ? {
-            price_data: {
-              currency: "usd",
-              unit_amount: COVER_DESIGN_CENTS,
-              product_data: {
-                name: "Cover Design",
-                description:
-                  "One cover concept for your book: ebook front cover, 2400x2400 audiobook cover, and a 3D book mockup. 2 rounds of changes included. Delivered within 5 business days of your clock-start date.",
-              },
-            },
-            quantity: 1,
-          }
-        : { price: priceId, quantity: 1 };
+    // Every package, Cover Design included, uses its Stripe catalog Price (amount and
+    // description live in Stripe). Cover default Price = $99 (Sarah, Sep 30 12:52 PM CT).
+    const lineItem = { price: priceId, quantity: 1 };
     const fields = {
       mode: "payment",
       line_items: [lineItem],
