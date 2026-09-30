@@ -9,7 +9,7 @@ import {
   type PassId,
   type PassStatus,
 } from "../lib/editingBoard";
-import { ownsFullEdit, type PackageId } from "../lib/packages";
+import { canBuy, ownsFullEdit, type PackageId } from "../lib/packages";
 import { startCheckout } from "../lib/billing";
 import {
   getPriorityReview,
@@ -230,9 +230,11 @@ export default function EditingPanel({ bookId, onSeePackages, onToast }: Props) 
               are coming soon.
             </p>
             <div className="pkg-cta-actions">
-              <button className="btn-solid" type="button" onClick={() => unlock("full-edit")}>
-                Unlock Full Edit · $249
-              </button>
+              {canBuy("full-edit") ? (
+                <button className="btn-solid" type="button" onClick={() => unlock("full-edit")}>
+                  Unlock Full Edit · $249
+                </button>
+              ) : null}
               <button className="btn-export" type="button" onClick={() => unlock("studio-bundle")}>
                 Get Studio Bundle $449
               </button>

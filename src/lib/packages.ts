@@ -72,6 +72,16 @@ function writeOwned(ids: string[]): void {
   }
 }
 
+/**
+ * Packages whose standalone buy buttons are hidden until Sarah defines what they
+ * deliver (Sarah 2026-09-30 8:55 AM). Remove an id here to bring its button back.
+ */
+const BUY_HIDDEN = new Set<string>(["full-edit", "marketing"]);
+
+export function canBuy(id: PackageId | string): boolean {
+  return !BUY_HIDDEN.has(id);
+}
+
 export function listPackages(): StudioPackage[] {
   return PACKAGES.slice();
 }

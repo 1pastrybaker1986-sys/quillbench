@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import {
+  canBuy,
   formatPrice,
   getOwned,
   listPackages,
@@ -413,9 +414,11 @@ export default function PublishingPanel({ bookId, bookSignals, onToast }: Props)
                 done-looks-like on each item (preorder, newsletter, social, KDP categories).
               </p>
               <div className="pkg-cta-actions">
-                <button className="btn-solid" type="button" onClick={() => unlock("marketing")}>
-                  Unlock Marketing · $129
-                </button>
+                {canBuy("marketing") ? (
+                  <button className="btn-solid" type="button" onClick={() => unlock("marketing")}>
+                    Unlock Marketing · $129
+                  </button>
+                ) : null}
                 <button className="btn-export" type="button" onClick={() => unlock("studio-bundle")}>
                   Get Studio Bundle $449
                 </button>
@@ -435,7 +438,7 @@ export default function PublishingPanel({ bookId, bookSignals, onToast }: Props)
           across phones and computers.
         </p>
         <ul className="pkg-grid">
-          {packages.map((pkg) => {
+          {packages.filter((pkg) => canBuy(pkg.id) || owns(pkg.id)).map((pkg) => {
             const isOwned =
               pkg.id === "studio-bundle"
                 ? ownedIds.has("studio-bundle")
