@@ -9,8 +9,7 @@ import {
   type PassId,
   type PassStatus,
 } from "../lib/editingBoard";
-import { canBuy, ownsFullEdit, type PackageId } from "../lib/packages";
-import { startCheckout } from "../lib/billing";
+import { ownsFullEdit } from "../lib/packages";
 import {
   getPriorityReview,
   setPriorityReview,
@@ -194,18 +193,7 @@ export default function EditingPanel({ bookId, onSeePackages, onToast }: Props) 
     flushPriority({ quiet: true });
   }
 
-  async function unlock(id: PackageId) {
-    const result = await startCheckout(id);
-    if (!result.ok) {
-      onToast?.(result.reason);
-      return;
-    }
-    if (result.mode === "stripe") return; // redirected to Checkout
-    setHasFullEdit(ownsFullEdit());
-    onToast?.(
-      id === "studio-bundle" ? "Studio Bundle unlocked on this device" : "Full Edit unlocked on this device",
-    );
-  }
+
 
   const passes = listPasses();
 
@@ -219,32 +207,7 @@ export default function EditingPanel({ bookId, onSeePackages, onToast }: Props) 
         </p>
       </header>
 
-      {!hasFullEdit ? (
-        <div className="pkg-cta" role="region" aria-label="Unlock Full Edit">
-          <div className="pkg-cta-copy">
-            <h3>Unlock Full Edit package</h3>
-            <p>
-              Keep using the free board. Unlock Full Edit and you get three editor prompts
-              (focus-first, open questions, non-negotiables) plus a note on each four-pass gate.
-              Unlocks stay on this device for now; accounts for sync across phones and computers
-              are coming soon.
-            </p>
-            <div className="pkg-cta-actions">
-              {canBuy("full-edit") ? (
-                <button className="btn-solid" type="button" onClick={() => unlock("full-edit")}>
-                  Unlock Full Edit · $249
-                </button>
-              ) : null}
-              <button className="btn-export" type="button" onClick={() => unlock("studio-bundle")}>
-                Get Studio Bundle $449
-              </button>
-              <button className="linkish" type="button" onClick={onSeePackages}>
-                See all packages
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : (
+      {hasFullEdit ? (
         <>
           <div className="pkg-owned-banner">
             <span className="pkg-badge owned">Full Edit owned</span>
@@ -304,7 +267,7 @@ export default function EditingPanel({ bookId, onSeePackages, onToast }: Props) 
             </div>
           </section>
         </>
-      )}
+      ) : null}
 
       <ul className="editing-board">
         {passes.map((pass, index) => {

@@ -56,8 +56,8 @@ type Props = {
 
 const DELIVERABLES: { id: CoverDeliverable; label: string }[] = [
   { id: "front", label: "Front cover" },
-  { id: "spine", label: "Spine" },
-  { id: "back", label: "Back cover" },
+  { id: "spine", label: "Spine (print wrap, Bundle only)" },
+  { id: "back", label: "Back cover (print wrap, Bundle only)" },
   { id: "ebook", label: "Ebook cover" },
 ];
 
@@ -223,9 +223,9 @@ export default function PublishingPanel({ bookId, bookSignals, onToast }: Props)
               <span className="pkg-badge owned">Owned</span>
             </div>
             <p className="payoff-lede">
-              Trim, comps, must-haves, do-nots, and a front / spine / back / ebook checklist —
-              attach final print/ebook files in Formatting. We do not rebuild Eden&apos;s Fall
-              covers.
+              Your brief for Sarah: trim, comps, must-haves, and do-nots. Cover Design includes an
+              ebook front cover, 2400x2400 audiobook cover, and a 3D book mockup; print wrap (spine
+              and back) is not included.
             </p>
             <label className="editing-field">
               Trim preference
@@ -343,8 +343,7 @@ export default function PublishingPanel({ bookId, bookSignals, onToast }: Props)
               <span className="pkg-badge owned">Owned</span>
             </div>
             <p className="payoff-lede">
-              Audience, blurb, keywords, and a launch kit with a done-looks-like on each check —
-              so $129 is a kit, not four boxes.
+              Audience, blurb, keywords, and a launch checklist with a done-looks-like on each check.
             </p>
             <label className="editing-field">
               Audience
@@ -405,7 +404,7 @@ export default function PublishingPanel({ bookId, bookSignals, onToast }: Props)
               <span className="editing-autosave-hint">Fields save on blur; checklist saves immediately</span>
             </div>
           </div>
-        ) : (
+        ) : canBuy("marketing") ? (
           <div className="pkg-cta payoff-teaser" role="region" aria-label="Unlock Marketing">
             <div className="pkg-cta-copy">
               <h4>Marketing locked</h4>
@@ -425,7 +424,7 @@ export default function PublishingPanel({ bookId, bookSignals, onToast }: Props)
               </div>
             </div>
           </div>
-        )}
+        ) : null}
       </section>
 
       <section className="pub-section">
@@ -438,7 +437,7 @@ export default function PublishingPanel({ bookId, bookSignals, onToast }: Props)
           across phones and computers.
         </p>
         <ul className="pkg-grid">
-          {packages.filter((pkg) => canBuy(pkg.id) || owns(pkg.id)).map((pkg) => {
+          {packages.filter((pkg) => canBuy(pkg.id)).map((pkg) => {
             const isOwned =
               pkg.id === "studio-bundle"
                 ? ownedIds.has("studio-bundle")

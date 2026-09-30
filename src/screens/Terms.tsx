@@ -29,7 +29,7 @@ export default function Terms({ onBack }: Props) {
           <h2>What you get</h2>
           <p>
             Free tools on this device (scan, grammar notes, editing board, formatting, export)
-            plus optional <strong>studio packages</strong> (Full Edit, Cover, Marketing, Bundle).
+            plus optional <strong>studio packages</strong> (Cover Design and Studio Bundle).
             Package prices on the landing and Publishing shelf are available via Stripe
             Checkout.
           </p>
