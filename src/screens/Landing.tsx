@@ -372,7 +372,7 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
           <h2>Get started</h2>
           <p className="lede">
             {cloudOn
-              ? "Cloud Save preview — email a magic link to sync Works in Progress across devices. Local-only start stays on this browser."
+              ? "Cloud Save: email a magic link to keep an online copy of your Works in Progress. Start on this device to stay local-only."
               : "Email sign-in stays on this device. Or start free with an empty Works in Progress — same Write, Scan, and tools."}
           </p>
           <label className="field" htmlFor="email">
