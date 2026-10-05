@@ -306,8 +306,8 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
             <>
               <div className="hs-section-head">
                 <p className="hs-eyebrow">Recent work</p>
-                <h2 id="samples-heading">Eden&rsquo;s Fall, front and back</h2>
-                <p className="hs-muted">A front and back cover set designed by Sarah.</p>
+                <h2 id="samples-heading">Eden&rsquo;s Fall</h2>
+                <p className="hs-muted">Cover art and a back-cover detail from Eden&rsquo;s Fall, designed by Sarah.</p>
               </div>
               <div className="hs-sample-grid">
                 {SAMPLES.map((s) => (
