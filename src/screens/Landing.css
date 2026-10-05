@@ -426,14 +426,17 @@
   align-items: start;
 }
 
+/* Intrinsic frame: each sample keeps its own ratio (front is the 3:2 print front) so
+   nothing is cropped (author name stays whole at every width). No forced 16:9 / cover. */
 .hs-sample .hs-frame picture {
-  aspect-ratio: 16 / 9;
-  overflow: hidden;
+  aspect-ratio: auto;
+  overflow: visible;
 }
 
 .hs-sample .hs-frame img {
-  height: 100%;
-  object-fit: cover;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
 }
 
 .hs-sample {

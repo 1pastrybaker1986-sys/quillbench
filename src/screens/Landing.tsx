@@ -24,7 +24,7 @@ type Props = {
  * Cover samples shown on the home page. Real work only: never stock art, AI mock-ups, or
  * invented "client" covers. Add or remove an entry here to change the section; with an
  * empty array the hero falls back to the desk illustration and the samples section shows a
- * single "Samples on request" line. Eden's Fall approved by Sarah (via Rook, 12:59 AM Oct 5). S1 Soft-PASS 1:37 AM Oct 5: web front is the published sunset print front (Edens-Fall-FRONT-cover-print-300dpi), matching the print back detail.
+ * single "Samples on request" line. Eden's Fall approved by Sarah (via Rook, 12:59 AM Oct 5). S1 Soft-PASS 1:37 AM Oct 5: web front is the published sunset print front (full 3:2, uncropped), matching the print back detail. Provenance: docs/samples-PROVENANCE.md.
  * The back cover is a cropped detail: the author name and barcode are left off on purpose.
  */
 type CoverSample = {
