@@ -24,7 +24,7 @@ type Props = {
  * Cover samples shown on the home page. Real work only: never stock art, AI mock-ups, or
  * invented "client" covers. Add or remove an entry here to change the section; with an
  * empty array the hero falls back to the desk illustration and the samples section shows a
- * single "Samples on request" line. Eden's Fall approved by Sarah (via Rook, 12:59 AM Oct 5).
+ * single "Samples on request" line. Eden's Fall approved by Sarah (via Rook, 12:59 AM Oct 5). S1 Soft-PASS 1:37 AM Oct 5: web front is the published sunset print front (Edens-Fall-FRONT-cover-print-300dpi), matching the print back detail.
  * The back cover is a cropped detail: the author name and barcode are left off on purpose.
  */
 type CoverSample = {
@@ -50,7 +50,7 @@ const SAMPLES: CoverSample[] = [
       { src: "/samples/edens-fall-front-1280.webp", w: 1280 },
     ],
     width: 800,
-    height: 450,
+    height: 533,
   },
   {
     id: "edens-fall-back",
@@ -306,8 +306,8 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
             <>
               <div className="hs-section-head">
                 <p className="hs-eyebrow">Recent work</p>
-                <h2 id="samples-heading">Eden&rsquo;s Fall</h2>
-                <p className="hs-muted">Cover art and a back-cover detail from Eden&rsquo;s Fall, designed by Sarah.</p>
+                <h2 id="samples-heading">Eden&rsquo;s Fall, front and back</h2>
+                <p className="hs-muted">A front and back cover set designed by Sarah.</p>
               </div>
               <div className="hs-sample-grid">
                 {SAMPLES.map((s) => (
