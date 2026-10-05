@@ -338,12 +338,7 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
                 Who I am
               </p>
               <p className="hs-about-text">
-                Hi, I&rsquo;m Sarah, and I post as Space Cowgirl (
-                <a href="https://x.com/SpacecowgirlTX" rel="me noopener noreferrer" target="_blank">
-                  @SpacecowgirlTX
-                </a>{" "}
-                on X). I&rsquo;m based in Texas, where I build tools and design covers for indie
-                authors. When you order a cover here, I&rsquo;m the one who designs it.
+                Hi, I&rsquo;m Sarah. I design every cover myself.
               </p>
             </div>
           </div>
