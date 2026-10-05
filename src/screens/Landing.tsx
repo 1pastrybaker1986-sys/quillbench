@@ -2,8 +2,8 @@ import { FormEvent, useEffect, useState } from "react";
 import { startLocalSession, signInWithEmail } from "../lib/store";
 import { isCloudSaveEnabled } from "../lib/cloudSaveFlag";
 import { identityMagicLink } from "../lib/netlifyCloudSave";
-import { submitWaitlist } from "../lib/waitlist";
 import { startCheckout } from "../lib/billing";
+import type { PackageId } from "../lib/packages";
 import {
   formatCatalogBundlePrice,
   formatSoftBundlePrice,
@@ -11,6 +11,7 @@ import {
 } from "../lib/softLaunch";
 import type { Session } from "../lib/types";
 import Nib from "../components/Nib";
+import "./Landing.css";
 
 type Props = {
   onSignedIn: (session: Session) => void;
@@ -19,63 +20,122 @@ type Props = {
   onOpenTerms: () => void;
 };
 
-const TILES = [
+/**
+ * Cover samples shown on the home page. Real work only: never stock art, AI mock-ups, or
+ * invented "client" covers. Add or remove an entry here to change the section; with an
+ * empty array the hero falls back to the desk illustration and the samples section shows a
+ * single "Samples on request" line. Eden's Fall approved by Sarah (via Rook, 12:59 AM Oct 5).
+ * The back cover is a cropped detail: the author name and barcode are left off on purpose.
+ */
+type CoverSample = {
+  id: string;
+  label: string;
+  alt: string;
+  /** 800px-wide JPEG fallback */
+  jpg: string;
+  /** WebP sources with their pixel widths */
+  webp: { src: string; w: number }[];
+  width: number;
+  height: number;
+};
+
+const SAMPLES: CoverSample[] = [
   {
-    id: "scan",
-    title: "Scan",
-    blurb: "OCR typed pages into clean manuscript text — ready for craft, not stuck as photos.",
-    art: "/art/pages-desk.svg",
+    id: "edens-fall-front",
+    label: "Front cover",
+    alt: "Eden's Fall front cover, designed by Sarah",
+    jpg: "/samples/edens-fall-front-800.jpg",
+    webp: [
+      { src: "/samples/edens-fall-front-800.webp", w: 800 },
+      { src: "/samples/edens-fall-front-1280.webp", w: 1280 },
+    ],
+    width: 800,
+    height: 450,
   },
   {
-    id: "edit",
-    title: "Edit craft",
-    blurb: "Fiction-aware notes and a four-pass board from developmental through proof.",
-    art: "/art/hero-manuscript.svg",
+    id: "edens-fall-back",
+    label: "Back cover (detail)",
+    alt: "Eden's Fall back cover, a cropped detail showing the blurb, designed by Sarah",
+    jpg: "/samples/edens-fall-back-detail-800.jpg",
+    webp: [
+      { src: "/samples/edens-fall-back-detail-800.webp", w: 800 },
+      { src: "/samples/edens-fall-back-detail-1280.webp", w: 1280 },
+    ],
+    width: 800,
+    height: 417,
   },
-  {
-    id: "format",
-    title: "Format→export",
-    blurb: "Print PDF and EPUB with front matter, chapters, and publish-ready files.",
-    art: "/art/paper-stack.svg",
-  },
+];
+
+const COVER_INCLUDES = [
+  "Ebook front cover",
+  "2400x2400 audiobook cover",
+  "3D book mockup",
+  "2 rounds of changes included",
 ] as const;
+
+const BUNDLE_INCLUDES = [
+  "Cover: ebook front cover, 2400x2400 audiobook cover, and a 3D book mockup",
+  "Print wrap (spine and back)",
+  "Proofread up to 40,000 words",
+  "Blurb polish",
+  "6 promo graphics sized from your approved cover",
+  "2 rounds of changes on cover and proofread; graphics get typo or crop fixes",
+] as const;
+
+function SamplePicture({
+  sample,
+  sizes,
+  eager = false,
+}: {
+  sample: CoverSample;
+  sizes: string;
+  eager?: boolean;
+}) {
+  return (
+    <picture>
+      <source
+        type="image/webp"
+        srcSet={sample.webp.map((s) => `${s.src} ${s.w}w`).join(", ")}
+        sizes={sizes}
+      />
+      <img
+        src={sample.jpg}
+        alt={sample.alt}
+        width={sample.width}
+        height={sample.height}
+        loading={eager ? "eager" : "lazy"}
+        decoding="async"
+        {...(eager ? { fetchPriority: "high" as const } : {})}
+      />
+    </picture>
+  );
+}
 
 export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpenTerms }: Props) {
   const [email, setEmail] = useState("");
-  const [waitlistEmail, setWaitlistEmail] = useState("");
-  const [waitlistDone, setWaitlistDone] = useState(false);
-  const [waitlistBusy, setWaitlistBusy] = useState(false);
-  const [checkoutBusy, setCheckoutBusy] = useState(false);
-  const [checkoutNote, setCheckoutNote] = useState<string | null>(null);
+  const [busyPkg, setBusyPkg] = useState<PackageId | null>(null);
+  const [checkoutNote, setCheckoutNote] = useState<{ pkg: PackageId; text: string } | null>(null);
   const [authNote, setAuthNote] = useState<string | null>(null);
   const [authBusy, setAuthBusy] = useState(false);
   const cloudOn = isCloudSaveEnabled();
+  const heroSample = SAMPLES[0];
 
-  // Deep links: /waitlist, /pricing, /pricing/bundle, ?buy=studio-bundle
+  // Deep links: ?buy=studio-bundle starts Bundle checkout; /pricing* scrolls to the offers.
+  // (/pricing, /pricing/bundle, /pricing/cover and /waitlist are static pages on Netlify.)
   useEffect(() => {
     try {
       const path = window.location.pathname.replace(/\/+$/, "") || "/";
       const params = new URLSearchParams(window.location.search);
-      const wantBuy = params.get("buy") === "studio-bundle";
-      if (path === "/waitlist" || path.endsWith("/waitlist")) {
+      if (path.startsWith("/pricing")) {
+        const target = path.startsWith("/pricing/bundle") ? "landing-price" : "landing-cover";
         window.setTimeout(() => {
-          document.getElementById("landing-waitlist")?.scrollIntoView({ behavior: "smooth", block: "center" });
-        }, 80);
-      } else if (path.startsWith("/pricing")) {
-        window.setTimeout(() => {
-          document.getElementById("landing-price")?.scrollIntoView({ behavior: "smooth", block: "center" });
+          document.getElementById(target)?.scrollIntoView({ behavior: "smooth", block: "start" });
         }, 80);
       }
-      if (wantBuy) {
+      if (params.get("buy") === "studio-bundle") {
         window.setTimeout(() => {
-          void (async () => {
-            if (checkoutBusy) return;
-            setCheckoutNote(null);
-            setCheckoutBusy(true);
-            const result = await startCheckout("studio-bundle");
-            setCheckoutBusy(false);
-            if (!result.ok) setCheckoutNote(result.reason);
-          })();
+          document.getElementById("landing-price")?.scrollIntoView({ behavior: "smooth", block: "start" });
+          void buy("studio-bundle");
         }, 120);
       }
     } catch {
@@ -83,7 +143,6 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- boot deep-link once
   }, []);
-
 
   async function continueWithEmail(e: FormEvent) {
     e.preventDefault();
@@ -100,309 +159,311 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
     setAuthNote(result.message);
   }
 
-  async function joinWaitlist(e: FormEvent) {
-    e.preventDefault();
-    if (waitlistBusy) return;
-    setWaitlistBusy(true);
-    const ok = await submitWaitlist(waitlistEmail);
-    setWaitlistBusy(false);
-    if (!ok) return;
-    setWaitlistDone(true);
-    setWaitlistEmail("");
-  }
-
-  async function buyStudioBundle() {
-    if (checkoutBusy) return;
+  /**
+   * Starts the existing Stripe Checkout flow. startCheckout() itself records the click with the
+   * visit counter (checkout_click on /app/cover-design or /app/studio-bundle), so no second
+   * beacon is sent here: that would count every home click twice.
+   */
+  async function buy(pkg: PackageId) {
+    if (busyPkg) return;
     setCheckoutNote(null);
-    setCheckoutBusy(true);
-    const result = await startCheckout("studio-bundle");
-    setCheckoutBusy(false);
-    if (!result.ok) {
-      setCheckoutNote(result.reason);
-      return;
-    }
-    // stripe redirects; stub unlocks locally — note stays quiet
+    setBusyPkg(pkg);
+    const result = await startCheckout(pkg);
+    setBusyPkg(null);
+    if (!result.ok) setCheckoutNote({ pkg, text: result.reason });
   }
 
-  function scrollToSignIn() {
-    document.getElementById("landing-signin")?.scrollIntoView({ behavior: "smooth", block: "center" });
-    window.setTimeout(() => document.getElementById("email")?.focus(), 350);
+  function scrollToId(id: string, focusId?: string) {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (focusId) window.setTimeout(() => document.getElementById(focusId)?.focus(), 450);
   }
 
-  function scrollToWaitlist() {
-    document.getElementById("landing-waitlist")?.scrollIntoView({ behavior: "smooth", block: "center" });
-    window.setTimeout(() => document.getElementById("waitlist-email")?.focus(), 350);
-  }
-
-  function scrollToBundle() {
-    document.getElementById("landing-price")?.scrollIntoView({ behavior: "smooth", block: "center" });
-  }
+  const coverLabel = busyPkg === "cover-design" ? "Opening checkout…" : "Get your cover, $99";
+  const bundleLabel =
+    busyPkg === "studio-bundle" ? "Opening checkout…" : `Get Studio Bundle ${formatSoftBundlePrice()}`;
+  const note = (pkg: PackageId) =>
+    checkoutNote?.pkg === pkg ? (
+      <p className="hs-checkout-note" role="alert">
+        {checkoutNote.text}
+      </p>
+    ) : null;
 
   return (
-    <div className="landing">
-      <header className="landing-top">
-        <div className="landing-mark wordmark">
+    <div className="landing hs">
+      <header className="hs-top">
+        <a className="hs-mark wordmark" href="/" aria-label="Quillbench home">
           <Nib className="nib" />
           Quillbench
-        </div>
-        <button className="btn btn-ghost landing-top-cta" type="button" onClick={scrollToSignIn}>
-          Get started
+        </a>
+        <button className="hs-top-link" type="button" onClick={() => scrollToId("landing-app", "email")}>
+          Free app · Sign in
         </button>
       </header>
 
-      <section className="landing-hero" aria-labelledby="landing-headline">
-        <div className="landing-hero-copy">
-          <p className="landing-eyebrow">Book production for writers</p>
-          <h1 id="landing-headline">Write free. Ship pro.</h1>
-          <p className="landing-lede">
-            One bench for Write, Scan, Grammar, Editing, Formatting, and Publishing —
-            start free on this device, unlock Studio when you are ready.
-          </p>
-          <div className="landing-cta-row">
-            <button
-              className="btn btn-primary landing-cta-primary"
-              type="button"
-              onClick={() => onSignedIn(startLocalSession())}
-            >
-              Start free
-            </button>
-            <button
-              className="btn btn-ghost landing-cta-secondary landing-cta-bundle"
-              type="button"
-              onClick={scrollToBundle}
-            >
-              Bundle {formatSoftBundlePrice()} · {SOFT_LAUNCH.couponCode}
-            </button>
-            <button className="btn btn-ghost landing-cta-secondary" type="button" onClick={onScanStart}>
-              Scan a page
-            </button>
-          </div>
-          <p className="landing-cta-hint">
-            Scan a page — photo in, text in Write. PNG, JPEG, or WebP (no PDF in this version).
-          </p>
-        </div>
-        <div className="landing-hero-aside landing-hero-still" aria-hidden="true">
-          <img
-            src="/art/calm-desk.svg"
-            alt=""
-            width={520}
-            height={390}
-          />
-        </div>
-      </section>
-
-      <section
-        className="landing-bundle-hero"
-        aria-label="Studio Bundle soft launch"
-      >
-        <div className="landing-bundle-card landing-bundle-ribbon">
-          <p className="landing-bundle-eyebrow">Soft launch · Studio Bundle</p>
-          <span className="landing-bundle-ribbon-price">{formatSoftBundlePrice()}</span>
-          <button
-            className="btn btn-primary landing-bundle-ribbon-cta"
-            type="button"
-            disabled={checkoutBusy}
-            onClick={() => void buyStudioBundle()}
-          >
-            {checkoutBusy ? "Opening checkout…" : `Get Studio Bundle ${formatSoftBundlePrice()}`}
-          </button>
-        </div>
-      </section>
-
-      <section className="landing-tiles" aria-labelledby="landing-tiles-heading">
-        <div className="landing-tiles-head">
-          <p className="landing-tiles-eyebrow">From draft to files</p>
-          <h2 id="landing-tiles-heading">Built for writers who ship</h2>
-        </div>
-        <ul className="landing-tile-grid">
-          {TILES.map((t) => (
-            <li key={t.id} className={`landing-tile landing-tile-${t.id}`}>
-              <span className="landing-tile-icon" aria-hidden="true">
-                <img src={t.art} alt="" width={96} height={72} />
-              </span>
-              <h3>{t.title}</h3>
-              <p>{t.blurb}</p>
-              {t.id === "scan" ? (
-                <button className="landing-tile-link" type="button" onClick={onScanStart}>
-                  Scan a page →
-                </button>
-              ) : null}
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <section className="landing-price-card-wrap" id="landing-price" aria-labelledby="price-card-heading">
-        <div className="landing-price-card">
-          <p className="landing-price-card-eyebrow">Soft launch · early access</p>
-          <h2 id="price-card-heading">Studio Bundle</h2>
-          <p className="landing-price-card-inclusions">
-            Cover, print wrap, proofread, blurb polish, and 6 promo graphics
-          </p>
-          <div className="landing-bundle-price-row">
-            <span className="landing-bundle-soft">{formatSoftBundlePrice()}</span>
-            <span className="landing-bundle-then">for the first 10 authors, then {formatCatalogBundlePrice()}</span>
-            <span className="landing-bundle-save">{SOFT_LAUNCH.couponCode} auto</span>
-          </div>
-          <p className="landing-bundle-window">
-            <strong>{SOFT_LAUNCH.couponCode}</strong> is applied automatically at Checkout for the
-            first 10 authors. Price is{" "}
-            {formatSoftBundlePrice()} USD, not $4.49.
-          </p>
-          <ul className="landing-price-inclusions" aria-label="Studio Bundle includes">
-            <li>
-              <strong>Cover</strong>
-              <span>Ebook front, 2400x2400 audiobook, 3D mockup</span>
-            </li>
-            <li>
-              <strong>Print wrap + proofread</strong>
-              <span>Spine and back; up to 40,000 words</span>
-            </li>
-            <li>
-              <strong>Blurb + graphics</strong>
-              <span>Blurb polish and 6 promo graphics</span>
-            </li>
-          </ul>
-          <div className="landing-bundle-actions">
-            <button
-              className="btn btn-primary"
-              type="button"
-              disabled={checkoutBusy}
-              onClick={() => void buyStudioBundle()}
-            >
-              {checkoutBusy ? "Opening checkout…" : `Get Studio Bundle ${formatSoftBundlePrice()}`}
-            </button>
-            <button className="btn btn-ghost" type="button" onClick={scrollToWaitlist}>
-              Save my spot
-            </button>
-            {checkoutNote ? (
-              <p className="landing-waitlist-checkout-note">{checkoutNote}</p>
-            ) : null}
-          </div>
-        </div>
-      </section>
-
-      {/*
-        Waitlist: localStorage quillbench.waitlist.v1 + Netlify Forms `quillbench-waitlist`.
-        Sarah: Netlify → Forms → enable email notifications to her Gmail / sarah@brundigebusiness.com
-      */}
-      <section className="landing-waitlist" id="landing-waitlist" aria-labelledby="waitlist-heading">
-        <div className="landing-waitlist-card">
-          <p className="landing-waitlist-eyebrow">Early access</p>
-          <h2 id="waitlist-heading">Save your spot — or buy the Bundle now</h2>
-          <p className="landing-waitlist-lede">
-            Soft launch: Studio Bundle {formatSoftBundlePrice()} {SOFT_LAUNCH.softLaunchThrough}. Leave your email for early-access notes.
-            Ready to finish? Studio Bundle Checkout is already {formatSoftBundlePrice()} USD with{" "}
-            <strong>{SOFT_LAUNCH.couponCode}</strong> applied for the first 10 authors (then{" "}
-            {formatCatalogBundlePrice()}) — no waitlist required.
-          </p>
-          {waitlistDone ? (
-            <div className="landing-waitlist-next" role="status">
-              <p className="landing-waitlist-thanks">
-                You’re on the list. We’ll email early-access notes.
-              </p>
-              <p className="landing-waitlist-next-lede">
-                Ready now? Studio Bundle Checkout is {formatSoftBundlePrice()} USD with{" "}
-                <strong>{SOFT_LAUNCH.couponCode}</strong> applied automatically (not $4.49).
-              </p>
+      <main>
+        <section className="hs-hero" aria-labelledby="landing-headline">
+          <div className="hs-hero-copy">
+            <p className="hs-eyebrow">Book covers and launch kits for indie authors</p>
+            <h1 id="landing-headline">Your book cover, designed for&nbsp;you.</h1>
+            <p className="hs-lede">
+              Send a short brief and Sarah designs your cover. You get an ebook front cover, a
+              2400x2400 audiobook cover, and a 3D book mockup, with 2 rounds of changes included.
+            </p>
+            <div className="hs-cta-row">
               <button
-                className="btn btn-primary landing-waitlist-buy"
+                className="hs-btn hs-btn-primary"
                 type="button"
-                disabled={checkoutBusy}
-                onClick={() => void buyStudioBundle()}
+                disabled={busyPkg !== null}
+                onClick={() => void buy("cover-design")}
               >
-                {checkoutBusy
-                  ? "Opening checkout…"
-                  : `Get Studio Bundle ${formatSoftBundlePrice()}`}
+                {coverLabel}
               </button>
-              {checkoutNote ? (
-                <p className="landing-waitlist-checkout-note">{checkoutNote}</p>
-              ) : null}
+              <a className="hs-btn hs-btn-quiet" href="/tools/cover-brief/">
+                Start with a free Cover Brief
+              </a>
             </div>
-          ) : (
-            <form
-              className="landing-waitlist-form"
-              name="quillbench-waitlist"
-              method="POST"
-              data-netlify="true"
-              data-netlify-honeypot="bot-field"
-              onSubmit={(e) => void joinWaitlist(e)}
-            >
-              <input type="hidden" name="form-name" value="quillbench-waitlist" />
-              <p className="sr-only" aria-hidden="true">
-                <label>
-                  Don’t fill this out: <input name="bot-field" tabIndex={-1} autoComplete="off" />
-                </label>
+            {note("cover-design")}
+            <p className="hs-fine">
+              One-time $99 USD · delivered within 5 business days of your clock-start date ·
+              full refund any time before work starts
+            </p>
+          </div>
+
+          <figure className="hs-hero-art">
+            {heroSample ? (
+              <>
+                <div className="hs-frame hs-frame-tilt">
+                  <SamplePicture
+                    sample={heroSample}
+                    sizes="(max-width: 900px) calc(100vw - 3rem), 46vw"
+                    eager
+                  />
+                </div>
+                <figcaption>Eden&rsquo;s Fall, {heroSample.label.toLowerCase()} · designed by Sarah</figcaption>
+              </>
+            ) : (
+              <img className="hs-hero-still" src="/art/calm-desk.svg" alt="" width={520} height={390} />
+            )}
+          </figure>
+        </section>
+
+        <section className="hs-section hs-cover" id="landing-cover" aria-labelledby="cover-heading">
+          <div className="hs-card hs-cover-card">
+            <div className="hs-cover-what">
+              <p className="hs-eyebrow">Cover Design</p>
+              <h2 id="cover-heading">What you get for $99</h2>
+              <ul className="hs-checks">
+                {COVER_INCLUDES.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+              <p className="hs-muted">
+                Print wrap (spine and back) isn&rsquo;t included. It comes with the Studio Bundle
+                below.
               </p>
-              <label className="sr-only" htmlFor="waitlist-email">
-                Email for early access
+            </div>
+            <div className="hs-cover-how">
+              <h3>How it works</h3>
+              <ol className="hs-steps">
+                <li>
+                  <strong>Check out.</strong> One-time payment of $99 USD.
+                </li>
+                <li>
+                  <strong>Send your brief.</strong> A short form right after checkout asks for your
+                  title, genre, the feel you want, books you like the look of, and a link to your
+                  files.
+                </li>
+                <li>
+                  <strong>Get your cover.</strong> Sarah emails within 1 business day to confirm
+                  your brief is complete. That&rsquo;s your clock-start date, and your cover is
+                  delivered within 5 business days of it.
+                </li>
+              </ol>
+              <p className="hs-muted">
+                Full refund any time before work starts; no refund after.{" "}
+                <a href="/refund/">Refund policy</a>
+              </p>
+            </div>
+            <div className="hs-card-actions">
+              <button
+                className="hs-btn hs-btn-primary"
+                type="button"
+                disabled={busyPkg !== null}
+                onClick={() => void buy("cover-design")}
+              >
+                {coverLabel}
+              </button>
+              <a className="hs-text-link" href="/pricing/cover/">
+                Full Cover Design details
+              </a>
+              {note("cover-design")}
+            </div>
+          </div>
+        </section>
+
+        <section className="hs-section hs-samples" id="landing-samples" aria-labelledby="samples-heading">
+          {SAMPLES.length > 0 ? (
+            <>
+              <div className="hs-section-head">
+                <p className="hs-eyebrow">Recent work</p>
+                <h2 id="samples-heading">Eden&rsquo;s Fall, front and back</h2>
+                <p className="hs-muted">A front and back cover set designed by Sarah.</p>
+              </div>
+              <div className="hs-sample-grid">
+                {SAMPLES.map((s) => (
+                  <figure key={s.id} className="hs-sample">
+                    <div className="hs-frame">
+                      <SamplePicture sample={s} sizes="(max-width: 900px) calc(100vw - 3rem), 44vw" />
+                    </div>
+                    <figcaption>{s.label}</figcaption>
+                  </figure>
+                ))}
+              </div>
+            </>
+          ) : (
+            <p className="hs-muted hs-samples-empty" id="samples-heading">
+              Samples on request: email{" "}
+              <a href="mailto:sarah@brundigebusiness.com">sarah@brundigebusiness.com</a>
+            </p>
+          )}
+        </section>
+
+        <section className="hs-section hs-about" aria-labelledby="about-heading">
+          <div className="hs-about-inner">
+            <span className="hs-monogram" aria-hidden="true">
+              S
+            </span>
+            <div>
+              <p className="hs-eyebrow" id="about-heading">
+                Who I am
+              </p>
+              <p className="hs-about-text">
+                Hi, I&rsquo;m Sarah, and I post as Space Cowgirl (
+                <a href="https://x.com/SpacecowgirlTX" rel="me noopener noreferrer" target="_blank">
+                  @SpacecowgirlTX
+                </a>{" "}
+                on X). I&rsquo;m based in Texas, where I build tools and design covers for indie
+                authors. When you order a cover here, I&rsquo;m the one who designs it.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section className="hs-section hs-bundle" id="landing-price" aria-labelledby="price-card-heading">
+          <div className="hs-card hs-bundle-card">
+            <div className="hs-bundle-head">
+              <p className="hs-eyebrow">Want the whole launch done?</p>
+              <h2 id="price-card-heading">Studio Bundle</h2>
+              <p className="hs-bundle-lede">
+                Your cover plus the print wrap, a proofread, blurb polish, and launch graphics, in
+                one order.
+              </p>
+              <p className="hs-bundle-price">
+                <span className="hs-bundle-amount">{formatSoftBundlePrice()}</span>
+                <span className="hs-bundle-then">
+                  {SOFT_LAUNCH.softLaunchThrough}, then {formatCatalogBundlePrice()}
+                </span>
+              </p>
+              <p className="hs-muted hs-small">
+                {SOFT_LAUNCH.couponCode} is applied automatically at Checkout. Price is{" "}
+                {formatSoftBundlePrice()} USD, not $4.49.
+              </p>
+            </div>
+            <div className="hs-bundle-body">
+              <ul className="hs-checks">
+                {BUNDLE_INCLUDES.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+              <p className="hs-muted">
+                Delivered within 14 business days of your clock-start date. If you owe a
+                word-count invoice, your clock starts when it&rsquo;s paid.
+              </p>
+              <div className="hs-card-actions">
+                <button
+                  className="hs-btn hs-btn-outline"
+                  type="button"
+                  disabled={busyPkg !== null}
+                  onClick={() => void buy("studio-bundle")}
+                >
+                  {bundleLabel}
+                </button>
+                <a className="hs-text-link" href="/pricing/bundle/">
+                  Full Studio Bundle details
+                </a>
+                {note("studio-bundle")}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="hs-section hs-free" id="landing-app" aria-labelledby="free-heading">
+          <div className="hs-free-copy">
+            <p className="hs-eyebrow">Also free</p>
+            <h2 id="free-heading">The Quillbench writing app</h2>
+            <p>
+              Write, scan typed pages into clean text, and export a print PDF and EPUB. It&rsquo;s
+              free and runs on this device.
+            </p>
+            <div className="hs-free-actions">
+              <button
+                className="hs-btn hs-btn-outline"
+                type="button"
+                onClick={() => onSignedIn(startLocalSession())}
+              >
+                Start writing free
+              </button>
+              <button className="hs-text-link" type="button" onClick={onScanStart}>
+                Scan a page
+              </button>
+            </div>
+            <p className="hs-muted hs-small">
+              Planning a cover? The free <a href="/tools/cover-brief/">Cover Brief tool</a> turns
+              your ideas into a brief and works out your spine width and cover sizes.
+            </p>
+          </div>
+
+          <div className="hs-signin" id="landing-signin">
+            <form className="signin-card hs-signin-card" onSubmit={continueWithEmail}>
+              <h2>Sign in</h2>
+              <p className="lede">
+                {cloudOn
+                  ? "Cloud Save: email a magic link and the Works in Progress on this device are copied to your Quillbench account. Start on this device to stay local-only."
+                  : "Email sign-in stays on this device. Or start free with an empty Works in Progress — same Write, Scan, and tools."}
+              </p>
+              <label className="field" htmlFor="email">
+                Email
               </label>
               <input
-                id="waitlist-email"
-                name="email"
+                id="email"
                 type="email"
                 autoComplete="email"
                 placeholder="you@example.com"
-                value={waitlistEmail}
-                onChange={(e) => setWaitlistEmail(e.target.value)}
-                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
-              <button className="btn btn-primary" type="submit" disabled={waitlistBusy}>
-                {waitlistBusy ? "Saving…" : "Save my spot"}
+              <button className="btn btn-primary" type="submit" disabled={authBusy}>
+                {cloudOn ? (authBusy ? "Sending link…" : "Email magic link") : "Continue"}
               </button>
+              <button className="btn btn-ghost" type="button" onClick={() => onSignedIn(startLocalSession())}>
+                Start on this device
+              </button>
+              {authNote ? (
+                <p className="landing-auth-note" role="status">
+                  {authNote}
+                </p>
+              ) : null}
             </form>
-          )}
-          <p className="landing-waitlist-support">
-            Questions?{" "}
-            <a href="mailto:sarah@brundigebusiness.com">sarah@brundigebusiness.com</a>
-          </p>
-        </div>
-      </section>
-
-      <section className="landing-signin-wrap" id="landing-signin">
-        <div className="landing-signin-orbs" aria-hidden="true">
-          <span className="orb orb-1" />
-          <span className="orb orb-2" />
-          <span className="orb orb-3" />
-        </div>
-        <form className="signin-card landing-signin-card" onSubmit={continueWithEmail}>
-          <div className="landing-signin-motif" aria-hidden="true">
-            <img src="/art/open-book-motif.svg" alt="" width={56} height={44} />
           </div>
-          <h2>Get started</h2>
-          <p className="lede">
-            {cloudOn
-              ? "Cloud Save: email a magic link and the Works in Progress on this device are copied to your Quillbench account. Start on this device to stay local-only."
-              : "Email sign-in stays on this device. Or start free with an empty Works in Progress — same Write, Scan, and tools."}
-          </p>
-          <label className="field" htmlFor="email">
-            Email
-          </label>
-          <input
-            id="email"
-            type="email"
-            autoComplete="email"
-            placeholder="you@example.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <button className="btn btn-primary" type="submit" disabled={authBusy}>
-            {cloudOn ? (authBusy ? "Sending link…" : "Email magic link") : "Continue"}
-          </button>
-          <button className="btn btn-ghost" type="button" onClick={() => onSignedIn(startLocalSession())}>
-            Start on this device
-          </button>
-          {authNote ? (
-            <p className="landing-auth-note" role="status">
-              {authNote}
-            </p>
-          ) : null}
-        </form>
-      </section>
+        </section>
+      </main>
 
-      <footer className="landing-foot">
-        <img src="/art/quill-flourish.svg" alt="" width={280} height={20} aria-hidden="true" />
-        <p>Quillbench · draft to publish-ready</p>
+      <footer className="hs-foot">
+        <img src="/art/quill-flourish.svg" alt="" width={280} height={20} aria-hidden="true" loading="lazy" />
+        <p>Quillbench · book covers and launch kits for indie authors</p>
+        <p>
+          Questions? <a href="mailto:sarah@brundigebusiness.com">sarah@brundigebusiness.com</a>
+        </p>
         <nav className="legal-links" aria-label="Legal and support">
           <button className="legal-link" type="button" onClick={onOpenPrivacy}>
             Privacy
@@ -415,6 +476,8 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
           <a className="legal-link" href="/refund/">Refunds</a>
           <span aria-hidden="true">·</span>
           <a className="legal-link" href="/support/">Support</a>
+          <span aria-hidden="true">·</span>
+          <a className="legal-link" href="/waitlist">Email updates</a>
         </nav>
       </footer>
     </div>
