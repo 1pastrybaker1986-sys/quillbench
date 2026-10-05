@@ -338,7 +338,7 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
                 Who I am
               </p>
               <p className="hs-about-text">
-                Hi, I&rsquo;m Sarah. I design every cover myself.
+                Hi, I&rsquo;m Sarah. I design every cover myself. I take pride in the work and make sure each design tells the story as much as the words themselves.
               </p>
             </div>
           </div>
