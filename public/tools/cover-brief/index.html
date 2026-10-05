@@ -99,10 +99,11 @@
       <div class="cta noprint" style="background:transparent;border:1px solid #e3d8cd">
         <strong>Get cover and launch tips by email</strong> <span class="small">(optional, unsubscribe anytime)</span>
         <form id="em" style="display:flex;gap:.5rem;margin-top:.5rem">
-          <input type="email" name="email" required placeholder="you@example.com" />
-          <button class="btn" style="margin:0" type="submit">Join</button>
+          <input type="email" name="email" required placeholder="you@example.com" aria-label="Email" />
+          <button class="btn" id="embtn" style="margin:0" type="submit">Join</button>
         </form>
-        <p id="emok" class="small" hidden>Thanks, you're on the list.</p>
+        <p id="emerr" class="small" role="alert" style="color:#9b3b3b" hidden></p>
+        <p id="emok" class="small" role="status" hidden>Thanks, you're on the list.</p>
       </div>
     </div>
 
@@ -177,9 +178,23 @@
         document.getElementById("print").addEventListener("click", function () { count("tool_copy"); window.print(); });
         document.getElementById("em").addEventListener("submit", function (ev) {
           ev.preventDefault();
-          var body = new URLSearchParams({ "form-name": "quillbench-waitlist", email: this.elements.email.value, source: "cover-brief" + (location.search ? " " + location.search.slice(0, 120) : "") });
+          var em = this, embtn = document.getElementById("embtn"), emerr = document.getElementById("emerr");
+          emerr.hidden = true;
+          embtn.disabled = true;
+          embtn.textContent = "Joining…";
+          var body = new URLSearchParams({ "form-name": "quillbench-waitlist", email: em.elements.email.value, source: "cover-brief" + (location.search ? " " + location.search.slice(0, 120) : "") });
+          // Thanks only after the form service confirms (response.ok); otherwise show an error and keep the form for a retry.
           fetch("/", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: body.toString() })
-            .then(function () { document.getElementById("em").hidden = true; document.getElementById("emok").hidden = false; count("tool_email"); });
+            .then(function (r) {
+              if (!r.ok) throw new Error("status " + r.status);
+              em.hidden = true; em.style.display = "none"; document.getElementById("emok").hidden = false; count("tool_email");
+            })
+            .catch(function () {
+              embtn.disabled = false;
+              embtn.textContent = "Try again";
+              emerr.textContent = "That didn't go through, so you're not on the list yet. Try again, or email sarah@brundigebusiness.com.";
+              emerr.hidden = false;
+            });
         });
       })();
     </script>

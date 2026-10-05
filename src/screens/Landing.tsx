@@ -477,7 +477,7 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
           <span aria-hidden="true">·</span>
           <a className="legal-link" href="/support/">Support</a>
           <span aria-hidden="true">·</span>
-          <a className="legal-link" href="/waitlist">Email updates</a>
+          <a className="legal-link" href="/waitlist">Waitlist</a>
         </nav>
       </footer>
     </div>
