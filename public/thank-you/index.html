@@ -76,7 +76,7 @@
       <select id="f-pkg" name="package" required>
         <option value="">Choose one</option>
         <option value="Cover Design ($99)">Cover Design ($99)</option>
-        <option value="Studio Bundle ($449)">Studio Bundle ($449)</option>
+        <option value="Studio Bundle">Studio Bundle</option>
       </select>
 
       <label for="f-title">Book title and author name</label>
@@ -108,7 +108,7 @@
 
     <script>
       (function () {
-        var NAMES = { "cover-design": "Cover Design ($99)", "studio-bundle": "Studio Bundle ($449)" };
+        var NAMES = { "cover-design": "Cover Design ($99)", "studio-bundle": "Studio Bundle" };
         var qs = new URLSearchParams(location.search);
         var sid = qs.get("session_id") || "";
         function show(id) {

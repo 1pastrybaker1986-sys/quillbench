@@ -241,12 +241,12 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
           </p>
           <div className="landing-bundle-price-row">
             <span className="landing-bundle-soft">{formatSoftBundlePrice()}</span>
-            <span className="landing-bundle-then">through October 10, then {formatCatalogBundlePrice()}</span>
+            <span className="landing-bundle-then">for the first 10 authors, then {formatCatalogBundlePrice()}</span>
             <span className="landing-bundle-save">{SOFT_LAUNCH.couponCode} auto</span>
           </div>
           <p className="landing-bundle-window">
-            <strong>{SOFT_LAUNCH.couponCode}</strong> is applied automatically at Checkout through
-            October 10. Price is{" "}
+            <strong>{SOFT_LAUNCH.couponCode}</strong> is applied automatically at Checkout for the
+            first 10 authors. Price is{" "}
             {formatSoftBundlePrice()} USD, not $4.49.
           </p>
           <ul className="landing-price-inclusions" aria-label="Studio Bundle includes">
@@ -291,9 +291,9 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
           <p className="landing-waitlist-eyebrow">Early access</p>
           <h2 id="waitlist-heading">Save your spot — or buy the Bundle now</h2>
           <p className="landing-waitlist-lede">
-            Soft launch {SOFT_LAUNCH.softLaunchThrough}. Leave your email for early-access notes.
+            Soft launch: Studio Bundle {formatSoftBundlePrice()} {SOFT_LAUNCH.softLaunchThrough}. Leave your email for early-access notes.
             Ready to finish? Studio Bundle Checkout is already {formatSoftBundlePrice()} USD with{" "}
-            <strong>{SOFT_LAUNCH.couponCode}</strong> applied through October 10 (then{" "}
+            <strong>{SOFT_LAUNCH.couponCode}</strong> applied for the first 10 authors (then{" "}
             {formatCatalogBundlePrice()}) — no waitlist required.
           </p>
           {waitlistDone ? (
@@ -402,7 +402,7 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
 
       <footer className="landing-foot">
         <img src="/art/quill-flourish.svg" alt="" width={280} height={20} aria-hidden="true" />
-        <p>Quillbench · draft to publish-ready · soft launch {SOFT_LAUNCH.softLaunchThrough}</p>
+        <p>Quillbench · draft to publish-ready</p>
         <nav className="legal-links" aria-label="Legal and support">
           <button className="legal-link" type="button" onClick={onOpenPrivacy}>
             Privacy
