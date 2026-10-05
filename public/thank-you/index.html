@@ -99,6 +99,11 @@
       <strong>Got it. Your details were submitted.</strong>
       <p style="margin:.4rem 0 0">Within 1 business day, Sarah will email you to confirm your brief is complete. Your clock starts on the day of that email. If anything is missing, she'll ask for it instead.</p>
     </div>
+
+    <div class="card hidden" id="upsell">
+      <p style="margin:0"><strong>Want the whole launch done?</strong> The <a href="/pricing/bundle">Studio Bundle</a> adds a print wrap (spine and back), a proofread up to 40,000 words, blurb polish, and 6 promo graphics sized from your approved cover. It's $449 for the first 10 authors, then $499.</p>
+      <p style="margin:.5rem 0 0">It's a separate order and includes its own cover; your Cover Design payment isn't credited toward it. If you'd rather switch, email <a href="mailto:sarah@brundigebusiness.com">sarah@brundigebusiness.com</a> before work starts: your Cover Design is fully refundable until then.</p>
+    </div>
     </div>
 
     <h2>Questions?</h2>
@@ -131,6 +136,7 @@
           } catch (e) {}
           document.getElementById("f-pkg").value = NAMES[pkg];
           document.getElementById("pkg-line").textContent = "You bought " + NAMES[pkg] + ". It's unlocked in Quillbench on this device.";
+          if (pkg === "cover-design") document.getElementById("upsell").classList.remove("hidden");
           document.getElementById("delivery").innerHTML = pkg === "cover-design"
             ? "<strong>Delivery:</strong> within 5 business days of your clock-start date."
             : "<strong>Delivery:</strong> within 14 business days of your clock-start date.";

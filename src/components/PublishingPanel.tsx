@@ -436,7 +436,10 @@ export default function PublishingPanel({ bookId, bookSignals, onToast }: Props)
           save on this device.
         </p>
         <ul className="pkg-grid">
-          {packages.filter((pkg) => canBuy(pkg.id)).map((pkg) => {
+          {packages
+            .filter((pkg) => canBuy(pkg.id))
+            .sort((a, b) => (a.id === "cover-design" ? -1 : b.id === "cover-design" ? 1 : 0))
+            .map((pkg) => {
             const isOwned =
               pkg.id === "studio-bundle"
                 ? ownedIds.has("studio-bundle")
