@@ -9,6 +9,7 @@
  *
  * The secret key stays in this function. Amounts are read from Stripe, never
  * from the client.
+ * Soft-PASS redeploy marker 2026-10-06: pick up deploy-preview STRIPE_COUPON_COVER_CREDIT_99.
  */
 import Stripe from "stripe";
 import {
