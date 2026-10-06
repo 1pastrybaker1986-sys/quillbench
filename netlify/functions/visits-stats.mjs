@@ -3,6 +3,15 @@ import { getStore } from "@netlify/blobs";
 
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
+const TOOL_LABEL = {
+  tool_generate: "Cover Brief made",
+  tool_copy: "Cover Brief copied/printed",
+  tool_to_cover: "Cover Brief → Cover $99 click",
+  tool_email: "Cover Brief email signup",
+};
+
+const utmTag = (r) => (r.utm?.s ? `${r.utm.s}${r.utm.c ? " / " + r.utm.c : ""}` : "(none)");
+
 export default async (req) => {
   const url = new URL(req.url);
   const key = process.env.VISITS_STATS_KEY;
@@ -20,6 +29,7 @@ export default async (req) => {
   const real = url.searchParams.get("include_test") === "1" ? recs : recs.filter((r) => !r.test);
   const tally = (arr, f) => arr.reduce((m, r) => { const k = f(r); if (k) m[k] = (m[k] || 0) + 1; return m; }, {});
   const views = real.filter((r) => r.e === "view");
+  const toolHits = real.filter((r) => r.e.startsWith("tool_"));
   const byDay = {};
   for (const r of views) {
     const d = new Date(r.t).toLocaleDateString("en-CA", { timeZone: "America/Chicago" });
@@ -49,7 +59,14 @@ export default async (req) => {
       if (path === "/app/cover-design") return "Cover Design $99 (in-app)";
       return `other (${path || "/"})`;
     }),
-    tool_events: tally(real.filter((r) => r.e.startsWith("tool_")), (r) => ({ tool_generate: "Cover Brief made", tool_copy: "Cover Brief copied/printed", tool_to_cover: "Cover Brief → Cover $99 click", tool_email: "Cover Brief email signup" })[r.e]),
+    tool_events: tally(toolHits, (r) => TOOL_LABEL[r.e]),
+    tool_events_by_utm: tally(toolHits, (r) => {
+      const label = TOOL_LABEL[r.e];
+      return label ? `${label} | ${utmTag(r)}` : "";
+    }),
+    tool_events_by_day: tally(real.filter((r) => r.e === "tool_generate"), (r) =>
+      new Date(r.t).toLocaleDateString("en-CA", { timeZone: "America/Chicago" }),
+    ),
     pages: tally(views, (r) => r.p),
     referrers: tally(views, (r) => r.ref || "(direct / none)"),
     utm: tally(views, (r) => (r.utm?.s ? `${r.utm.s}${r.utm.c ? " / " + r.utm.c : ""}` : "")),
@@ -62,7 +79,7 @@ export default async (req) => {
 <h1>Quillbench visits, last ${days} days (Central time)</h1>
 <div class=big><div>${out.totals.views}<span>page views</span></div><div>${out.totals.visitors}<span>daily unique visitors</span></div><div>${out.totals.checkout_clicks}<span>checkout clicks</span></div></div>
 <h2>By day</h2><table><tr><th>Day</th><th>Views</th><th>Visitors</th><th>Checkout clicks</th></tr>${dayRows}</table>
-${table("Checkout clicks by offer", out.checkout_clicks_by_offer)}${table("Cover Brief tool", out.tool_events)}${table("Pages", out.pages)}${table("Where visitors came from", out.referrers)}${table("Campaign tags (utm)", out.utm)}
+${table("Checkout clicks by offer", out.checkout_clicks_by_offer)}${table("Cover Brief tool", out.tool_events)}${table("Cover Brief tool by campaign (utm)", out.tool_events_by_utm)}${table("Pages", out.pages)}${table("Where visitors came from", out.referrers)}${table("Campaign tags (utm)", out.utm)}
 <p style="color:#6b6460;font-size:13px">No cookies. Visitors are counted per day from a one-way hash, and IP addresses are never stored. Bots and test hits are left out (${out.totals.test_hits_excluded} test hits excluded).</p>`;
   return new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-store" } });
 };
