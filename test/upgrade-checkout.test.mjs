@@ -65,8 +65,11 @@ function mockStripe(options = {}) {
   const calls = [];
   const piUpdates = [];
   const expires = [];
+  const sessionsById = new Map();
+  const sessionsByKey = new Map();
   let bundle = options.prior ?? null;
   let piUpdateAttempts = 0;
+  if (bundle?.id) sessionsById.set(bundle.id, bundle);
   if (options.prior) {
     cover.payment_intent.metadata = {
       ...(cover.payment_intent.metadata || {}),
@@ -102,7 +105,7 @@ function mockStripe(options = {}) {
       sessions: {
         retrieve: async (id) => {
           if (id === cover.id) return cover;
-          if (bundle && id === bundle.id) return bundle;
+          if (sessionsById.has(id)) return sessionsById.get(id);
           const err = new Error("No such checkout.session");
           err.code = "resource_missing";
           err.statusCode = 404;
@@ -110,11 +113,11 @@ function mockStripe(options = {}) {
         },
         create: async (fields, requestOptions) => {
           if (options.createError) throw options.createError;
+          const key = requestOptions?.idempotencyKey;
           const baseKey = `cover-credit-${cover.id}`;
           if (
             options.replayExpired &&
-            (requestOptions?.idempotencyKey === `${baseKey}-brand` ||
-              requestOptions?.idempotencyKey === baseKey)
+            (key === `${baseKey}-brand` || key === baseKey)
           ) {
             calls.push({ fields, requestOptions, replay: true });
             return {
@@ -123,13 +126,25 @@ function mockStripe(options = {}) {
               status: "expired",
             };
           }
+          if (key && sessionsByKey.has(key)) {
+            const existing = sessionsByKey.get(key);
+            calls.push({ fields, requestOptions, idempotentReplay: true });
+            return existing;
+          }
+          const createdCount = sessionsByKey.size;
+          const id =
+            createdCount === 0
+              ? (options.nextId ?? "cs_test_bundle_new")
+              : `${options.nextId ?? "cs_test_bundle_new"}_${createdCount + 1}`;
           const created = {
-            id: options.nextId ?? "cs_test_bundle_new",
-            url: "https://checkout.stripe.com/c/pay/cs_test_bundle_new",
+            id,
+            url: `https://checkout.stripe.com/c/pay/${id}`,
             status: "open",
             payment_status: "unpaid",
             metadata: fields.metadata,
           };
+          if (key) sessionsByKey.set(key, created);
+          sessionsById.set(id, created);
           calls.push({ fields, requestOptions });
           bundle = created;
           return created;
@@ -405,6 +420,36 @@ test("an expired unpaid upgrade can be started again", async () => {
   assert.equal(result.sessionId, "cs_test_bundle_retry");
   assert.equal(result.expectedChargeCents, 40000);
   assert.equal(stripe.calls.filter((call) => !call.replay).length, 1);
+  assert.equal(
+    stripe.calls.find((call) => !call.replay).requestOptions.idempotencyKey,
+    `cover-credit-retry:${COVER_ID}:cs_test_expired_replay-brand`,
+  );
+});
+
+test("two concurrent retries after an expired upgrade create one session", async () => {
+  const stripe = mockStripe({
+    prior: {
+      id: "cs_test_bundle_expired",
+      status: "expired",
+      payment_status: "unpaid",
+      metadata: { cover_session_id: COVER_ID },
+    },
+    replayExpired: true,
+  });
+  const [first, second] = await Promise.all([
+    upgrade(stripe, ENV, PAID_OCT_5 + 10),
+    upgrade(stripe, ENV, PAID_OCT_5 + 11),
+  ]);
+  assert.equal(first.sessionId, second.sessionId);
+  assert.equal(first.url, second.url);
+  const created = stripe.calls.filter((call) => !call.replay && !call.idempotentReplay);
+  assert.equal(created.length, 1);
+  assert.equal(
+    created[0].requestOptions.idempotencyKey,
+    `cover-credit-retry:${COVER_ID}:cs_test_expired_replay-brand`,
+  );
+  assert.equal(created[0].requestOptions.idempotencyKey.includes(String(PAID_OCT_5 + 10)), false);
+  assert.equal(created[0].requestOptions.idempotencyKey.includes(String(PAID_OCT_5 + 11)), false);
 });
 
 test("missing credit coupon env fails closed and does not name env vars", async () => {

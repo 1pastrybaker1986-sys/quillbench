@@ -390,8 +390,15 @@ export async function createCoverCreditUpgrade({ stripe, coverSessionId, nowUnix
       /* The create response is enough when the new id cannot be read back yet. */
     }
   }
-  if (session?.status === "expired") {
-    session = await createCheckoutSession(stripe, fields, `${idempotencyKey}-${nowUnix}`);
+  if (session?.status === "expired" && session.id) {
+    // The first key replays the expired Checkout Session for up to 24 hours.
+    // A clock-based retry key lets two callers in the same moment each open
+    // a new credited session. Key off the expired session id so they collapse.
+    session = await createCheckoutSession(
+      stripe,
+      fields,
+      `cover-credit-retry:${coverId}:${session.id}`,
+    );
   }
   if (!session?.url || !session.id) {
     throw new CoverCreditError(502, COULD_NOT_START);
