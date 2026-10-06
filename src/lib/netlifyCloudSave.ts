@@ -170,8 +170,7 @@ export async function pushCloudSyncPayload(
   if (!token) {
     return {
       ok: false,
-      message:
-        "Blobs push: no Identity JWT. Complete magic-link login first. Identity is not enabled in production.",
+      message: "Sign-in didn't finish. Try the email link again, or email sarah@brundigebusiness.com.",
     };
   }
 

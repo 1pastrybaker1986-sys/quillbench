@@ -129,7 +129,7 @@ export default function App() {
           if (migrateMessage) setCheckoutBanner(migrateMessage);
         } catch (e) {
           setCheckoutBanner(
-            e instanceof Error ? e.message : "Identity handshake failed (not Live).",
+            e instanceof Error ? e.message : "Sign-in didn't finish. Try the email link again, or email sarah@brundigebusiness.com.",
           );
         }
       })();
@@ -153,7 +153,7 @@ export default function App() {
       } catch (e) {
         if (!cancelled) {
           setCheckoutBanner(
-            e instanceof Error ? e.message : "Identity handshake failed (not Live).",
+            e instanceof Error ? e.message : "Sign-in didn't finish. Try the email link again, or email sarah@brundigebusiness.com.",
           );
         }
       }

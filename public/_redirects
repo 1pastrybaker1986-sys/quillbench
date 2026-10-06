@@ -17,4 +17,6 @@
 /thank-you/           /thank-you/index.html  200
 /pricing              /pricing/index.html   200
 /pricing/             /pricing/index.html   200
+/privacy              /?page=privacy        302
+/privacy/             /?page=privacy        302
 /*                    /index.html           200

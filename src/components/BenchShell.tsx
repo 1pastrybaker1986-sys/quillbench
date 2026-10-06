@@ -443,8 +443,8 @@ export default function BenchShell({
               <h2 className="bench-panel-title">Settings</h2>
               <p className="bench-panel-lede">
                 {isCloudSaveEnabled()
-                  ? "Cloud Save is on: signed-in works are copied to your Quillbench account."
-                  : "Local on this device — cloud stays off for now."}
+                  ? "Saved on this device. When you're signed in, your Works in Progress are also copied to your Quillbench account."
+                  : "Saved on this device."}
               </p>
               <dl className="bench-settings-list">
                 <div>
@@ -455,7 +455,7 @@ export default function BenchShell({
                   <dt>Device save</dt>
                   <dd>
                     {isCloudSaveEnabled()
-                      ? "Local cache on this browser. Signed-in library is also copied to your Quillbench account."
+                      ? "Saved in this browser. When you're signed in, a copy also goes to your Quillbench account. Use Account → backup to keep your own file."
                       : "Drafts and Works in Progress save in this browser. Use Account → backup to carry a file."}
                   </dd>
                 </div>
@@ -463,8 +463,8 @@ export default function BenchShell({
                   <dt>Cloud Save</dt>
                   <dd>
                     {isCloudSaveEnabled()
-                      ? "On · Email magic link. Works in Progress are copied to your account (Netlify)."
-                      : "Coming. Nothing syncs across devices yet."}
+                      ? "On when you sign in with an email link. Your Works in Progress are copied to your account each time you open Quillbench. To delete your account and its copy, email sarah@brundigebusiness.com."
+                      : "Off. Your Works in Progress stay on this device. Use Account → backup to move them."}
                   </dd>
                 </div>
               </dl>

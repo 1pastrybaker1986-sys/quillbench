@@ -423,7 +423,7 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
               <h2>Sign in</h2>
               <p className="lede">
                 {cloudOn
-                  ? "Cloud Save: email a magic link and the Works in Progress on this device are copied to your Quillbench account. Start on this device to stay local-only."
+                  ? "Optional: enter your email to get a sign-in link. Once you're signed in, the Works in Progress on this device are copied to your Quillbench account. Choose Start on this device to keep everything in this browser only."
                   : "Email sign-in stays on this device. Or start free with an empty Works in Progress — same Write, Scan, and tools."}
               </p>
               <label className="field" htmlFor="email">

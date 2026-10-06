@@ -93,8 +93,7 @@ export async function handler(event, context) {
   const user = resolveUser(event, context);
   if (!user?.sub) {
     return json(401, {
-      error:
-        "Unauthorized — Netlify Identity JWT required. Identity is not enabled in production (Soft-FAIL).",
+      error: "Sign-in required.",
     });
   }
 
@@ -145,7 +144,7 @@ export async function handler(event, context) {
     try {
       await store.setJSON(key, payload);
       return json(200, {
-        message: `Saved ${payload.books.length} book(s) to Blobs (${key}).`,
+        message: `Copied ${payload.books.length} book(s) to your Quillbench account.`,
         payload,
       });
     } catch (err) {

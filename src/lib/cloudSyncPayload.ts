@@ -113,8 +113,7 @@ export async function migrateThisDeviceWip(
   if (!isCloudSaveEnabled()) {
     return {
       status: "not-enabled",
-      message:
-        "VITE_CLOUD_SAVE is off. Turn on locally to exercise migrate-this-device; Identity is not enabled in production.",
+      message: "Sign-in didn't finish. Try the email link again, or email sarah@brundigebusiness.com.",
     };
   }
 
