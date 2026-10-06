@@ -23,6 +23,11 @@ import {
   resolveSiteOrigin,
 } from "../lib/coverCredit.mjs";
 
+const NOT_CONFIGURED = "Checkout is not configured.";
+const COULD_NOT_START = "The upgrade checkout could not be started.";
+const CANNOT_CREDIT = "This Cover purchase cannot be credited.";
+const ALREADY_USED = "This Cover purchase was already used toward a Studio Bundle.";
+
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "Content-Type",
@@ -65,57 +70,72 @@ async function createCheckoutSession(stripe, fields, idempotencyKey) {
 }
 
 /**
- * @param {import("stripe").Stripe} stripe
- * @param {string} coverSessionId
- * @param {{ metadata?: Record<string, string> }} coverSession
+ * Log only Stripe's type, code, and request id. Never the message or the key.
+ * @param {unknown} err
  */
-async function findPriorUpgrades(stripe, coverSessionId, coverSession) {
-  /** @type {Map<string, any>} */
-  const found = new Map();
-  try {
-    const res = await stripe.checkout.sessions.search({
-      query: `metadata['cover_session_id']:'${coverSessionId}'`,
-      limit: 10,
-    });
-    if (res?.has_more) {
-      throw new CoverCreditError(
-        409,
-        "This Cover purchase was already used toward a Studio Bundle.",
-      );
-    }
-    for (const session of res?.data || []) {
-      if (session?.id) found.set(session.id, session);
-    }
-  } catch (err) {
-    if (err instanceof CoverCreditError) throw err;
-    /* Search can be unavailable. The metadata pointer below still blocks reuse. */
-  }
-
-  const pointed = coverSession.metadata?.cover_credit_session;
-  if (isCheckoutSessionId(pointed) && !found.has(pointed)) {
-    try {
-      const prior = await stripe.checkout.sessions.retrieve(pointed);
-      if (prior?.metadata?.cover_session_id === coverSessionId && prior.id) {
-        found.set(prior.id, prior);
-      }
-    } catch {
-      /* Stale pointer. A new checkout is allowed when nothing else blocks. */
-    }
-  }
-  return [...found.values()];
+function logStripeFailure(err) {
+  const details = stripeErrorDetails(err);
+  console.error("upgrade-checkout failed", details.type, details.code, details.requestId);
 }
 
 /**
- * A prior Bundle checkout still open, complete, or paid consumes the one use.
- * An expired unpaid checkout does not.
- * @param {any[]} priors
+ * @param {unknown} err
  */
-function blockingPrior(priors) {
-  return priors.find((session) => {
-    if (!session) return false;
-    if (session.payment_status === "paid") return true;
-    return session.status === "open" || session.status === "complete";
-  });
+function stripeErrorDetails(err) {
+  if (!err || typeof err !== "object") {
+    return { type: "Error", code: undefined, requestId: undefined };
+  }
+  const record = /** @type {any} */ (err);
+  const raw = record.raw && typeof record.raw === "object" ? record.raw : null;
+  const requestId =
+    typeof record.requestId === "string"
+      ? record.requestId
+      : raw && typeof raw.requestId === "string"
+        ? raw.requestId
+        : undefined;
+  const type = typeof record.type === "string" ? record.type : record.name || "Error";
+  const code = typeof record.code === "string" ? record.code : undefined;
+  return { type, code, requestId };
+}
+
+/**
+ * @param {unknown} err
+ */
+function isMissing(err) {
+  if (!err || typeof err !== "object") return false;
+  const record = /** @type {any} */ (err);
+  return record.code === "resource_missing" || record.statusCode === 404;
+}
+
+/**
+ * A refund, a partial refund, or a dispute spends the credit.
+ * @param {any} charge
+ */
+function chargeBlocksCredit(charge) {
+  if (!charge || typeof charge !== "object") return true;
+  if (charge.refunded === true) return true;
+  const refundedCents = Number(charge.amount_refunded);
+  if (Number.isFinite(refundedCents) && refundedCents > 0) return true;
+  if (charge.disputed === true) return true;
+  if (charge.dispute) return true;
+  return false;
+}
+
+/**
+ * @param {any} session
+ * @param {number} nowUnix
+ * @returns {"used" | "open" | "none"}
+ */
+function upgradeState(session, nowUnix) {
+  if (!session) return "none";
+  if (session.payment_status === "paid" || session.status === "complete") return "used";
+  if (session.status === "expired") return "none";
+  if (session.status === "open") {
+    if (Number.isFinite(session.expires_at) && session.expires_at <= nowUnix) return "none";
+    return "open";
+  }
+  // Unknown status: do not open a second checkout.
+  return "used";
 }
 
 /**
@@ -130,32 +150,86 @@ function buyerEmail(session) {
 }
 
 /**
+ * PaymentIntent metadata is the one-use lock. Live coupons have no redemption cap.
  * @param {import("stripe").Stripe} stripe
- * @param {any} coverSession
- * @param {string} bundleSessionId
+ * @param {any} paymentIntent
+ * @param {string} coverId
+ * @param {number} nowUnix
  */
-async function rememberUpgrade(stripe, coverSession, bundleSessionId) {
-  await stripe.checkout.sessions.update(coverSession.id, {
-    metadata: {
-      ...(coverSession.metadata || {}),
-      cover_credit_session: bundleSessionId,
-      cover_credit_status: "checkout_open",
-    },
-  });
-
-  const pi = coverSession.payment_intent;
-  const piId = typeof pi === "string" ? pi : pi?.id;
-  if (!piId || !stripe.paymentIntents?.update) return;
+async function lookupUpgrade(stripe, paymentIntent, coverId, nowUnix) {
+  const pointer = paymentIntent?.metadata?.cover_credit_upgrade_session;
+  if (!isCheckoutSessionId(pointer)) return null;
+  let prior;
   try {
-    await stripe.paymentIntents.update(piId, {
-      metadata: {
-        ...(typeof pi === "object" && pi.metadata ? pi.metadata : {}),
-        cover_credit_session: bundleSessionId,
-      },
-    });
-  } catch {
-    /* The Checkout Session metadata and the Bundle session search are the lock. */
+    prior = await stripe.checkout.sessions.retrieve(pointer);
+  } catch (err) {
+    if (isMissing(err)) return null;
+    logStripeFailure(err);
+    throw new CoverCreditError(502, COULD_NOT_START);
   }
+  if (prior?.metadata?.cover_session_id && prior.metadata.cover_session_id !== coverId) {
+    logStripeFailure({ type: "Error", code: "upgrade_pointer_mismatch" });
+    throw new CoverCreditError(502, COULD_NOT_START);
+  }
+  if (upgradeState(prior, nowUnix) === "none") return null;
+  return prior;
+}
+
+/**
+ * Write the lock only after the Bundle session exists. If the write fails,
+ * expire that session so a retry cannot pay it and also create another.
+ * @param {import("stripe").Stripe} stripe
+ * @param {any} paymentIntent
+ * @param {string} bundleSessionId
+ * @param {number} nowUnix
+ */
+async function recordUpgradePointer(stripe, paymentIntent, bundleSessionId, nowUnix) {
+  const metadata = {
+    ...(paymentIntent.metadata || {}),
+    cover_credit_upgrade_session: bundleSessionId,
+    cover_credit_used_at: String(nowUnix),
+  };
+  try {
+    await stripe.paymentIntents.update(paymentIntent.id, { metadata });
+    return;
+  } catch (err) {
+    logStripeFailure(err);
+  }
+
+  let expired = false;
+  try {
+    await stripe.checkout.sessions.expire(bundleSessionId);
+    expired = true;
+  } catch (err) {
+    logStripeFailure(err);
+  }
+
+  if (!expired) {
+    try {
+      await stripe.paymentIntents.update(paymentIntent.id, { metadata });
+    } catch (err) {
+      logStripeFailure(err);
+    }
+  }
+  throw new CoverCreditError(502, COULD_NOT_START);
+}
+
+/**
+ * @param {import("stripe").Stripe} stripe
+ * @param {any} cover
+ */
+async function loadCoverCharge(stripe, cover) {
+  const piRef = cover?.payment_intent;
+  const piId = typeof piRef === "string" ? piRef : piRef?.id;
+  if (!piId) throw new CoverCreditError(409, CANNOT_CREDIT);
+  const paymentIntent = await stripe.paymentIntents.retrieve(piId, {
+    expand: ["latest_charge"],
+  });
+  const chargeRef = paymentIntent?.latest_charge;
+  const chargeId = typeof chargeRef === "string" ? chargeRef : chargeRef?.id;
+  if (!chargeId) throw new CoverCreditError(409, CANNOT_CREDIT);
+  const charge = await stripe.charges.retrieve(chargeId);
+  return { paymentIntent, charge };
 }
 
 /**
@@ -174,7 +248,7 @@ export async function createCoverCreditUpgrade({ stripe, coverSessionId, nowUnix
     throw new CoverCreditError(400, "A Cover Checkout Session id is required.");
   }
   if (!origin) {
-    throw new CoverCreditError(503, "Site URL is not configured on the server.");
+    throw new CoverCreditError(503, NOT_CONFIGURED);
   }
 
   let cover;
@@ -222,29 +296,41 @@ export async function createCoverCreditUpgrade({ stripe, coverSessionId, nowUnix
     throw new CoverCreditError(400, "The 30-day Cover credit window has ended.");
   }
 
-  const priors = await findPriorUpgrades(stripe, cover.id || coverSessionId, cover);
-  if (blockingPrior(priors)) {
-    throw new CoverCreditError(
-      409,
-      "This Cover purchase was already used toward a Studio Bundle.",
-    );
+  const coverId = cover.id || coverSessionId;
+  const { paymentIntent, charge } = await loadCoverCharge(stripe, cover);
+  const existing = await lookupUpgrade(stripe, paymentIntent, coverId, nowUnix);
+  if (chargeBlocksCredit(charge)) {
+    if (existing && upgradeState(existing, nowUnix) === "open") {
+      try {
+        await stripe.checkout.sessions.expire(existing.id);
+      } catch (err) {
+        logStripeFailure(err);
+      }
+    }
+    throw new CoverCreditError(409, CANNOT_CREDIT);
+  }
+  const existingState = upgradeState(existing, nowUnix);
+  if (existingState === "used") {
+    throw new CoverCreditError(409, ALREADY_USED);
+  }
+  if (existingState === "open") {
+    if (!existing.url) throw new CoverCreditError(502, COULD_NOT_START);
+    return {
+      url: existing.url,
+      sessionId: existing.id,
+      expectedChargeCents: BUNDLE_LIST_CENTS - cover.amount_total,
+    };
   }
 
   const couponId = typeof env[envName] === "string" ? env[envName].trim() : "";
   if (!couponId || /softlaunch50/i.test(couponId)) {
-    throw new CoverCreditError(
-      503,
-      `Cover credit is not configured on the server (missing ${envName}).`,
-    );
+    throw new CoverCreditError(503, NOT_CONFIGURED);
   }
 
   const bundlePriceId =
     typeof env.STRIPE_PRICE_STUDIO_BUNDLE === "string" ? env.STRIPE_PRICE_STUDIO_BUNDLE.trim() : "";
   if (!bundlePriceId.startsWith("price_")) {
-    throw new CoverCreditError(
-      503,
-      "No Stripe price configured for studio-bundle. Set STRIPE_PRICE_STUDIO_BUNDLE on Netlify.",
-    );
+    throw new CoverCreditError(503, NOT_CONFIGURED);
   }
 
   const coupon = await stripe.coupons.retrieve(couponId);
@@ -258,7 +344,7 @@ export async function createCoverCreditUpgrade({ stripe, coverSessionId, nowUnix
     !Array.isArray(appliesTo) ||
     appliesTo.length === 0
   ) {
-    throw new CoverCreditError(503, "Cover credit coupon does not match the amount paid.");
+    throw new CoverCreditError(503, NOT_CONFIGURED);
   }
 
   const price = await stripe.prices.retrieve(bundlePriceId);
@@ -270,16 +356,15 @@ export async function createCoverCreditUpgrade({ stripe, coverSessionId, nowUnix
     !productId ||
     !appliesTo.includes(productId)
   ) {
-    throw new CoverCreditError(503, "Studio Bundle price is not configured for this credit.");
+    throw new CoverCreditError(503, NOT_CONFIGURED);
   }
 
-  const coverId = cover.id || coverSessionId;
   /** @type {Record<string, unknown>} */
   const fields = {
     mode: "payment",
     line_items: [{ price: bundlePriceId, quantity: 1 }],
     success_url: bundleSuccessUrl(origin),
-    cancel_url: bundleCancelUrl(origin),
+    cancel_url: bundleCancelUrl(origin, coverId),
     client_reference_id: coverId,
     // Live checkout-status maps metadata.packageId to `pkg`. Live /thank-you/
     // unlocks studio-bundle from that field. Do not fork those files for this.
@@ -309,10 +394,10 @@ export async function createCoverCreditUpgrade({ stripe, coverSessionId, nowUnix
     session = await createCheckoutSession(stripe, fields, `${idempotencyKey}-${nowUnix}`);
   }
   if (!session?.url || !session.id) {
-    throw new CoverCreditError(502, "Stripe did not return a Checkout URL.");
+    throw new CoverCreditError(502, COULD_NOT_START);
   }
 
-  await rememberUpgrade(stripe, cover, session.id);
+  await recordUpgradePointer(stripe, paymentIntent, session.id, nowUnix);
 
   return {
     url: session.url,
@@ -336,9 +421,7 @@ export async function handleUpgradeCheckout(event, deps = {}) {
   const env = deps.env ?? process.env;
   const secretKey = typeof env.STRIPE_SECRET_KEY === "string" ? env.STRIPE_SECRET_KEY.trim() : "";
   if (!secretKey && !deps.stripe) {
-    return json(503, {
-      error: "Checkout is not configured on the server (missing STRIPE_SECRET_KEY).",
-    });
+    return json(503, { error: NOT_CONFIGURED });
   }
 
   let payload;
@@ -367,12 +450,8 @@ export async function handleUpgradeCheckout(event, deps = {}) {
     if (err instanceof CoverCreditError) {
       return json(err.statusCode, { error: err.message });
     }
-    const message =
-      err && typeof err === "object" && "message" in err && typeof err.message === "string"
-        ? err.message
-        : "Failed to create Checkout Session.";
-    console.error("upgrade-checkout failed:", message);
-    return json(502, { error: `Could not start the upgrade checkout. ${message}` });
+    logStripeFailure(err);
+    return json(502, { error: COULD_NOT_START });
   }
 }
 

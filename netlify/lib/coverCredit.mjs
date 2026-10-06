@@ -151,10 +151,13 @@ export function bundleSuccessUrl(origin) {
 }
 
 /**
+ * Buyer who leaves Checkout returns to their paid Cover confirmation.
+ * The live thank-you page loads this session id and asks checkout-status.
  * @param {string} origin
+ * @param {string} coverSessionId
  */
-export function bundleCancelUrl(origin) {
-  return `${origin}/thank-you/?upgrade=cancel`;
+export function bundleCancelUrl(origin, coverSessionId) {
+  return `${origin}/thank-you/?session_id=${encodeURIComponent(coverSessionId)}`;
 }
 
 /**

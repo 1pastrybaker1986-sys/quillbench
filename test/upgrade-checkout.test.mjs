@@ -54,13 +54,26 @@ function coverSession(overrides = {}) {
   };
 }
 
+function withCharge(fields) {
+  const cover = coverSession();
+  Object.assign(cover.payment_intent.latest_charge, fields);
+  return cover;
+}
+
 function mockStripe(options = {}) {
   const cover = options.cover ?? coverSession();
   const calls = [];
-  const updates = [];
   const piUpdates = [];
+  const expires = [];
   let bundle = options.prior ?? null;
-  const searchError = options.searchError ?? null;
+  let piUpdateAttempts = 0;
+  if (options.prior) {
+    cover.payment_intent.metadata = {
+      ...(cover.payment_intent.metadata || {}),
+      cover_credit_upgrade_session: options.prior.id,
+      cover_credit_used_at: String(PAID_OCT_5),
+    };
+  }
   const coupons = options.coupons ?? {
     "cover-credit-99": coupon(9900),
     "cover-credit-179": coupon(17900),
@@ -73,10 +86,18 @@ function mockStripe(options = {}) {
     product: PRODUCT,
   };
 
+  function lockError() {
+    return Object.assign(new Error("metadata write failed"), {
+      type: "api_error",
+      code: "lock_timeout",
+      requestId: "req_lock",
+    });
+  }
+
   const stripe = {
     calls,
-    updates,
     piUpdates,
+    expires,
     checkout: {
       sessions: {
         retrieve: async (id) => {
@@ -87,11 +108,8 @@ function mockStripe(options = {}) {
           err.statusCode = 404;
           throw err;
         },
-        search: async () => {
-          if (searchError) throw searchError;
-          return { data: bundle ? [bundle] : [] };
-        },
         create: async (fields, requestOptions) => {
+          if (options.createError) throw options.createError;
           const baseKey = `cover-credit-${cover.id}`;
           if (
             options.replayExpired &&
@@ -116,10 +134,17 @@ function mockStripe(options = {}) {
           bundle = created;
           return created;
         },
-        update: async (id, params) => {
-          updates.push({ id, params });
-          if (id === cover.id) cover.metadata = { ...cover.metadata, ...params.metadata };
-          return { id, ...params };
+        expire: async (id) => {
+          expires.push(id);
+          if (options.failExpire) {
+            throw Object.assign(new Error("expire failed"), {
+              type: "api_error",
+              code: "expire_failed",
+              requestId: "req_exp",
+            });
+          }
+          if (bundle && bundle.id === id) bundle.status = "expired";
+          return { id, status: "expired" };
         },
       },
     },
@@ -143,10 +168,37 @@ function mockStripe(options = {}) {
         return price;
       },
     },
+    charges: {
+      retrieve: async (id) => {
+        const charge = cover.payment_intent?.latest_charge;
+        if (!charge || charge.id !== id) {
+          const err = new Error("No such charge");
+          err.code = "resource_missing";
+          throw err;
+        }
+        return charge;
+      },
+    },
     paymentIntents: {
+      retrieve: async (id) => {
+        if (!cover.payment_intent || cover.payment_intent.id !== id) {
+          const err = new Error("No such payment_intent");
+          err.code = "resource_missing";
+          err.statusCode = 404;
+          throw err;
+        }
+        return cover.payment_intent;
+      },
       update: async (id, params) => {
+        piUpdateAttempts += 1;
+        if (options.failPiUpdate === "always") throw lockError();
+        if (options.failPiUpdate === "once" && piUpdateAttempts === 1) throw lockError();
+        cover.payment_intent.metadata = {
+          ...(cover.payment_intent.metadata || {}),
+          ...(params.metadata || {}),
+        };
         piUpdates.push({ id, params });
-        return { id };
+        return { id, metadata: cover.payment_intent.metadata };
       },
     },
     promotionCodes: {
@@ -195,8 +247,16 @@ test("$99 Cover credit charges $400 and does not stack SOFTLAUNCH50", async () =
     "https://quillbench.test/thank-you/?pkg=studio-bundle&session_id={CHECKOUT_SESSION_ID}",
   );
   assert.equal(fields.customer_email, "buyer@example.com");
-  assert.equal(stripe.updates[0].params.metadata.cover_credit_session, result.sessionId);
-  assert.equal(JSON.stringify(stripe.updates[0].params.metadata).includes("@"), false);
+  assert.equal(
+    fields.cancel_url,
+    "https://quillbench.test/thank-you/?session_id=cs_test_coverpaid123",
+  );
+  assert.equal(
+    stripe.piUpdates[0].params.metadata.cover_credit_upgrade_session,
+    result.sessionId,
+  );
+  assert.equal(stripe.piUpdates[0].params.metadata.cover_credit_used_at, String(PAID_OCT_5 + 10));
+  assert.equal(JSON.stringify(stripe.piUpdates[0].params.metadata).includes("@"), false);
   assert.equal(stripe.piUpdates[0].id, "pi_test_cover");
 });
 
@@ -300,25 +360,18 @@ test("expired window is rejected, including the Oct 5 CDT → Nov 4 CST boundary
   assert.equal(result.expectedChargeCents, 40000);
 });
 
-test("a second use of the same Cover session is rejected", async () => {
+test("an open upgrade session is returned instead of a second checkout", async () => {
   const stripe = mockStripe();
   const first = await upgrade(stripe, ENV, PAID_OCT_5);
   assert.equal(first.expectedChargeCents, 40000);
-  await assert.rejects(
-    () => upgrade(stripe, ENV, PAID_OCT_5 + 60),
-    (err) => err instanceof CoverCreditError && err.statusCode === 409 && /already used/.test(err.message),
-  );
+  const second = await upgrade(stripe, ENV, PAID_OCT_5 + 60);
+  assert.equal(second.url, first.url);
+  assert.equal(second.sessionId, first.sessionId);
   assert.equal(stripe.calls.filter((call) => !call.replay).length, 1);
-});
-
-test("a second use is rejected when Checkout search is unavailable", async () => {
-  const stripe = mockStripe({ searchError: new Error("search down") });
-  await upgrade(stripe, ENV, PAID_OCT_5);
-  await assert.rejects(
-    () => upgrade(stripe, ENV, PAID_OCT_5 + 30),
-    (err) => err instanceof CoverCreditError && err.statusCode === 409,
+  assert.equal(
+    stripe.piUpdates[0].params.metadata.cover_credit_upgrade_session,
+    first.sessionId,
   );
-  assert.equal(stripe.calls.filter((call) => !call.replay).length, 1);
 });
 
 test("a paid prior Bundle session blocks another credit", async () => {
@@ -354,25 +407,151 @@ test("an expired unpaid upgrade can be started again", async () => {
   assert.equal(stripe.calls.filter((call) => !call.replay).length, 1);
 });
 
-test("missing credit coupon env fails closed and does not open Checkout", async () => {
+test("missing credit coupon env fails closed and does not name env vars", async () => {
   const stripe = mockStripe();
   const env = { ...ENV, STRIPE_COUPON_COVER_CREDIT_99: "  " };
   await assert.rejects(
     () => upgrade(stripe, env, PAID_OCT_5),
-    (err) => err instanceof CoverCreditError && err.statusCode === 503 && /not configured/.test(err.message),
+    (err) =>
+      err instanceof CoverCreditError &&
+      err.statusCode === 503 &&
+      err.message === "Checkout is not configured." &&
+      !/STRIPE_|COUPON|SECRET/.test(err.message),
   );
   assert.equal(stripe.calls.length, 0);
 });
 
-test("a coupon that is not the Cover amount is refused", async () => {
+test("a coupon that is not the Cover amount is refused without naming env vars", async () => {
   const stripe = mockStripe({
     coupons: { "cover-credit-99": coupon(5000) },
   });
   await assert.rejects(
     () => upgrade(stripe, ENV, PAID_OCT_5),
-    (err) => err instanceof CoverCreditError && /does not match/.test(err.message),
+    (err) =>
+      err instanceof CoverCreditError &&
+      err.statusCode === 503 &&
+      err.message === "Checkout is not configured." &&
+      !/STRIPE_/.test(err.message),
   );
   assert.equal(stripe.calls.length, 0);
+});
+
+test("a refunded Cover charge is not credited", async () => {
+  const stripe = mockStripe({
+    cover: withCharge({ refunded: true, amount_refunded: 9900 }),
+  });
+  await assert.rejects(
+    () => upgrade(stripe, ENV, PAID_OCT_5),
+    (err) =>
+      err instanceof CoverCreditError &&
+      err.statusCode === 409 &&
+      err.message === "This Cover purchase cannot be credited." &&
+      !/refund|dispute/i.test(err.message),
+  );
+  assert.equal(stripe.calls.length, 0);
+});
+
+test("a partially refunded Cover charge is not credited", async () => {
+  const stripe = mockStripe({
+    cover: withCharge({ refunded: false, amount_refunded: 1000, disputed: false }),
+  });
+  await assert.rejects(
+    () => upgrade(stripe, ENV, PAID_OCT_5),
+    (err) =>
+      err instanceof CoverCreditError &&
+      err.statusCode === 409 &&
+      err.message === "This Cover purchase cannot be credited.",
+  );
+  assert.equal(stripe.calls.length, 0);
+});
+
+test("a disputed Cover charge is not credited", async () => {
+  const stripe = mockStripe({
+    cover: withCharge({ refunded: false, amount_refunded: 0, disputed: true }),
+  });
+  await assert.rejects(
+    () => upgrade(stripe, ENV, PAID_OCT_5),
+    (err) =>
+      err instanceof CoverCreditError &&
+      err.statusCode === 409 &&
+      err.message === "This Cover purchase cannot be credited." &&
+      !/refund|dispute/i.test(err.message),
+  );
+  assert.equal(stripe.calls.length, 0);
+});
+
+test("Stripe error text is not returned to the caller", async () => {
+  const stripe = mockStripe({
+    createError: Object.assign(new Error("No such price: buyer@example.com raw gateway"), {
+      type: "invalid_request_error",
+      code: "resource_missing",
+      requestId: "req_123",
+    }),
+  });
+  const logs = [];
+  const original = console.error;
+  console.error = (...args) => {
+    logs.push(args);
+  };
+  try {
+    const response = await handleUpgradeCheckout(
+      { httpMethod: "POST", body: JSON.stringify({ coverSessionId: COVER_ID }) },
+      { stripe, env: ENV, nowUnix: PAID_OCT_5 },
+    );
+    assert.equal(response.statusCode, 502);
+    const body = JSON.parse(response.body);
+    assert.equal(body.error, "The upgrade checkout could not be started.");
+    assert.equal(JSON.stringify(body).includes("buyer@example.com"), false);
+    assert.equal(JSON.stringify(body).includes("raw gateway"), false);
+  } finally {
+    console.error = original;
+  }
+  const logged = JSON.stringify(logs);
+  assert.equal(logged.includes("invalid_request_error"), true);
+  assert.equal(logged.includes("resource_missing"), true);
+  assert.equal(logged.includes("req_123"), true);
+  assert.equal(logged.includes("buyer@example.com"), false);
+  assert.equal(logged.includes("raw gateway"), false);
+});
+
+test("a failed one-use lock expires the new checkout and returns a generic error", async () => {
+  const stripe = mockStripe({ failPiUpdate: "always" });
+  const logs = [];
+  const original = console.error;
+  console.error = (...args) => {
+    logs.push(args);
+  };
+  try {
+    await assert.rejects(
+      () => upgrade(stripe, ENV, PAID_OCT_5),
+      (err) =>
+        err instanceof CoverCreditError &&
+        err.statusCode === 502 &&
+        err.message === "The upgrade checkout could not be started." &&
+        !/metadata write failed|req_lock/.test(err.message),
+    );
+  } finally {
+    console.error = original;
+  }
+  assert.deepEqual(stripe.expires, ["cs_test_bundle_new"]);
+  assert.equal(stripe.calls.filter((call) => !call.replay).length, 1);
+  assert.equal(stripe.piUpdates.length, 0);
+  const logged = JSON.stringify(logs);
+  assert.equal(logged.includes("lock_timeout"), true);
+  assert.equal(logged.includes("req_lock"), true);
+  assert.equal(logged.includes("metadata write failed"), false);
+});
+
+test("a lock write recovered after expire fails does not open a second checkout", async () => {
+  const stripe = mockStripe({ failPiUpdate: "once", failExpire: true });
+  await assert.rejects(
+    () => upgrade(stripe, ENV, PAID_OCT_5),
+    (err) => err instanceof CoverCreditError && err.statusCode === 502,
+  );
+  const second = await upgrade(stripe, ENV, PAID_OCT_5 + 5);
+  assert.equal(second.sessionId, "cs_test_bundle_new");
+  assert.equal(second.url, "https://checkout.stripe.com/c/pay/cs_test_bundle_new");
+  assert.equal(stripe.calls.filter((call) => !call.replay).length, 1);
 });
 
 test("a forged session id is rejected", async () => {
@@ -391,5 +570,6 @@ test("shipped function source does not embed a Stripe secret key", () => {
   for (const file of files) {
     const source = readFileSync(new URL(`../${file}`, import.meta.url), "utf8");
     assert.equal(/sk_live|sk_test/.test(source), false, file);
+    assert.equal(source.includes("sessions.search"), false, file);
   }
 });
