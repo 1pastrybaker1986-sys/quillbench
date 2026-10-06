@@ -92,7 +92,7 @@ export async function blobsPull(_session: Session): Promise<CloudSaveOpResult> {
   if (!token) {
     return {
       ok: false,
-      message: "Blobs pull: no Identity JWT. Complete magic-link login first (Identity not Live until Soft-PASS).",
+      message: "Sign-in required.",
     };
   }
 
@@ -190,7 +190,7 @@ export async function pushCloudSyncPayload(
         ok: false,
         message:
           body.error ||
-          `Blobs push failed (${res.status}). Ensure Identity + Blobs store env on the site (not Live Soft-FAIL).`,
+          `Couldn't copy your Works in Progress to your account (error ${res.status}). They're still saved on this device.`,
       };
     }
     return {

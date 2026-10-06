@@ -147,8 +147,8 @@ export default function App() {
         const { session: next, migrateMessage } = await finishIdentityLoginAndMigrate();
         if (cancelled || !next) return;
         setSession(next);
-        setLegalUrl(null);
-        setRoute({ name: "library" });
+        const legal = readLegalFromUrl();
+        if (legal) { setRoute({ name: legal }); } else { setLegalUrl(null); setRoute({ name: "library" }); }
         if (migrateMessage) setCheckoutBanner(migrateMessage);
       } catch (e) {
         if (!cancelled) {

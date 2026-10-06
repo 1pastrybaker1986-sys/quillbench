@@ -89,7 +89,7 @@ export default function Terms({ onBack }: Props) {
           </p>
         </section>
 
-        <p className="legal-updated">Last updated September 2026 · Soft launch</p>
+        <p className="legal-updated">Last updated October 2026 · Soft launch</p>
       </main>
 
       <footer className="legal-foot">

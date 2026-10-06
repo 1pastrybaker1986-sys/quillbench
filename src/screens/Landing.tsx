@@ -438,7 +438,7 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
                 onChange={(e) => setEmail(e.target.value)}
               />
               <button className="btn btn-primary" type="submit" disabled={authBusy}>
-                {cloudOn ? (authBusy ? "Sending link…" : "Email magic link") : "Continue"}
+                {cloudOn ? (authBusy ? "Sending link…" : "Email me a sign-in link") : "Continue"}
               </button>
               <button className="btn btn-ghost" type="button" onClick={() => onSignedIn(startLocalSession())}>
                 Start on this device

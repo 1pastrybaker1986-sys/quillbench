@@ -104,7 +104,7 @@ export async function requestMagicLink(email: string): Promise<MagicLinkResult> 
 
   const trimmed = email.trim().toLowerCase();
   if (!trimmed || !trimmed.includes("@")) {
-    return { ok: false, message: "Enter a valid email for the magic link." };
+    return { ok: false, message: "Enter a valid email address." };
   }
 
   let auth: GoTrueClient;
@@ -116,7 +116,7 @@ export async function requestMagicLink(email: string): Promise<MagicLinkResult> 
       message:
         e instanceof Error
           ? e.message
-          : "Could not load GoTrue client. Is Identity enabled on this site?",
+          : "Sign-in isn't available right now. Try again later, or email sarah@brundigebusiness.com.",
     };
   }
 
@@ -125,7 +125,7 @@ export async function requestMagicLink(email: string): Promise<MagicLinkResult> 
     return {
       ok: true,
       kind: "recovery",
-      message: "Magic link sent — check your email to finish signing in (Identity).",
+      message: "Sign-in link sent. Check your email to finish signing in.",
     };
   } catch (recoverErr) {
     const msg =
@@ -145,14 +145,12 @@ export async function requestMagicLink(email: string): Promise<MagicLinkResult> 
           ok: true,
           kind: "signup",
           message:
-            "Check your email for a confirmation link to finish signing in (Identity magic link).",
+            "Check your email for a link to finish signing in.",
         };
       } catch (signupErr) {
-        const sMsg =
-          signupErr instanceof Error ? signupErr.message : String(signupErr);
         return {
           ok: false,
-          message: `Identity magic link failed (${msg}). Signup also failed (${sMsg}). Identity may not be enabled on this site (not Live).`,
+          message: "Sign-in didn't finish. Try the email link again, or email sarah@brundigebusiness.com.",
         };
       }
     }
@@ -163,13 +161,12 @@ export async function requestMagicLink(email: string): Promise<MagicLinkResult> 
         ok: true,
         kind: "signup",
         message:
-          "Check your email for a confirmation link to finish signing in (Identity magic link).",
+          "Check your email for a link to finish signing in.",
       };
     } catch (signupErr) {
-      const sMsg = signupErr instanceof Error ? signupErr.message : String(signupErr);
       return {
         ok: false,
-        message: `Identity signup failed: ${sMsg}. Identity may not be enabled (not Live).`,
+        message: "Sign-in didn't finish. Try the email link again, or email sarah@brundigebusiness.com.",
       };
     }
   }
