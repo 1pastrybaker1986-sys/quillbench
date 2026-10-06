@@ -984,7 +984,7 @@ export default function Workspace({ session, bookId, initialModule, autoScan, on
           </aside>
 
           <section className="preview-wrap">
-            <div className="preview-caption">Print spread preview · placeholder</div>
+            <div className="preview-caption">Print spread preview</div>
             <SpreadPreview book={{ ...book, manuscriptText: draftText }} />
           </section>
         </div>
