@@ -38,8 +38,7 @@ export default function Terms({ onBack }: Props) {
         <section className="legal-section">
           <h2>Paid unlocks</h2>
           <p>
-            Paid unlocks use Stripe Checkout. After a successful payment, ownership is recorded on
-            this device. Unlocks may not sync to other phones or computers until accounts launch.
+            Paid unlocks use Stripe Checkout. After a successful payment, the unlock is saved on this device only. It doesn't carry over to other phones or computers automatically.
           </p>
         </section>
 

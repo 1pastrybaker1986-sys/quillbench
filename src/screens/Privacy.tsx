@@ -21,17 +21,13 @@ export default function Privacy({ onBack }: Props) {
         <p className="legal-eyebrow">Privacy</p>
         <h1>Your work stays on your bench</h1>
         <p className="legal-lede">
-          Plain talk for writers. This build keeps your manuscript close — on this device — while
-          Quillbench grows toward payments and a public host.
+          Plain talk for writers. Your manuscripts stay in this browser on this device. This page lists everything Quillbench does collect when you sign up, buy, send an order brief or visit, and where it goes.
         </p>
 
         <section className="legal-section">
           <h2>What lives on this device</h2>
           <p>
-            Session, library, manuscripts, matter, covers, export locker notes, grammar dismissals,
-            editing board state, package unlocks, and the payments waitlist are stored in your
-            browser’s <strong>localStorage</strong>. Clearing site data for this origin removes
-            them. We do not sync that data to Quillbench servers in this build.
+            Session, library, manuscripts, matter, covers, export locker notes, grammar dismissals, editing board state and package unlocks are stored in your browser's localStorage. Clearing site data for this origin removes them. Quillbench doesn't receive any of it. To move your work to another device, use Account → Download Works in Progress backup.
           </p>
         </section>
 
@@ -44,22 +40,44 @@ export default function Privacy({ onBack }: Props) {
         </section>
 
         <section className="legal-section">
-          <h2>What we don’t collect here</h2>
           <p>
-            This soft-launch build has no Quillbench account backend and no manuscript upload
-            pipeline. Local and email sign-in stay on this device so you can use the bench
-            offline. Waitlist emails stay in localStorage until a remote form is
-            wired (see deploy notes).
+            <strong>Emails you give us.</strong>{" "}
+            If you join the waitlist, or sign up for cover and launch tips on the free Cover Brief page, we keep your email address and where you signed up from, including any campaign tags in the link you followed. Netlify, our web host, stores these sign-ups for us and keeps its own standard server logs. We use your email only to send Quillbench updates and tips. We don't delete sign-ups automatically yet. To unsubscribe or have your email deleted, email sarah@brundigebusiness.com.
+          </p>
+        </section>
+
+        <section className="legal-section">
+          <p>
+            <strong>Your order brief.</strong>{" "}
+            After you buy, the thank-you page asks for your email, package, book title, brief, a link to your files and any notes, along with your checkout reference. Netlify stores these for us so Sarah can do your order. Your files link should only share what you want Sarah to see. Email sarah@brundigebusiness.com to have your order details deleted after your order is finished.
+          </p>
+        </section>
+
+        <section className="legal-section">
+          <p>
+            <strong>Visit counts.</strong>{" "}
+            Our pages count visits without cookies. For each visit we record the page, the site that sent you, any campaign tags in the link, and a one-day code made from your IP address and browser that we can't turn back into either. We don't store your IP address. Visit records aren't deleted automatically yet.
+          </p>
+        </section>
+
+        <section className="legal-section">
+          <p>
+            <strong>Your Cover Brief.</strong>{" "}
+            The answers you type into the free Cover Brief tool stay in your browser. We don't receive them.
+          </p>
+        </section>
+
+        <section className="legal-section">
+          <p>
+            <strong>What we don't collect here.</strong>{" "}
+            Quillbench accounts aren't switched on in this build, and manuscripts are never uploaded. Email sign-in in the app stays on this device so you can use the bench offline.
           </p>
         </section>
 
         <section className="legal-section">
           <h2>Payments</h2>
           <p>
-            Studio packages use Stripe Checkout for secure payment. Card details are handled by
-            Stripe — Quillbench does not store your full card number on this device. After a
-            successful checkout, unlocks are saved on this device until accounts launch for sync
-            across phones and computers.
+            Studio packages use Stripe Checkout. Stripe handles your card details; Quillbench never sees or stores your full card number. Stripe keeps the payment record and shows us your order details, such as your email, what you bought and the amount, so we can deliver your order and handle refunds. After a successful checkout, your unlock is saved on this device.
           </p>
         </section>
 
@@ -71,7 +89,7 @@ export default function Privacy({ onBack }: Props) {
           </p>
         </section>
 
-        <p className="legal-updated">Last updated September 2026 · Soft launch</p>
+        <p className="legal-updated">Last updated October 2026 · Soft launch</p>
       </main>
 
       <footer className="legal-foot">

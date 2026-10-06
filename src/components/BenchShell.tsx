@@ -444,7 +444,7 @@ export default function BenchShell({
               <p className="bench-panel-lede">
                 {isCloudSaveEnabled()
                   ? "Cloud Save is on: signed-in works are copied to your Quillbench account."
-                  : "Local on this device — cloud stays off for now."}
+                  : "Saved on this device."}
               </p>
               <dl className="bench-settings-list">
                 <div>
@@ -464,7 +464,7 @@ export default function BenchShell({
                   <dd>
                     {isCloudSaveEnabled()
                       ? "On · Email magic link. Works in Progress are copied to your account (Netlify)."
-                      : "Coming. Nothing syncs across devices yet."}
+                      : "Off. Your Works in Progress stay on this device. Use Account → backup to move them."}
                   </dd>
                 </div>
               </dl>

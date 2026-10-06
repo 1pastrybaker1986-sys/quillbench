@@ -1,4 +1,4 @@
-/* Quillbench visit counter: no cookies, no storage, no personal data. */
+/* Quillbench visit counter: no cookies and nothing saved in your browser. Sends the page, referrer and campaign tags; the server keeps a one-day visitor code, never the IP address. Details: /privacy */
 (function () {
   try {
     if (/bot|crawl|spider|slurp|headless|lighthouse|preview/i.test(navigator.userAgent)) return;

@@ -19,5 +19,5 @@ export function cloudSaveStatusLine(): string {
   if (isCloudSaveEnabled()) {
     return "Cloud Save on for this build · drafts stay on this device";
   }
-  return "Saved on this device · Cloud Save coming";
+  return "Saved on this device";
 }
