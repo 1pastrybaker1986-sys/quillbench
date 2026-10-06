@@ -355,7 +355,7 @@ export async function createCoverCreditUpgrade({ stripe, coverSessionId, nowUnix
     throw new CoverCreditError(503, NOT_CONFIGURED);
   }
 
-  const coupon = await stripe.coupons.retrieve(couponId);
+  const coupon = await stripe.coupons.retrieve(couponId, { expand: ["applies_to"] });
   const appliesTo = coupon?.applies_to?.products;
   if (
     coupon?.valid === false ||
