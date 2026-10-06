@@ -44,12 +44,37 @@ export default function Privacy({ onBack }: Props) {
         </section>
 
         <section className="legal-section">
-          <h2>What we don’t collect here</h2>
           <p>
-            This soft-launch build has no Quillbench account backend and no manuscript upload
-            pipeline. Local and email sign-in stay on this device so you can use the bench
-            offline. Waitlist emails stay in localStorage until a remote form is
-            wired (see deploy notes).
+            <strong>Emails you give us.</strong> If you join the waitlist, or sign up for cover and
+            launch tips on the free Cover Brief page, we keep your email address and the link you
+            arrived from (including any campaign tags in it). Our host, Netlify, stores these
+            sign-ups for us and keeps its own standard server logs. We use your email only to send
+            Quillbench updates and tips. To unsubscribe or have your email deleted, email{" "}
+            <a href="mailto:sarah@brundigebusiness.com">sarah@brundigebusiness.com</a>.
+          </p>
+        </section>
+
+        <section className="legal-section">
+          <p>
+            <strong>Visit counts.</strong> Our pages count visits without cookies. For each visit we
+            record the page, the site that sent you, any campaign tags in the link, and a one-day
+            code made from your IP address and browser that we can't turn back into either. We
+            don't store your IP address.
+          </p>
+        </section>
+
+        <section className="legal-section">
+          <p>
+            <strong>Your Cover Brief.</strong> The answers you type into the Cover Brief tool stay
+            in your browser. We don't receive them.
+          </p>
+        </section>
+
+        <section className="legal-section">
+          <p>
+            <strong>What we don't collect here.</strong> This soft-launch build has no Quillbench
+            account backend and no manuscript upload pipeline. Local and email sign-in stay on this
+            device so you can use the bench offline.
           </p>
         </section>
 
@@ -58,8 +83,7 @@ export default function Privacy({ onBack }: Props) {
           <p>
             Studio packages use Stripe Checkout for secure payment. Card details are handled by
             Stripe — Quillbench does not store your full card number on this device. After a
-            successful checkout, unlocks are saved on this device until accounts launch for sync
-            across phones and computers.
+            successful checkout, unlocks are saved on this device.
           </p>
         </section>
 
@@ -71,7 +95,7 @@ export default function Privacy({ onBack }: Props) {
           </p>
         </section>
 
-        <p className="legal-updated">Last updated September 2026 · Soft launch</p>
+        <p className="legal-updated">Last updated October 2026 · Soft launch</p>
       </main>
 
       <footer className="legal-foot">

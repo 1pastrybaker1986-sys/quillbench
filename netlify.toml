@@ -111,6 +111,18 @@
   force = false
 
 [[redirects]]
+  from = "/privacy"
+  to = "/?page=privacy"
+  status = 302
+  force = false
+
+[[redirects]]
+  from = "/privacy/"
+  to = "/?page=privacy"
+  status = 302
+  force = false
+
+[[redirects]]
   from = "/stats"
   to = "/.netlify/functions/visits-stats"
   status = 200
