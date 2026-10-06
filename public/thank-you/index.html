@@ -101,8 +101,8 @@
     </div>
 
     <div class="card hidden" id="upsell">
-      <p style="margin:0"><strong>Want the whole launch done?</strong> The <a href="/pricing/bundle">Studio Bundle</a> adds a print wrap (spine and back), a proofread up to 40,000 words, blurb polish, and 6 promo graphics sized from your approved cover. It's $449 for the first 10 authors, then $499.</p>
-      <p style="margin:.5rem 0 0">Upgrade to the Studio Bundle within 30 days of your Cover payment and your $99 counts toward it. Email <a href="mailto:sarah@brundigebusiness.com">sarah@brundigebusiness.com</a> and you'll get a one-use upgrade code and link within 1 business day. The credit can't be combined with the soft-launch price.</p>
+      <p id="upsell-price" style="margin:0"><strong>Want the whole launch done?</strong> The <a href="/pricing/bundle">Studio Bundle</a> adds a print wrap (spine and back), a proofread up to 40,000 words, blurb polish, and 6 promo graphics sized from your approved cover. It's $449 for the first 10 authors, then $499.</p>
+      <p style="margin:.5rem 0 0">Upgrade to the Studio Bundle within 30 days of your Cover payment and your $99 counts toward it. Email <a href="mailto:sarah@brundigebusiness.com">sarah@brundigebusiness.com</a> and you'll get a private upgrade link within 1 business day. The credit can't be combined with the soft-launch price.</p>
     </div>
     </div>
 
@@ -136,7 +136,17 @@
           } catch (e) {}
           document.getElementById("f-pkg").value = NAMES[pkg];
           document.getElementById("pkg-line").textContent = "You bought " + NAMES[pkg] + ". It's unlocked in Quillbench on this device.";
-          if (pkg === "cover-design") document.getElementById("upsell").classList.remove("hidden");
+          if (pkg === "cover-design") {
+            var upsell = document.getElementById("upsell");
+            upsell.classList.remove("hidden");
+            // N8: Cover-credit upgrade cancel_url is /thank-you/?session_id=<cover> with no pkg param
+            // (normal Cover success_url always carries pkg=cover-design). Drop the $449/$499 line there.
+            if (!qs.get("pkg")) {
+              var priceLine = document.getElementById("upsell-price");
+              if (priceLine) upsell.removeChild(priceLine);
+              if (upsell.firstElementChild) upsell.firstElementChild.style.marginTop = "0";
+            }
+          }
           document.getElementById("delivery").innerHTML = pkg === "cover-design"
             ? "<strong>Delivery:</strong> within 5 business days of your clock-start date."
             : "<strong>Delivery:</strong> within 14 business days of your clock-start date.";
