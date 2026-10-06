@@ -69,6 +69,8 @@ function mockStripe(options = {}) {
   const sessionsByKey = new Map();
   let bundle = options.prior ?? null;
   let piUpdateAttempts = 0;
+  let heldKey = null;
+  let releaseHold = null;
   if (bundle?.id) sessionsById.set(bundle.id, bundle);
   if (options.prior) {
     cover.payment_intent.metadata = {
@@ -105,7 +107,12 @@ function mockStripe(options = {}) {
       sessions: {
         retrieve: async (id) => {
           if (id === cover.id) return cover;
-          if (sessionsById.has(id)) return sessionsById.get(id);
+          if (sessionsById.has(id)) {
+            const live = sessionsById.get(id);
+            // A create replay keeps the original body. Retrieve is the live session.
+            if (options.alwaysExpired && id !== cover.id) return { ...live, status: "expired" };
+            return live;
+          }
           const err = new Error("No such checkout.session");
           err.code = "resource_missing";
           err.statusCode = 404;
@@ -120,16 +127,41 @@ function mockStripe(options = {}) {
             (key === `${baseKey}-brand` || key === baseKey)
           ) {
             calls.push({ fields, requestOptions, replay: true });
-            return {
+            const replay = {
               id: "cs_test_expired_replay",
               url: "https://checkout.stripe.com/c/pay/cs_test_expired_replay",
               status: "expired",
+              payment_status: "unpaid",
             };
+            if (!sessionsById.has(replay.id)) sessionsById.set(replay.id, { ...replay });
+            return { ...replay };
           }
+          // Completed keys replay the original create body, not the live session.
           if (key && sessionsByKey.has(key)) {
-            const existing = sessionsByKey.get(key);
             calls.push({ fields, requestOptions, idempotentReplay: true });
-            return existing;
+            return { ...sessionsByKey.get(key) };
+          }
+          if (options.holdInFlight && key) {
+            if (heldKey === key) {
+              calls.push({ fields, requestOptions, inFlightConflict: true });
+              releaseHold?.();
+              throw Object.assign(
+                new Error(
+                  "There is currently another in-flight request using this Idempotency Key",
+                ),
+                {
+                  type: "idempotency_error",
+                  code: "idempotency_key_in_use",
+                  requestId: "req_inflight",
+                },
+              );
+            }
+            if (!heldKey) {
+              heldKey = key;
+              await new Promise((resolve) => {
+                releaseHold = resolve;
+              });
+            }
           }
           const createdCount = sessionsByKey.size;
           const id =
@@ -143,11 +175,25 @@ function mockStripe(options = {}) {
             payment_status: "unpaid",
             metadata: fields.metadata,
           };
-          if (key) sessionsByKey.set(key, created);
           sessionsById.set(id, created);
+          if (key) {
+            sessionsByKey.set(key, {
+              id: created.id,
+              url: created.url,
+              status: created.status,
+              payment_status: created.payment_status,
+              metadata: created.metadata,
+            });
+          }
           calls.push({ fields, requestOptions });
           bundle = created;
-          return created;
+          return {
+            id: created.id,
+            url: created.url,
+            status: created.status,
+            payment_status: created.payment_status,
+            metadata: created.metadata,
+          };
         },
         expire: async (id) => {
           expires.push(id);
@@ -158,7 +204,8 @@ function mockStripe(options = {}) {
               requestId: "req_exp",
             });
           }
-          if (bundle && bundle.id === id) bundle.status = "expired";
+          const live = sessionsById.get(id);
+          if (live) live.status = "expired";
           return { id, status: "expired" };
         },
       },
@@ -450,6 +497,107 @@ test("two concurrent retries after an expired upgrade create one session", async
   );
   assert.equal(created[0].requestOptions.idempotencyKey.includes(String(PAID_OCT_5 + 10)), false);
   assert.equal(created[0].requestOptions.idempotencyKey.includes(String(PAID_OCT_5 + 11)), false);
+});
+
+test("a second expiry opens a fresh session and points the lock at it", async () => {
+  const stripe = mockStripe();
+  const first = await upgrade(stripe, ENV, PAID_OCT_5 + 10);
+  await stripe.checkout.sessions.expire(first.sessionId);
+
+  const second = await upgrade(stripe, ENV, PAID_OCT_5 + 20);
+  assert.notEqual(second.sessionId, first.sessionId);
+  await stripe.checkout.sessions.expire(second.sessionId);
+
+  const third = await upgrade(stripe, ENV, PAID_OCT_5 + 30);
+  assert.notEqual(third.sessionId, first.sessionId);
+  assert.notEqual(third.sessionId, second.sessionId);
+  const live = await stripe.checkout.sessions.retrieve(third.sessionId);
+  assert.equal(live.status, "open");
+  const dead = await stripe.checkout.sessions.retrieve(second.sessionId);
+  assert.equal(dead.status, "expired");
+  assert.equal(dead.url === third.url, false);
+  const fresh = stripe.calls.filter((call) => !call.replay && !call.idempotentReplay);
+  assert.equal(fresh.length, 3);
+  assert.equal(
+    fresh[2].requestOptions.idempotencyKey,
+    `cover-credit-retry:${COVER_ID}:${second.sessionId}-brand`,
+  );
+  assert.equal(
+    stripe.piUpdates.at(-1).params.metadata.cover_credit_upgrade_session,
+    third.sessionId,
+  );
+  assert.equal(third.url.includes(second.sessionId), false);
+});
+
+test("a duplicate in-flight create fails closed and does not open a second session", async () => {
+  const stripe = mockStripe({ holdInFlight: true });
+  const event = {
+    httpMethod: "POST",
+    body: JSON.stringify({ coverSessionId: COVER_ID }),
+  };
+  const logs = [];
+  const original = console.error;
+  console.error = (...args) => {
+    logs.push(args);
+  };
+  let results;
+  try {
+    results = await Promise.all([
+      handleUpgradeCheckout(event, { stripe, env: ENV, nowUnix: PAID_OCT_5 + 10 }),
+      handleUpgradeCheckout(event, { stripe, env: ENV, nowUnix: PAID_OCT_5 + 11 }),
+    ]);
+  } finally {
+    console.error = original;
+  }
+  const statuses = results.map((result) => result.statusCode).sort((a, b) => a - b);
+  assert.deepEqual(statuses, [200, 502]);
+  const ok = results.find((result) => result.statusCode === 200);
+  const failed = results.find((result) => result.statusCode === 502);
+  const okBody = JSON.parse(ok.body);
+  const failedBody = JSON.parse(failed.body);
+  assert.equal(okBody.url, "https://checkout.stripe.com/c/pay/cs_test_bundle_new");
+  assert.equal(failedBody.error, "The upgrade checkout could not be started.");
+  assert.equal(JSON.stringify(failedBody).includes("Idempotency"), false);
+  assert.equal(JSON.stringify(failedBody).includes("req_inflight"), false);
+  const created = stripe.calls.filter(
+    (call) => !call.replay && !call.idempotentReplay && !call.inFlightConflict,
+  );
+  assert.equal(created.length, 1);
+  assert.equal(stripe.calls.filter((call) => call.inFlightConflict).length, 1);
+  assert.equal(
+    stripe.piUpdates[0].params.metadata.cover_credit_upgrade_session,
+    "cs_test_bundle_new",
+  );
+  assert.equal(JSON.stringify(logs).includes("req_inflight"), true);
+  assert.equal(JSON.stringify(logs).includes("Idempotency Key"), false);
+});
+
+test("three expired hops then fail closed without returning a dead link", async () => {
+  const stripe = mockStripe({ alwaysExpired: true });
+  await assert.rejects(
+    () => upgrade(stripe, ENV, PAID_OCT_5),
+    (err) =>
+      err instanceof CoverCreditError &&
+      err.statusCode === 502 &&
+      err.message === "The upgrade checkout could not be started." &&
+      !/expired|cs_test/.test(err.message),
+  );
+  const created = stripe.calls.filter((call) => !call.replay && !call.idempotentReplay);
+  assert.equal(created.length, 4);
+  assert.equal(created[0].requestOptions.idempotencyKey, `cover-credit-${COVER_ID}-brand`);
+  assert.equal(
+    created[1].requestOptions.idempotencyKey,
+    `cover-credit-retry:${COVER_ID}:cs_test_bundle_new-brand`,
+  );
+  assert.equal(
+    created[2].requestOptions.idempotencyKey,
+    `cover-credit-retry:${COVER_ID}:cs_test_bundle_new_2-brand`,
+  );
+  assert.equal(
+    created[3].requestOptions.idempotencyKey,
+    `cover-credit-retry:${COVER_ID}:cs_test_bundle_new_3-brand`,
+  );
+  assert.equal(stripe.piUpdates.length, 0);
 });
 
 test("missing credit coupon env fails closed and does not name env vars", async () => {

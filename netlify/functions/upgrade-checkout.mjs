@@ -27,6 +27,9 @@ const NOT_CONFIGURED = "Checkout is not configured.";
 const COULD_NOT_START = "The upgrade checkout could not be started.";
 const CANNOT_CREDIT = "This Cover purchase cannot be credited.";
 const ALREADY_USED = "This Cover purchase was already used toward a Studio Bundle.";
+// Stripe keeps an idempotency result for at least 24 hours. Three hops cover
+// the original session plus two later expiries, then the request fails closed.
+const MAX_EXPIRED_RETRIES = 3;
 
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
@@ -66,6 +69,24 @@ async function createCheckoutSession(stripe, fields, idempotencyKey) {
         : "";
     if (!/branding_settings|unknown parameter/i.test(brandMsg)) throw brandErr;
     return await stripe.checkout.sessions.create(fields, { idempotencyKey });
+  }
+}
+
+/**
+ * The create call can replay an idempotency key's original body, including
+ * status "open" for a session that has since expired. The retrieved session
+ * is the one whose status is safe to trust.
+ * @param {import("stripe").Stripe} stripe
+ * @param {any} created
+ */
+async function confirmedSession(stripe, created) {
+  if (!created?.id) return null;
+  try {
+    const current = await stripe.checkout.sessions.retrieve(created.id);
+    if (!current?.status) return null;
+    return { ...current, url: current.url || created.url };
+  } catch {
+    return null;
   }
 }
 
@@ -379,28 +400,32 @@ export async function createCoverCreditUpgrade({ stripe, coverSessionId, nowUnix
   const email = buyerEmail(cover);
   if (email) fields.customer_email = email;
 
-  const idempotencyKey = `cover-credit-${coverId}`;
-  let session = await createCheckoutSession(stripe, fields, idempotencyKey);
-  if (session?.id) {
-    const created = session;
-    try {
-      const current = await stripe.checkout.sessions.retrieve(session.id);
-      if (current?.status) session = { ...current, url: current.url || created.url };
-    } catch {
-      /* The create response is enough when the new id cannot be read back yet. */
-    }
-  }
-  if (session?.status === "expired" && session.id) {
-    // The first key replays the expired Checkout Session for up to 24 hours.
-    // A clock-based retry key lets two callers in the same moment each open
-    // a new credited session. Key off the expired session id so they collapse.
-    session = await createCheckoutSession(
+  // Re-read after every create. A reused idempotency key replays the original
+  // "open" body, so the retry key has to come from the latest expired id or
+  // the buyer is handed that dead Checkout URL for as long as Stripe keeps
+  // the key. Each hop still collapses concurrent callers onto one session.
+  let session = await confirmedSession(
+    stripe,
+    await createCheckoutSession(stripe, fields, `cover-credit-${coverId}`),
+  );
+  for (
+    let hop = 0;
+    session && upgradeState(session, nowUnix) === "none" && hop < MAX_EXPIRED_RETRIES;
+    hop++
+  ) {
+    session = await confirmedSession(
       stripe,
-      fields,
-      `cover-credit-retry:${coverId}:${session.id}`,
+      await createCheckoutSession(
+        stripe,
+        fields,
+        `cover-credit-retry:${coverId}:${session.id}`,
+      ),
     );
   }
-  if (!session?.url || !session.id) {
+  if (session && upgradeState(session, nowUnix) === "used") {
+    throw new CoverCreditError(409, ALREADY_USED);
+  }
+  if (!session?.url || upgradeState(session, nowUnix) !== "open") {
     throw new CoverCreditError(502, COULD_NOT_START);
   }
 
