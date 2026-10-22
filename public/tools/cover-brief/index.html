@@ -6,13 +6,16 @@
     <meta name="color-scheme" content="light only" />
     <meta name="theme-color" content="#F7F1EA" />
     <title>Free Book Cover Brief Generator + Spine Width Calculator | Quillbench</title>
-    <meta name="description" content="Free cover brief generator for self-published authors. Answer a few questions and get a designer-ready brief, deliverables checklist, and paperback spine and full-cover sizes. No signup." />
+    <meta name="description" content="Free cover brief generator for authors, whether you're self-publishing, working with a small press or making a family book. Answer a few questions and get a designer-ready brief, deliverables checklist, and paperback spine and full-cover sizes. No signup." />
     <meta property="og:title" content="Free Book Cover Brief Generator | Quillbench" />
     <meta property="og:description" content="A designer-ready cover brief, deliverables checklist, and paperback spine size in two minutes. Free, no signup." />
     <meta property="og:image" content="https://quillbench.netlify.app/og-image.png" />
-    <meta property="og:url" content="https://quillbench.netlify.app/tools/cover-brief" />
+    <meta property="og:url" content="https://quillbench.netlify.app/tools/cover-brief/" />
     <meta name="twitter:card" content="summary_large_image" />
-    <link rel="canonical" href="https://quillbench.netlify.app/tools/cover-brief" />
+    <meta name="twitter:title" content="Free Book Cover Brief Generator | Quillbench" />
+    <meta name="twitter:description" content="A designer-ready cover brief, deliverables checklist, and paperback spine size in two minutes. Free, no signup." />
+    <meta name="twitter:image" content="https://quillbench.netlify.app/og-image.png" />
+    <link rel="canonical" href="https://quillbench.netlify.app/tools/cover-brief/" />
     <style>
       html,body{background:#F7F1EA;color:#1C1917;color-scheme:light only;margin:0}
       body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;max-width:40rem;margin:2.5rem auto;padding:0 1.25rem;line-height:1.55}
@@ -91,29 +94,42 @@
     <div id="result" hidden>
       <div id="out"></div>
       <p class="noprint"><button class="btn ghost" id="copy" type="button">Copy brief</button><button class="btn ghost" id="print" type="button">Print / save PDF</button></p>
+      <!-- ONE email box (Sarah via Rook, 9:34 AM CT Oct 11): "Send me my results" + optional UNCHECKED tips opt-in.
+           Hidden until /js/cover-brief-results.js runs, so the brief never depends on it: if that script is blocked or throws,
+           this box simply stays hidden. Results -> Netlify Forms "cover-brief-results"; tips opt-in (only if ticked) -> the
+           existing "quillbench-waitlist" form, same fields/source as the old tips box. -->
+      <div class="cta noprint" id="rsbox" hidden style="background:transparent;border:1px solid #e3d8cd">
+        <strong>Send me my results</strong> <span class="small">(optional)</span>
+        <form id="rs" style="margin-top:.5rem" novalidate>
+          <div style="display:flex;gap:.5rem">
+            <input type="email" name="email" required placeholder="you@example.com" aria-label="Email for your brief" autocomplete="email" />
+            <input type="text" name="bot-field" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" />
+            <button class="btn" id="rsbtn" style="margin:0;white-space:nowrap" type="submit">Send</button>
+          </div>
+          <label class="small" style="display:flex;gap:.4rem;align-items:center;font-weight:400;margin:.5rem 0 0"><input type="checkbox" name="tips" id="rstips" value="yes" /> Also send me cover and launch tips <span>(optional, unsubscribe anytime)</span></label>
+        </form>
+        <p class="small" id="rsnote" style="margin:.4rem 0 0">We'll use this email only to send your brief. You'll get tips only if you tick the box. Ask us to delete it anytime. <a href="/privacy/">Privacy</a></p>
+        <p id="rserr" class="small" role="alert" style="color:#9b3b3b" hidden></p>
+        <p id="rsok" class="small" role="status" hidden>Got it. We'll email your brief within 24 hours.</p>
+      </div>
       <div class="cta">
         <strong>Want this brief turned into a finished cover?</strong>
-        <p style="margin:.4rem 0 .2rem">Quillbench Cover Design builds from this brief: one cover concept with an ebook front cover, 2400x2400 audiobook cover, and a 3D book mockup. Print wrap is not included. One-time $99.</p>
+        <p style="margin:.4rem 0 .2rem">Quillbench Cover Design builds from this brief: one cover concept with an ebook front cover, 2400x2400 audiobook cover, and a 3D book mockup. Print wrap (spine and back cover) is not included: add it with the $59 <a href="/pricing/cover/#print-wrap">Print Wrap add-on</a>, or get it in the <a href="/pricing/bundle/">Studio Bundle</a>. Cover Design is one-time $99.</p>
         <a class="btn" id="toCover" href="/pricing/cover/">See Cover Design $99</a>
-      </div>
-      <div class="cta noprint" style="background:transparent;border:1px solid #e3d8cd">
-        <strong>Get cover and launch tips by email</strong> <span class="small">(optional, unsubscribe anytime · <a href="/privacy/">Privacy</a>)</span>
-        <form id="em" style="display:flex;gap:.5rem;margin-top:.5rem">
-          <input type="email" name="email" required placeholder="you@example.com" aria-label="Email" />
-          <button class="btn" id="embtn" style="margin:0;white-space:nowrap" type="submit">Join</button>
-        </form>
-        <p id="emerr" class="small" role="alert" style="color:#9b3b3b" hidden></p>
-        <p id="emok" class="small" role="status" hidden>Thanks, you're on the list.</p>
       </div>
     </div>
 
-    <form name="quillbench-waitlist" method="POST" data-netlify="true" netlify netlify-honeypot="bot-field" hidden>
+    <form hidden method='POST' name='quillbench-waitlist' data-netlify="true" netlify-honeypot="bot-field">
       <input type="hidden" name="form-name" value="quillbench-waitlist" />
       <input type="text" name="bot-field" /><input type="email" name="email" /><input type="text" name="source" />
     </form>
+    <form hidden method='POST' name='cover-brief-results' data-netlify="true" netlify-honeypot="bot-field">
+      <input type="hidden" name="form-name" value="cover-brief-results" />
+      <input type="text" name="bot-field" /><input type="email" name="email" /><textarea name="brief"></textarea><input type="text" name="source" /><input type="text" name="tips" />
+    </form>
 
     <p class="small" style="margin-top:2rem">Spine and full-cover sizes use Amazon KDP's published paperback formulas (0.002252 in per page for white paper, 0.0025 in for cream, 0.002347 in for premium color, plus 0.125 in bleed on each edge). Always confirm with your printer's own template before final files. Ebook size follows KDP's recommended 1,600 × 2,560 px (width × height, 1.6:1); audiobook minimum is ACX's 2,400 × 2,400 px square.</p>
-    <p class="small"><a href="/">Quillbench home</a> · <a href="/pricing/cover/">Cover Design $99</a> · <a href="/pricing/bundle/">Studio Bundle</a> · <a href="/refund/">Refunds</a> · <a href="/support/">Support</a> · <a href="/privacy/">Privacy</a></p>
+    <p class="small"><a href="/">Quillbench home</a> · <a href="/pricing/cover/">Cover Design $99</a> · <a href="/pricing/cover-check/">Cover Check $29</a> · <a href="/pricing/bundle/">Studio Bundle</a> · <a href="/refund/">Refunds</a> · <a href="/support/">Support</a> · <a href="/faq/">FAQ</a> · <a href="/privacy/">Privacy</a></p>
 
     <script>
       (function () {
@@ -152,14 +168,14 @@
           if (fmts.indexOf("ebook") > -1) L.push("[ ] Ebook front cover, 1,600 wide × 2,560 tall px (1.6:1), RGB JPG");
           if (fmts.indexOf("paperback") > -1) {
             var t = v("trim").split("x"), w = parseFloat(t[0]), h = parseFloat(t[1]);
-            var pages = Math.max(24, Math.min(828, parseInt(v("pages"), 10) || 0));
+            var maxP = v("paper") === "cream" ? 776 : 828; var pages = Math.max(24, Math.min(maxP, parseInt(v("pages"), 10) || 0)); pages += pages % 2; // KDP: cream max 776; page count rounds up to even
             var spine = pages * PER[v("paper")];
             var fw = 0.125 + w + spine + w + 0.125, fh = h + 0.25;
             L.push("[ ] Paperback full wrap (back + spine + front), single print-ready PDF, images 300 DPI+, CMYK");
             L.push("    Trim " + w + " × " + h + " in, " + pages + " pages, " + f.elements.paper.selectedOptions[0].text.toLowerCase());
             L.push("    Spine width: " + r3(spine) + " in");
             L.push("    Full cover with bleed: " + r3(fw) + " × " + r3(fh) + " in");
-            L.push("    " + (pages > 79 ? "Spine text allowed (title + author)." : "Under 80 pages: KDP doesn't allow spine text; keep the spine plain."));
+            L.push("    " + (pages > 79 ? "Spine text allowed (title + author)." : "Under 80 pages: keep the spine plain (KDP prints spine text only above 79 pages)."));
             L.push("[ ] Back cover copy (blurb) and barcode area");
           }
           if (fmts.indexOf("hardcover") > -1) L.push("[ ] Hardcover case wrap: request the printer's template (hardcover sizes differ from paperback)");
@@ -176,27 +192,9 @@
           this.textContent = "Copied"; count("tool_copy");
         });
         document.getElementById("print").addEventListener("click", function () { count("tool_copy"); window.print(); });
-        document.getElementById("em").addEventListener("submit", function (ev) {
-          ev.preventDefault();
-          var em = this, embtn = document.getElementById("embtn"), emerr = document.getElementById("emerr");
-          emerr.hidden = true;
-          embtn.disabled = true;
-          embtn.textContent = "Joining…";
-          var body = new URLSearchParams({ "form-name": "quillbench-waitlist", email: em.elements.email.value, source: "cover-brief" + (location.search ? " " + location.search.slice(0, 120) : "") });
-          // Thanks only after the form service confirms (response.ok); otherwise show an error and keep the form for a retry.
-          fetch("/", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: body.toString() })
-            .then(function (r) {
-              if (!r.ok) throw new Error("status " + r.status);
-              em.hidden = true; em.style.display = "none"; document.getElementById("emok").hidden = false; count("tool_email");
-            })
-            .catch(function () {
-              embtn.disabled = false;
-              embtn.textContent = "Try again";
-              emerr.textContent = "That didn't go through, so you're not on the list yet. Try again, or email sarah@brundigebusiness.com.";
-              emerr.hidden = false;
-            });
-        });
       })();
     </script>
+    <script defer src="/js/cover-brief-results.js"></script>
+    <p class="qb-addr" style="margin-top:.75rem;font-size:.85rem;color:#6b5f56">Brundige Business, 1401 Lavaca St PMB 41086, Austin, TX 78701</p>
   </body>
 </html>

@@ -53,7 +53,7 @@
 
     <div class="card">
       <p id="delivery" style="margin:0"><strong>Delivery:</strong> Cover Design within 5 business days of your clock-start date. Studio Bundle within 14 business days of your clock-start date.</p>
-      <p style="margin:.5rem 0 0">Business days are Monday to Friday, not counting US public holidays. Your clock starts the day Sarah emails to confirm your brief is complete (all 5 fields filled in and your files link opens), within 1 business day. If you owe a word-count invoice, your clock starts when it's paid. Full refund any time before work starts; no refund after. Work starts on your clock-start date. <a href="/refund/">Refund policy</a></p>
+      <p style="margin:.5rem 0 0">Business days are Monday to Friday, not counting US public holidays. Your clock starts the day Quillbench emails to confirm your brief is complete (all 5 fields filled in and your files link opens), within 1 business day. Full refund before work starts. After that, refunds are case by case. Work starts on your clock-start date. <a href="/refund/">Refund policy</a></p>
     </div>
 
     <h2>What to send</h2>
@@ -63,9 +63,9 @@
       <li>Your brief: genre, the feel you want, 2 or 3 books you like the look of, must-haves, and anything to avoid.</li>
       <li>A link to your files (Google Drive, Dropbox, or similar), shared so anyone with the link can view.</li>
     </ul>
-    <p>Use the form below. It goes straight to Sarah.</p>
+    <p>Use the form below. It goes straight to Quillbench.</p>
 
-    <form id="intake" name="quillbench-intake" method="POST" data-netlify="true" netlify-honeypot="bot-field">
+    <form id='intake' method='POST' name='quillbench-intake' data-netlify="true" netlify-honeypot="bot-field">
       <input type="hidden" name="form-name" value="quillbench-intake" />
       <input type="hidden" name="session_id" id="f-session" value="" />
       <p class="hidden"><label>Leave this empty <input name="bot-field" /></label></p>
@@ -93,25 +93,25 @@
       <textarea id="f-notes" name="notes" style="min-height:5rem"></textarea>
 
       <p class="small">What happens to your brief: <a href="/privacy/">Privacy</a></p>
-      <button class="btn" id="submit" type="submit">Send to Sarah</button>
+      <button class="btn" id="submit" type="submit">Send to Quillbench</button>
       <p class="err hidden" id="err"></p>
     </form>
 
     <div class="ok hidden" id="ok">
       <strong>Got it. Your details were submitted.</strong>
-      <p style="margin:.4rem 0 0">Within 1 business day, Sarah will email you to confirm your brief is complete. Your clock starts on the day of that email. If anything is missing, she'll ask for it instead.</p>
+      <p style="margin:.4rem 0 0">Within 1 business day, Quillbench will email you to confirm your brief is complete. Your clock starts on the day of that email. If anything is missing, Quillbench will ask for it instead.</p>
     </div>
 
     <div class="card hidden" id="upsell">
-      <p style="margin:0"><strong>Want the whole launch done?</strong> The <a href="/pricing/bundle">Studio Bundle</a> adds a print wrap (spine and back), a proofread up to 40,000 words, blurb polish, and 6 promo graphics sized from your approved cover. It's $449 for the first 10 authors, then $499.</p>
-      <p style="margin:.5rem 0 0">Questions about upgrading? Email <a href="mailto:sarah@brundigebusiness.com">sarah@brundigebusiness.com</a>. Your Cover Design is fully refundable before work starts.</p>
+      <p style="margin:0"><strong>Want the whole launch done?</strong> The <a href="/pricing/bundle">Studio Bundle</a> adds a print wrap (spine and back), a proofread up to 40,000 words (a novella or short book), blurb polish, and 6 promo graphics sized from your approved cover. Writing a full-length novel? Most run 70,000 to 110,000 words. Email Quillbench for a quote before you buy. It's $499.</p>
+      <p style="margin:.5rem 0 0">Questions about upgrading? Email <a href="mailto:sarah@brundigebusiness.com">sarah@brundigebusiness.com</a>. Full refund before work starts. After that, refunds are case by case.</p>
     </div>
     </div>
 
     <h2>Questions?</h2>
     <p>Email <a href="mailto:sarah@brundigebusiness.com">sarah@brundigebusiness.com</a> or text <a href="sms:+19793184067">(979) 318-4067</a>. We usually reply within 1 to 2 business days.</p>
 
-    <p class="foot"><a href="/">Open Quillbench</a> · <a href="/refund/">Refunds</a> · <a href="/support/">Support</a> · <a href="/privacy/">Privacy</a></p>
+    <p class="foot"><a href="/">Open Quillbench</a> · <a href="/refund/">Refunds</a> · <a href="/support/">Support</a> · <a href="/faq/">FAQ</a> · <a href="/privacy/">Privacy</a></p>
 
     <script>
       (function () {
@@ -124,6 +124,7 @@
           });
         }
         function onPaid(pkg) {
+          if (pkg === "cover-check") { location.replace("/thank-you/cover-check/?session_id=" + encodeURIComponent(sid)); return; }
           show("paid");
           document.getElementById("f-session").value = sid;
           if (!(pkg && NAMES[pkg])) return;
@@ -135,6 +136,11 @@
             if (pkg === "studio-bundle") add.push("full-edit", "cover-design", "marketing");
             add.forEach(function (id) { if (owned.indexOf(id) === -1) owned.push(id); });
             localStorage.setItem(KEY, JSON.stringify(owned));
+            var PAID = "quillbench.packages.paid.v1";
+            var paid = JSON.parse(localStorage.getItem(PAID) || "[]");
+            if (!Array.isArray(paid)) paid = [];
+            if (!paid.some(function (r) { return r && r.sid === sid; })) paid.push({ sid: sid, pkg: pkg });
+            localStorage.setItem(PAID, JSON.stringify(paid));
           } catch (e) {}
           document.getElementById("f-pkg").value = NAMES[pkg];
           document.getElementById("pkg-line").textContent = "You bought " + NAMES[pkg] + ". It's unlocked in Quillbench on this device.";
@@ -173,12 +179,13 @@
             })
             .catch(function () {
               btn.disabled = false;
-              btn.textContent = "Send to Sarah";
+              btn.textContent = "Send to Quillbench";
               err.textContent = "That didn't send. Try again, or email sarah@brundigebusiness.com.";
               err.classList.remove("hidden");
             });
         });
       })();
     </script>
+    <p class="qb-addr" style="margin-top:.75rem;font-size:.85rem;color:#6b5f56">Brundige Business, 1401 Lavaca St PMB 41086, Austin, TX 78701</p>
   </body>
 </html>

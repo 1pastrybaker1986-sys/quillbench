@@ -17,6 +17,13 @@
 /thank-you/           /thank-you/index.html  200
 /pricing              /pricing/index.html   200
 /pricing/             /pricing/index.html   200
+/cover-check          /pricing/cover-check/  301
+/cover-check/         /pricing/cover-check/  301
+/refunds              /refund/              301
+/refunds/             /refund/              301
+/case-study           /case-study/down-is-where-you-land/  301
+/case-study/          /case-study/down-is-where-you-land/  301
 /privacy              /?page=privacy        302
 /privacy/             /?page=privacy        302
-/*                    /index.html           200
+# No /* catch-all: the app lives at / (routes are ?page=, ?checkout=, ?buy= query strings),
+# so unknown paths fall through to Netlify's default and get public/404.html with status 404.

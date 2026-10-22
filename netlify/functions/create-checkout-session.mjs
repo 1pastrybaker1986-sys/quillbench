@@ -168,26 +168,11 @@ export async function handler(event) {
     // Stripe forbids discounts + allow_promotion_codes on the same session.
     let session;
     if (packageId === "studio-bundle") {
-      const discount = await softLaunchDiscount(stripe);
-      if (discount) {
-        try {
-          session = await createCheckoutSession(stripe, {
-            ...fields,
-            discounts: [discount],
-          });
-        } catch {
-          session = await createCheckoutSession(stripe, {
-            ...fields,
-            allow_promotion_codes: true,
-          });
-        }
-      } else {
-        // Soft-launch code not found in this Stripe mode — keep typed promo field.
-        session = await createCheckoutSession(stripe, {
-          ...fields,
-          allow_promotion_codes: true,
-        });
-      }
+      // Studio Bundle charges its catalog Price ($499) flat: SOFTLAUNCH50 is no longer auto-applied.
+      session = await createCheckoutSession(stripe, {
+        ...fields,
+        allow_promotion_codes: true,
+      });
     } else if (packageId === "cover-design") {
       // Cover Design is a fixed $99; no promo-code field (Rook prod OK, Sep 29).
       session = await createCheckoutSession(stripe, fields);
