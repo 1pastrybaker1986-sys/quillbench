@@ -9,9 +9,13 @@
     <meta property="og:title" content="Quillbench Cover Design · $99" />
     <meta property="og:description" content="One cover concept for your book: ebook front cover, 2400x2400 audiobook cover, and a 3D book mockup. $99." />
     <meta property="og:image" content="https://quillbench.netlify.app/og-image.png" />
-    <meta property="og:url" content="https://quillbench.netlify.app/pricing/cover" />
+    <meta property="og:url" content="https://quillbench.netlify.app/pricing/cover/" />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Quillbench Cover Design · $99" />
+    <meta name="twitter:description" content="One cover concept for your book: ebook front cover, 2400x2400 audiobook cover, and a 3D book mockup. $99." />
+    <meta name="twitter:image" content="https://quillbench.netlify.app/og-image.png" />
     <title>Quillbench | Cover Design $99</title>
+    <link rel="canonical" href="https://quillbench.netlify.app/pricing/cover/" />
     <style>
       html,body{background:#F7F1EA;color:#1C1917;color-scheme:light only;margin:0}
       body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;max-width:32rem;margin:3rem auto;padding:0 1.25rem;line-height:1.55}
@@ -38,15 +42,46 @@
       <li>3D book mockup</li>
       <li>2 rounds of changes included</li>
     </ul>
-    <p>Delivered within <strong>5 business days</strong> of your clock-start date. Your clock starts the day Sarah emails to confirm your brief is complete (all 5 fields filled in and your files link opens), within 1 business day. Full refund any time before work starts; no refund after. Work starts on your clock-start date. <a href="/refund/">Refund policy</a></p>
+    <p>Delivered within <strong>5 business days</strong> of your clock-start date. Your clock starts the day Quillbench emails to confirm your brief is complete (all 5 fields filled in and your files link opens), within 1 business day. Full refund before work starts. After that, refunds are case by case. Work starts on your clock-start date. <a href="/refund/">Refund policy</a></p>
+    <section id="promise">
+      <h2 style="font-size:1.15rem;margin:0 0 .35rem">The promise: a cover built from your brief, ready to upload.</h2>
+      <p>You get an ebook front cover, a 2400x2400 audiobook cover and a 3D mockup, delivered within 5 business days of your clock-start date, with 2 rounds of changes included.</p>
+      <p>If it's late, you get an apology and one extra round of changes, free.</p>
+      <p><strong>First-look promise:</strong> Don't like the first version (ebook front cover, audiobook cover and 3D mockup) that Quillbench delivers? Email Quillbench (address on our <a href="/refund/">Refunds page</a>) within 7 days of the day Quillbench emails you the first version, before you ask for any changes, and get a full refund of your $99. Quillbench refunds the full $99 to your original payment method within 5 business days of your email; your bank may take a few more days to show it. No reason needed. Asking for a change ends the first-look promise. If you take the refund, you don't get the right to use that cover or its files. Quillbench will never show or sell that cover. We may use the same general style for other books, but never your title, your brief, or that cover's artwork. This applies to the $99 Cover Design only, not the Studio Bundle or Print Wrap.</p>
+      <p>Changed your mind? Full refund before work starts. After that, refunds are reviewed case by case: <a href="mailto:sarah@brundigebusiness.com?subject=Cover%20Design%20refund">email Quillbench</a> and a real person replies.</p>
+    </section>
+    <p>Some covers are made with AI tools and some by hand. Either way, Quillbench reviews and edits every cover before it's delivered.</p>
     <button class="btn" id="buy" type="button">Get Cover Design $99</button>
     <p id="err" class="err" hidden></p>
-    <p style="margin-top:1.75rem">Want the whole launch done? The <a href="/pricing/bundle">Studio Bundle</a> adds the print wrap, a proofread, blurb polish, and 6 promo graphics: $449 for the first 10 authors, then $499.</p>
-    <p><a href="/">Quillbench home</a> · <a href="/waitlist">Waitlist</a> · <a href="/refund/">Refunds</a> · <a href="/support/">Support</a> · <a href="/privacy/">Privacy</a></p>
+    <section id="print-wrap" style="margin-top:1.75rem">
+      <h2 style="font-size:1.15rem;margin:0 0 .35rem">Add-on: Print Wrap, $59</h2>
+      <p>Printing your book? Add the print wrap (spine and back cover) to your Cover Design. Print Wrap includes 1 revision and a free spine redo. Cover Design plus Print Wrap is $158 total.</p>
+      <p id="wrap-email"><a href="mailto:sarah@brundigebusiness.com?subject=Add%20Print%20Wrap%20to%20my%20Cover%20Design">Email Quillbench to add the Print Wrap</a>.</p>
+      <a class="btn" id="wrap-buy" href="https://buy.stripe.com/fZu5kvau25NrfBp6XZfbq04">Add Print Wrap $59</a>
+    </section>
+    <script>
+      (function () {
+        // Print Wrap $59 payment link (plink_1UQdjv11jqNlRHnu6goOI5MS, packageId=print-wrap).
+        var PRINT_WRAP_LINK = "https://buy.stripe.com/fZu5kvau25NrfBp6XZfbq04";
+        if (/^https:\/\/buy\.stripe\.com\//.test(PRINT_WRAP_LINK)) {
+          var a = document.getElementById("wrap-buy");
+          var em = document.getElementById("wrap-email");
+          if (a) { a.href = PRINT_WRAP_LINK; a.hidden = false; if (em) em.hidden = true; }
+        }
+      })();
+    </script>
+    <p style="margin-top:1.75rem">Want the whole launch done? The <a href="/pricing/bundle">Studio Bundle</a> adds the print wrap, a proofread, blurb polish, and 6 promo graphics: $499.</p>
+    <p><a href="/">Quillbench home</a> · <a href="/waitlist">Waitlist</a> · <a href="/refund/">Refunds</a> · <a href="/support/">Support</a> · <a href="/faq/">FAQ</a> · <a href="/privacy/">Privacy</a></p>
     <script>
       (function () {
         var btn = document.getElementById("buy");
         var err = document.getElementById("err");
+        // Back from Stripe restores this page from the back-forward cache with the button still
+        // disabled ("Opening checkout…"). Reset it so the buyer can try again without reloading.
+        window.addEventListener("pageshow", function () {
+          btn.disabled = false;
+          btn.textContent = "Get Cover Design $99";
+        });
         btn.addEventListener("click", function () {
           err.hidden = true;
           btn.disabled = true;
@@ -80,5 +115,6 @@
         });
       })();
     </script>
+    <p class="qb-addr" style="margin-top:.75rem;font-size:.85rem;color:#6b5f56">Brundige Business, 1401 Lavaca St PMB 41086, Austin, TX 78701</p>
   </body>
 </html>

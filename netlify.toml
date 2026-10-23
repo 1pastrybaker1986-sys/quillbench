@@ -116,10 +116,7 @@
   status = 200
   force = true
 
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+# /* -> /index.html catch-all removed so unknown paths return 404.html with status 404.
 
 [functions]
   directory = "netlify/functions"
