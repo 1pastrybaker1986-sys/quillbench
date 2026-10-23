@@ -1,1 +1,125 @@
-hello
+[build]
+  # no build: prebuilt draft
+  publish = "site"
+
+[build.environment]
+  NODE_VERSION = "24"
+
+[[redirects]]
+  from = "/robots.txt"
+  to = "/robots.txt"
+  status = 200
+  force = false
+
+[[redirects]]
+  from = "/sitemap.xml"
+  to = "/sitemap.xml"
+  status = 200
+  force = false
+
+[[redirects]]
+  from = "/og-image.png"
+  to = "/og-image.png"
+  status = 200
+  force = false
+
+[[redirects]]
+  from = "/waitlist.html"
+  to = "/waitlist.html"
+  status = 200
+  force = false
+
+[[redirects]]
+  from = "/waitlist"
+  to = "/waitlist/index.html"
+  status = 200
+  force = false
+
+[[redirects]]
+  from = "/waitlist/"
+  to = "/waitlist/index.html"
+  status = 200
+  force = false
+
+[[redirects]]
+  from = "/pricing/bundle"
+  to = "/pricing/bundle/index.html"
+  status = 200
+  force = false
+
+[[redirects]]
+  from = "/pricing/bundle/"
+  to = "/pricing/bundle/index.html"
+  status = 200
+  force = false
+
+[[redirects]]
+  from = "/tools/cover-brief"
+  to = "/tools/cover-brief/index.html"
+  status = 200
+  force = false
+
+[[redirects]]
+  from = "/tools/cover-brief/"
+  to = "/tools/cover-brief/index.html"
+  status = 200
+  force = false
+
+[[redirects]]
+  from = "/pricing/cover"
+  to = "/pricing/cover/index.html"
+  status = 200
+  force = false
+
+[[redirects]]
+  from = "/pricing/cover/"
+  to = "/pricing/cover/index.html"
+  status = 200
+  force = false
+
+[[redirects]]
+  from = "/refund"
+  to = "/refund/index.html"
+  status = 200
+  force = false
+
+[[redirects]]
+  from = "/refund/"
+  to = "/refund/index.html"
+  status = 200
+  force = false
+
+[[redirects]]
+  from = "/support"
+  to = "/support/index.html"
+  status = 200
+  force = false
+
+[[redirects]]
+  from = "/support/"
+  to = "/support/index.html"
+  status = 200
+  force = false
+
+[[redirects]]
+  from = "/pricing"
+  to = "/pricing/index.html"
+  status = 200
+  force = false
+
+[[redirects]]
+  from = "/pricing/"
+  to = "/pricing/index.html"
+  status = 200
+  force = false
+
+[[redirects]]
+  from = "/stats"
+  to = "/.netlify/functions/visits-stats"
+  status = 200
+  force = true
+
+# /* -> /index.html catch-all removed so unknown paths return 404.html with status 404.
+
+[functions]
+  directory = "netlify/functions"
