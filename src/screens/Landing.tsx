@@ -296,6 +296,9 @@ export default function Landing({ onSignedIn, onScanStart, onOpenPrivacy, onOpen
               <a className="hs-text-link" href="/pricing/cover/">
                 Full Cover Design details
               </a>
+              <a className="hs-text-link" href="/portfolio/">
+                See sample covers
+              </a>
               {note("cover-design")}
             </div>
           </div>
