@@ -38,3 +38,11 @@ It still has to pass L&E pre-flight. Any deploy needs Sarah's separate yes.
    - The waitlist `<form>` in index.html is the source form. Netlify rewrites it at deploy, so the live HTML differs as expected.
 4. **Not covered by tests:** the camera scan was not tested in a real camera session, and Netlify Identity sign-in and cloud save weren't run end to end. Checkout was run only against a stubbed function.
 5. The original repo README is kept as README.original.md.
+
+## Netlify config (checked Oct 25, 2026)
+- The site's build settings come from the GitHub repo (main branch) with `npm run build` and publish dir `dist`. `config_path` is not set, so Netlify reads the root **netlify.toml**.
+- `deploy-netlify.toml` wasn't referenced by anything. It was a helper for manual drafts (publish="site", no build) and was removed in a local commit.
+
+## Function check against live 6add746e
+- The live function digests (sha256 of the zip) can't be reproduced locally, because the bundler version and the telemetry and bootstrap files differ, so a byte-level match is unknown.
+- Read-only probes of live (OPTIONS, GET, bad JSON, bad packageId, bad session_id) matched what this repo's code returns for all five functions.
