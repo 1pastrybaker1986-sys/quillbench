@@ -1,3 +1,4 @@
+import { runMagicLinkFlow, type MagicLinkResult } from "./magicLinkFlow";
 /**
  * Netlify Identity (GoTrue) magic-link / passwordless client.
  *
@@ -84,14 +85,12 @@ function randomPassword(): string {
   return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-export type MagicLinkResult =
-  | { ok: true; kind: "recovery" | "signup"; message: string }
-  | { ok: false; message: string };
+export type { MagicLinkResult } from "./magicLinkFlow";
 
 /**
- * Passwordless magic-link:
- * 1) requestPasswordRecovery (existing users — Netlify email link)
- * 2) if unknown user → signup with random password (confirmation email = magic link)
+ * Passwordless magic-link: signup first (new users get a confirmation link); on
+ * "already registered" (422) fall back to a recovery link. See magicLinkFlow.ts for why
+ * the recover 200 can't be trusted.
  *
  * Does not create a local Session until the user completes the email link.
  */
@@ -120,56 +119,7 @@ export async function requestMagicLink(email: string): Promise<MagicLinkResult> 
     };
   }
 
-  try {
-    await auth.requestPasswordRecovery(trimmed);
-    return {
-      ok: true,
-      kind: "recovery",
-      message: "Sign-in link sent. Check your email to finish signing in.",
-    };
-  } catch (recoverErr) {
-    const msg =
-      recoverErr && typeof recoverErr === "object" && "json" in recoverErr
-        ? JSON.stringify((recoverErr as { json: unknown }).json)
-        : recoverErr instanceof Error
-          ? recoverErr.message
-          : String(recoverErr);
-
-    // Unknown user → signup so they get a confirmation (magic) link
-    const notFound = /not found|no user|User not found|404/i.test(msg);
-    if (!notFound) {
-      // Still try signup as passwordless onboarding for open registration
-      try {
-        await auth.signup(trimmed, randomPassword());
-        return {
-          ok: true,
-          kind: "signup",
-          message:
-            "Check your email for a link to finish signing in.",
-        };
-      } catch (signupErr) {
-        return {
-          ok: false,
-          message: "Sign-in didn't finish. Try the email link again, or email sarah@brundigebusiness.com.",
-        };
-      }
-    }
-
-    try {
-      await auth.signup(trimmed, randomPassword());
-      return {
-        ok: true,
-        kind: "signup",
-        message:
-          "Check your email for a link to finish signing in.",
-      };
-    } catch (signupErr) {
-      return {
-        ok: false,
-        message: "Sign-in didn't finish. Try the email link again, or email sarah@brundigebusiness.com.",
-      };
-    }
-  }
+  return runMagicLinkFlow(auth, trimmed, randomPassword);
 }
 
 function takeHashParams(): URLSearchParams {
