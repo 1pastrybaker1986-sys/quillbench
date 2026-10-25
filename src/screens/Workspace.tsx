@@ -17,6 +17,7 @@ import Toast from "../components/Toast";
 import EditingPanel from "../components/EditingPanel";
 import PublishingPanel from "../components/PublishingPanel";
 import ExportBuyNudge from "../components/ExportBuyNudge";
+import CameraScan, { cameraFallbackMessage, checkCameraSupport } from "../components/CameraScan";
 import BenchShell from "../components/BenchShell";
 
 type Props = {
@@ -205,6 +206,8 @@ export default function Workspace({ session, bookId, initialModule, autoScan, on
   const [exporting, setExporting] = useState(false);
   const [scanning, setScanning] = useState(false);
   const [scanStatus, setScanStatus] = useState<string | null>(null);
+  const [cameraOpen, setCameraOpen] = useState(false);
+  const [scanNote, setScanNote] = useState<string | null>(null);
   const [detectPage, setDetectPage] = useState(() => {
     try {
       return localStorage.getItem("quillbench.scanDetectPage.v1") === "1";
@@ -391,10 +394,39 @@ export default function Workspace({ session, bookId, initialModule, autoScan, on
     reader.readAsText(file);
   }
 
+  // Live behavior: try the in-app camera first; any unsupported/denied camera falls back to the
+  // photo picker with a short note under the Scan buttons.
   function openScan(mode: "append" | "replace") {
-    if (scanning) return;
+    if (scanning || cameraOpen) return;
     scanModeRef.current = mode;
+    setScanNote(null);
+    const support = checkCameraSupport({
+      isSecureContext: window.isSecureContext,
+      mediaDevices: navigator.mediaDevices,
+    });
+    if (!support.ok) {
+      setScanNote(cameraFallbackMessage(support.reason));
+      scanInputRef.current?.click();
+      return;
+    }
+    setCameraOpen(true);
+  }
+
+  function uploadInstead(mode?: "append" | "replace") {
+    if (scanning) return;
+    if (mode) scanModeRef.current = mode;
     scanInputRef.current?.click();
+  }
+
+  function onCameraFallback(reason: string) {
+    setCameraOpen(false);
+    setScanNote(cameraFallbackMessage(reason));
+    scanInputRef.current?.click();
+  }
+
+  function onCameraDone(files: File[]) {
+    setCameraOpen(false);
+    void scanPages(files, scanModeRef.current);
   }
 
   useEffect(() => {
@@ -600,6 +632,18 @@ export default function Workspace({ session, bookId, initialModule, autoScan, on
           void onScanFiles(e.target.files);
         }}
       />
+      {cameraOpen ? (
+        <CameraScan
+          replace={scanModeRef.current === "replace"}
+          onDone={onCameraDone}
+          onCancel={() => setCameraOpen(false)}
+          onFallback={onCameraFallback}
+          onUploadInstead={() => {
+            setCameraOpen(false);
+            uploadInstead();
+          }}
+        />
+      ) : null}
 
       {module === "write" ? (
         <div className="write-surface write-surface-calm">
@@ -650,7 +694,16 @@ export default function Workspace({ session, bookId, initialModule, autoScan, on
               >
                 {scanning ? scanStatus || "Reading…" : "Scan pages"}
               </button>
+              <button
+                className="linkish scan-upload"
+                type="button"
+                disabled={scanning}
+                onClick={() => uploadInstead("append")}
+              >
+                Upload a photo instead
+              </button>
             </div>
+            {scanNote && !scanning ? <p className="scan-note">{scanNote}</p> : null}
             <details className="scan-more">
               <summary>Scan options</summary>
               <label className="scan-option">
@@ -770,7 +823,16 @@ export default function Workspace({ session, bookId, initialModule, autoScan, on
                   >
                     Replace with scan
                   </button>
+                      <button
+                        className="linkish scan-upload"
+                        type="button"
+                        disabled={scanning}
+                        onClick={() => uploadInstead("append")}
+                      >
+                        Upload a photo instead
+                      </button>
                 </div>
+                    {scanNote && !scanning ? <p className="scan-note">{scanNote}</p> : null}
                 {scanStatus ? (
                   <p className="scan-status" role="status" aria-live="polite">
                     {scanStatus}

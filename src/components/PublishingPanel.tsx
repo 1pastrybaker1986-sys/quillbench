@@ -11,9 +11,7 @@ import {
 } from "../lib/packages";
 import { startCheckout } from "../lib/billing";
 import {
-  SOFT_LAUNCH,
   formatCatalogBundlePrice,
-  formatSoftBundlePrice,
 } from "../lib/softLaunch";
 import {
   getChecklist,
@@ -56,8 +54,8 @@ type Props = {
 
 const DELIVERABLES: { id: CoverDeliverable; label: string }[] = [
   { id: "front", label: "Front cover" },
-  { id: "spine", label: "Spine (print wrap, Bundle only)" },
-  { id: "back", label: "Back cover (print wrap, Bundle only)" },
+  { id: "spine", label: "Spine (print wrap add-on or Bundle)" },
+  { id: "back", label: "Back cover (print wrap add-on or Bundle)" },
   { id: "ebook", label: "Ebook cover" },
 ];
 
@@ -223,9 +221,9 @@ export default function PublishingPanel({ bookId, bookSignals, onToast }: Props)
               <span className="pkg-badge owned">Owned</span>
             </div>
             <p className="payoff-lede">
-              Your brief for Sarah: trim, comps, must-haves, and do-nots. Cover Design includes an
+              Your brief for Quillbench: trim, comps, must-haves, and do-nots. Cover Design includes an
               ebook front cover, 2400x2400 audiobook cover, and a 3D book mockup; print wrap (spine
-              and back) is not included.
+              and back) is not included; add it with the Print Wrap add-on or the Studio Bundle.
             </p>
             <label className="editing-field">
               Trim preference
@@ -321,12 +319,15 @@ export default function PublishingPanel({ bookId, bookSignals, onToast }: Props)
                 One cover concept: ebook front cover, 2400x2400 audiobook cover, and a 3D book
                 mockup. 2 rounds of changes included.
               </p>
+              <p>
+                Some covers are made with AI tools and some by hand. Either way, Quillbench reviews and edits every cover before it's delivered.
+              </p>
               <div className="pkg-cta-actions">
                 <button className="btn-solid" type="button" onClick={() => unlock("cover-design")}>
                   Unlock Cover Design · $99
                 </button>
                 <button className="btn-export" type="button" onClick={() => unlock("studio-bundle")}>
-                  Get Studio Bundle $449
+                  Get Studio Bundle $499
                 </button>
               </div>
             </div>
@@ -412,6 +413,9 @@ export default function PublishingPanel({ bookId, bookSignals, onToast }: Props)
                 Unlock the kit: audience one-liner, blurb, keywords, and a launch checklist with a
                 done-looks-like on each item (preorder, newsletter, social, KDP categories).
               </p>
+              <p className="pub-stub-note">
+                Some covers are made with AI tools and some by hand. Either way, Quillbench reviews and edits every cover before it's delivered.
+              </p>
               <div className="pkg-cta-actions">
                 {canBuy("marketing") ? (
                   <button className="btn-solid" type="button" onClick={() => unlock("marketing")}>
@@ -419,7 +423,7 @@ export default function PublishingPanel({ bookId, bookSignals, onToast }: Props)
                   </button>
                 ) : null}
                 <button className="btn-export" type="button" onClick={() => unlock("studio-bundle")}>
-                  Get Studio Bundle $449
+                  Get Studio Bundle $499
                 </button>
               </div>
             </div>
@@ -430,10 +434,11 @@ export default function PublishingPanel({ bookId, bookSignals, onToast }: Props)
       <section className="pub-section">
         <h3>Studio packages</h3>
         <p className="pub-stub-note">
-          Soft launch: Studio Bundle Checkout opens at {formatSoftBundlePrice()}{" "}
-          <strong>USD</strong> with <strong>{SOFT_LAUNCH.couponCode}</strong> auto-applied for the first 10 authors, then{" "}
-          {formatCatalogBundlePrice()}. Price is {formatSoftBundlePrice()} USD, not $4.49. Unlocks
-          save on this device.
+          Studio Bundle Checkout is {formatCatalogBundlePrice()} <strong>USD</strong>. Unlocks save on
+          this device.
+        </p>
+        <p className="pub-stub-note">
+          Some covers are made with AI tools and some by hand. Either way, Quillbench reviews and edits every cover before it's delivered.
         </p>
         <ul className="pkg-grid">
           {packages
@@ -452,17 +457,10 @@ export default function PublishingPanel({ bookId, bookSignals, onToast }: Props)
                 <div className="pkg-card-top">
                   <h4>{pkg.title}</h4>
                   <span className="pkg-price">
-                    {pkg.featured ? (
-                      <>
-                        <span className="pkg-price-soft">{formatSoftBundlePrice()}</span>{" "}
-                        <span className="pkg-price-then">for the first 10 authors, then {formatPrice(pkg.price)}</span>
-                      </>
-                    ) : (
-                      formatPrice(pkg.price)
-                    )}
+                    {formatPrice(pkg.price)}
                   </span>
                 </div>
-                {pkg.featured ? <span className="pkg-badge best">Soft launch · Best value</span> : null}
+                {pkg.featured ? <span className="pkg-badge best">Best value</span> : null}
                 <p className="pkg-blurb">{pkg.blurb}</p>
                 {isOwned ? (
                   <span className="pkg-badge owned">Owned</span>
@@ -473,7 +471,7 @@ export default function PublishingPanel({ bookId, bookSignals, onToast }: Props)
                     onClick={() => unlock(pkg.id)}
                   >
                     {pkg.id === "studio-bundle"
-                      ? `Get Studio Bundle ${formatSoftBundlePrice()}`
+                      ? `Get Studio Bundle ${formatCatalogBundlePrice()}`
                       : `Unlock · ${formatPrice(pkg.price)}`}
                   </button>
                 )}

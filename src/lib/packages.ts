@@ -24,7 +24,7 @@ export const PACKAGES: StudioPackage[] = [
     title: "Studio Bundle",
     price: 499,
     blurb:
-      "Cover, print wrap, proofread up to 40,000 words, blurb polish, and 6 promo graphics in one package.",
+      "Cover (ebook front cover, 2400x2400 audiobook cover and 3D book mockup), print wrap, proofread up to 40,000 words (a novella or short book), blurb polish, and 6 promo graphics in one package. Writing a full-length novel? Most run 70,000 to 110,000 words. Email Quillbench for a quote before you buy.",
     unlocks: ["full-edit", "cover-design", "marketing"],
     featured: true,
   },
@@ -52,13 +52,43 @@ export const PACKAGES: StudioPackage[] = [
   },
 ];
 
+/**
+ * Paid-session ledger written by /thank-you/ after a verified Stripe Checkout.
+ * Entries look like { sid: "cs_live_…", pkg: "cover-design" | "studio-bundle" }.
+ */
+const PAID_KEY = "quillbench.packages.paid.v1";
+
+function readPaid(): Set<string> {
+  const paid = new Set<string>();
+  try {
+    const parsed = JSON.parse(localStorage.getItem(PAID_KEY) || "[]") as unknown;
+    if (!Array.isArray(parsed)) return paid;
+    for (const entry of parsed) {
+      const sid = entry && typeof entry === "object" ? (entry as { sid?: unknown }).sid : undefined;
+      const pkg = entry && typeof entry === "object" ? (entry as { pkg?: unknown }).pkg : undefined;
+      if (typeof sid !== "string" || !/^cs_(live|test)_[A-Za-z0-9]{10,200}$/.test(sid)) continue;
+      if (pkg !== "cover-design" && pkg !== "studio-bundle") continue;
+      paid.add(pkg);
+      if (pkg === "studio-bundle") ["full-edit", "cover-design", "marketing"].forEach((id) => paid.add(id));
+    }
+  } catch {
+    /* ignore */
+  }
+  return paid;
+}
+
+/** Owned ids, filtered to those backed by a paid Checkout session (stale/forged unlocks are dropped). */
 function readOwned(): string[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw) as unknown;
     if (!Array.isArray(parsed)) return [];
-    return parsed.filter((x): x is string => typeof x === "string");
+    const ids = parsed.filter((x): x is string => typeof x === "string");
+    const paid = readPaid();
+    const kept = ids.filter((id) => paid.has(id));
+    if (kept.length !== ids.length) writeOwned(kept);
+    return kept;
   } catch {
     return [];
   }

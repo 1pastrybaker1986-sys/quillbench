@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Toast from "./components/Toast";
 import { isCloudSaveEnabled } from "./lib/cloudSaveFlag";
 import { finishIdentityLoginAndMigrate } from "./lib/netlifyCloudSave";
@@ -84,6 +84,20 @@ function consumeCheckoutReturn(): string | null {
   }
 }
 
+/**
+ * Where to go after Identity finishes on boot. Never yank a writer out of an open book;
+ * keep a legal page if the URL asks for one; otherwise land in the library.
+ */
+function routeAfterSignIn(current: Route["name"], legal: LegalPage | null): Route["name"] | null {
+  if (current === "workspace") return null;
+  return legal || (current === "privacy" || current === "terms" ? null : "library");
+}
+
+/** Only swap the session when we navigate, nobody was signed in, or it's the same user. */
+function shouldAdoptSession(navigating: boolean, currentUserId: string | null, nextUserId: string): boolean {
+  return navigating || currentUserId === null || currentUserId === nextUserId;
+}
+
 function initialRoute(session: Session | null): Route {
   const legal = readLegalFromUrl();
   if (legal) return { name: legal };
@@ -108,6 +122,10 @@ export default function App() {
   const [session, setSession] = useState<Session | null>(boot);
   const [route, setRoute] = useState<Route>(() => initialRoute(boot));
   const [checkoutBanner, setCheckoutBanner] = useState<string | null>(null);
+  const routeRef = useRef(route);
+  routeRef.current = route;
+  const sessionRef = useRef(session);
+  sessionRef.current = session;
 
   useEffect(() => {
     setCheckoutBanner(consumeCheckoutReturn());
@@ -146,9 +164,14 @@ export default function App() {
       try {
         const { session: next, migrateMessage } = await finishIdentityLoginAndMigrate();
         if (cancelled || !next) return;
-        setSession(next);
-        const legal = readLegalFromUrl();
-        if (legal) { setRoute({ name: legal }); } else { setLegalUrl(null); setRoute({ name: "library" }); }
+        const target = routeAfterSignIn(routeRef.current.name, readLegalFromUrl());
+        if (shouldAdoptSession(target !== null, sessionRef.current?.userId ?? null, next.userId)) setSession(next);
+        if (target === "library") {
+          setLegalUrl(null);
+          setRoute({ name: "library" });
+        } else if (target) {
+          setRoute({ name: target } as Route);
+        }
         if (migrateMessage) setCheckoutBanner(migrateMessage);
       } catch (e) {
         if (!cancelled) {

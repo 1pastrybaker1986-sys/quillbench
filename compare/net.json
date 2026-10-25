@@ -1,0 +1,130 @@
+{
+ "live home 390": [
+  "GET /",
+  "GET /assets/index-6YZ6Klew.css",
+  "GET /assets/index-B9jwP51Z.js",
+  "GET /assets/index-Bh8SLGPN.js",
+  "GET /case-study/down-is-where-you-land/img/final-cover.jpg",
+  "GET /fonts/figtree-normal-latin.woff2",
+  "GET /fonts/fonts.css",
+  "GET /fonts/fraunces-normal-latin.woff2",
+  "GET /fonts/source-serif-4-normal-latin.woff2",
+  "GET /js/qb-count.js",
+  "GET /samples/edens-fall-back-detail-800.webp",
+  "GET /samples/edens-fall-front-800.webp"
+ ],
+ "live portfolio 390": [
+  "GET /fonts/figtree-normal-latin.woff2",
+  "GET /fonts/fonts.css",
+  "GET /portfolio/",
+  "GET /portfolio/covers/01-romance-the-overbooked-heart.jpg",
+  "GET /portfolio/covers/02-thriller-the-quiet-floor.jpg",
+  "GET /portfolio/covers/03-fantasy-the-lantern-keepers-almanac.jpg",
+  "GET /portfolio/covers/04-scifi-the-tithe-of-halcyon.jpg",
+  "GET /portfolio/covers/05-memoir-salt-in-the-sugar-bowl.jpg",
+  "GET /portfolio/covers/06-childrens-moth-who-borrowed-moon.jpg"
+ ],
+ "live portfolio robots": [
+  "noindex"
+ ],
+ "live home 1280": [
+  "GET /",
+  "GET /assets/index-6YZ6Klew.css",
+  "GET /assets/index-B9jwP51Z.js",
+  "GET /assets/index-Bh8SLGPN.js",
+  "GET /case-study/down-is-where-you-land/img/final-cover.jpg",
+  "GET /fonts/figtree-normal-latin.woff2",
+  "GET /fonts/fonts.css",
+  "GET /fonts/fraunces-normal-latin.woff2",
+  "GET /fonts/source-serif-4-normal-latin.woff2",
+  "GET /js/qb-count.js",
+  "GET /samples/edens-fall-back-detail-800.webp",
+  "GET /samples/edens-fall-front-800.webp"
+ ],
+ "live home links": [
+  "Cover Check, $29 -> /pricing/cover-check/",
+  "See sample covers -> /portfolio/",
+  "Get Cover Check, $29 -> /pricing/cover-check/",
+  "FAQ -> /faq/"
+ ],
+ "live img alts": [
+  "Final cover of Down Is Where You Land: an astronaut riding a hoverboard across a dusty Mars plain",
+  "Eden's Fall front cover, made with AI tools, edited and signed off by Quillbench",
+  "Eden's Fall back cover, a cropped detail showing the blurb, made with AI tools, edited and signed off by Quillbench"
+ ],
+ "live portfolio 1280": [
+  "GET /fonts/figtree-normal-latin.woff2",
+  "GET /fonts/fonts.css",
+  "GET /portfolio/",
+  "GET /portfolio/covers/01-romance-the-overbooked-heart.jpg",
+  "GET /portfolio/covers/02-thriller-the-quiet-floor.jpg",
+  "GET /portfolio/covers/03-fantasy-the-lantern-keepers-almanac.jpg",
+  "GET /portfolio/covers/04-scifi-the-tithe-of-halcyon.jpg",
+  "GET /portfolio/covers/05-memoir-salt-in-the-sugar-bowl.jpg",
+  "GET /portfolio/covers/06-childrens-moth-who-borrowed-moon.jpg"
+ ],
+ "rebuild home 390": [
+  "GET /",
+  "GET /assets/index-6YZ6Klew.css",
+  "GET /assets/index-Bh8SLGPN.js",
+  "GET /assets/index-DTOBtOfm.js",
+  "GET /case-study/down-is-where-you-land/img/final-cover.jpg",
+  "GET /fonts/figtree-normal-latin.woff2",
+  "GET /fonts/fonts.css",
+  "GET /fonts/fraunces-normal-latin.woff2",
+  "GET /fonts/source-serif-4-normal-latin.woff2",
+  "GET /js/qb-count.js",
+  "GET /samples/edens-fall-back-detail-800.webp",
+  "GET /samples/edens-fall-front-800.webp"
+ ],
+ "rebuild portfolio 390": [
+  "GET /fonts/figtree-normal-latin.woff2",
+  "GET /fonts/fonts.css",
+  "GET /portfolio/",
+  "GET /portfolio/covers/01-romance-the-overbooked-heart.jpg",
+  "GET /portfolio/covers/02-thriller-the-quiet-floor.jpg",
+  "GET /portfolio/covers/03-fantasy-the-lantern-keepers-almanac.jpg",
+  "GET /portfolio/covers/04-scifi-the-tithe-of-halcyon.jpg",
+  "GET /portfolio/covers/05-memoir-salt-in-the-sugar-bowl.jpg",
+  "GET /portfolio/covers/06-childrens-moth-who-borrowed-moon.jpg"
+ ],
+ "rebuild portfolio robots": [
+  "noindex"
+ ],
+ "rebuild home 1280": [
+  "GET /",
+  "GET /assets/index-6YZ6Klew.css",
+  "GET /assets/index-Bh8SLGPN.js",
+  "GET /assets/index-DTOBtOfm.js",
+  "GET /case-study/down-is-where-you-land/img/final-cover.jpg",
+  "GET /fonts/figtree-normal-latin.woff2",
+  "GET /fonts/fonts.css",
+  "GET /fonts/fraunces-normal-latin.woff2",
+  "GET /fonts/source-serif-4-normal-latin.woff2",
+  "GET /js/qb-count.js",
+  "GET /samples/edens-fall-back-detail-800.webp",
+  "GET /samples/edens-fall-front-800.webp"
+ ],
+ "rebuild home links": [
+  "Cover Check, $29 -> /pricing/cover-check/",
+  "See sample covers -> /portfolio/",
+  "Get Cover Check, $29 -> /pricing/cover-check/",
+  "FAQ -> /faq/"
+ ],
+ "rebuild img alts": [
+  "Final cover of Down Is Where You Land: an astronaut riding a hoverboard across a dusty Mars plain",
+  "Eden's Fall front cover, made with AI tools, edited and signed off by Quillbench",
+  "Eden's Fall back cover, a cropped detail showing the blurb, made with AI tools, edited and signed off by Quillbench"
+ ],
+ "rebuild portfolio 1280": [
+  "GET /fonts/figtree-normal-latin.woff2",
+  "GET /fonts/fonts.css",
+  "GET /portfolio/",
+  "GET /portfolio/covers/01-romance-the-overbooked-heart.jpg",
+  "GET /portfolio/covers/02-thriller-the-quiet-floor.jpg",
+  "GET /portfolio/covers/03-fantasy-the-lantern-keepers-almanac.jpg",
+  "GET /portfolio/covers/04-scifi-the-tithe-of-halcyon.jpg",
+  "GET /portfolio/covers/05-memoir-salt-in-the-sugar-bowl.jpg",
+  "GET /portfolio/covers/06-childrens-moth-who-borrowed-moon.jpg"
+ ]
+}

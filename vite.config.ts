@@ -3,6 +3,8 @@ import react from "@vitejs/plugin-react";
 import { execSync } from "node:child_process";
 
 function buildSha(): string {
+  // QB_BUILD_SHA lets a reproducibility check stamp the same sha as a known deploy.
+  if (process.env.QB_BUILD_SHA) return process.env.QB_BUILD_SHA;
   try {
     return execSync("git rev-parse --short HEAD").toString().trim();
   } catch {

@@ -119,7 +119,10 @@ export default function Library({ session, onOpenBook, onSignOut, onOpenPrivacy,
             <a className="legal-link" href="/refund/">Refunds</a>
             <span aria-hidden="true">·</span>
             <a className="legal-link" href="/support/">Support</a>
+            <span aria-hidden="true">·</span>
+            <a className="legal-link" href="/faq/">FAQ</a>
           </nav>
+          <p className="qb-addr">Brundige Business, 1401 Lavaca St PMB 41086, Austin, TX 78701</p>
         </footer>
 
         {creating && (

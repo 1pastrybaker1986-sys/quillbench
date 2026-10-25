@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { startCheckout } from "../lib/billing";
-import { SOFT_LAUNCH, formatCatalogBundlePrice, formatSoftBundlePrice } from "../lib/softLaunch";
+import { formatCatalogBundlePrice } from "../lib/softLaunch";
 
 type Props = {
   onSeePackages: () => void;
@@ -10,7 +10,6 @@ type Props = {
 export default function ExportBuyNudge({ onSeePackages, onDismiss }: Props) {
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<string | null>(null);
-  const soft = formatSoftBundlePrice();
 
   async function buyBundle() {
     if (busy) return;
@@ -27,11 +26,18 @@ export default function ExportBuyNudge({ onSeePackages, onDismiss }: Props) {
         ×
       </button>
       <p className="export-buy-nudge-eyebrow">Your files are ready</p>
-      <h3 className="export-buy-nudge-title">Studio Bundle soft launch</h3>
+      <h3 className="export-buy-nudge-title">Studio Bundle</h3>
       <p className="export-buy-nudge-lede">
-        Cover, print wrap, proofread, blurb polish, and 6 promo graphics for <strong>{soft} USD</strong>{" "}
-        for the first 10 authors, then {formatCatalogBundlePrice()}. Checkout applies <strong>{SOFT_LAUNCH.couponCode}</strong>{" "}
-        automatically — price is {soft} USD, not $4.49.
+        Cover (ebook front cover, 2400x2400 audiobook cover and 3D book mockup), print wrap, proofread,
+        blurb polish, and 6 promo graphics for <strong>{formatCatalogBundlePrice()} USD</strong>.
+      </p>
+      <p className="export-buy-nudge-note">
+        Some covers are made with AI tools and some by hand. Either way, Quillbench reviews and edits
+        every cover before it's delivered.
+      </p>
+      <p className="export-buy-nudge-note">
+        Proofreading and blurb are done by hand. Promo graphics are made with AI help, and Quillbench
+        edits every one.
       </p>
       <div className="export-buy-nudge-actions">
         <button
@@ -40,7 +46,7 @@ export default function ExportBuyNudge({ onSeePackages, onDismiss }: Props) {
           disabled={busy}
           onClick={() => void buyBundle()}
         >
-          {busy ? "Opening checkout…" : `Get Studio Bundle ${soft}`}
+          {busy ? "Opening checkout…" : `Get Studio Bundle ${formatCatalogBundlePrice()}`}
         </button>
         <button className="btn btn-ghost export-buy-nudge-alt" type="button" onClick={onSeePackages}>
           See packages

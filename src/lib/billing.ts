@@ -93,11 +93,7 @@ export async function startCheckout(packageId: PackageId): Promise<CheckoutResul
     if (!res.ok) {
       const reason = await readErrorReason(
         res,
-        res.status === 404
-          ? "Checkout function not found. Deploy netlify/functions/create-checkout-session and set STRIPE_* on Netlify."
-          : res.status === 503
-            ? "Checkout is not configured on the server. Set STRIPE_SECRET_KEY and STRIPE_PRICE_* on Netlify."
-            : "Checkout failed. Please try again or email sarah@brundigebusiness.com.",
+        "Checkout failed. Please try again or email sarah@brundigebusiness.com.",
       );
       return { ok: false, reason };
     }

@@ -1,0 +1,235 @@
+0a1
+> }
+11,18d11
+< function ID(ID, ID) {
+<   return ID === "workspace"
+<     ? null
+<     : ID || (ID === "privacy" || ID === "terms" ? null : "library");
+< }
+< function ID(ID, ID, ID) {
+<   return ID || ID === null || ID === ID;
+< }
+307c300
+<   return (ID([...Qa(), ID]), ID);
+---
+>   return (ID([...Ja(), ID]), ID);
+565c558
+<   return typeof ID == "string" && ID.trim() ? { ...Bh(), focusFirst: ID } : ID();
+---
+>   return typeof ID == "string" && ID.trim() ? { ...Uh(), focusFirst: ID } : ID();
+1191,1192c1184
+<           (ID.status === 404 || ID.status === 503,
+<           "Checkout failed. Please try again or email sarah@brundigebusiness.com."),
+---
+>           "Checkout failed. Please try again or email sarah@brundigebusiness.com.",
+1214c1206
+<   return `$${FS.bundlePrice}`;
+---
+>   return `$${zS.bundlePrice}`;
+1383c1375
+<       ID === "studio-bundle" ? "Opening checkout…" : `Get Studio Bundle ${To()}`,
+---
+>       ID === "studio-bundle" ? "Opening checkout…" : `Get Studio Bundle ${Eo()}`,
+2582c2574
+<                                       `${F}-${Vu(E, `Chapter ${ID + 1}`)}`,
+---
+>                                       `${F}-${Iu(E, `Chapter ${ID + 1}`)}`,
+3145,3146c3137
+<                   " ",
+<                   "Signing in is optional. When you enter your email to sign in, Netlify Identity (our web host's sign-in service) creates an account with your email address and emails you a sign-in link. It also stores a random password we generate, which you never see or use. Signing in sets a sign-in cookie and keeps you signed in in this browser.",
+---
+>                   " Signing in is optional. When you enter your email to sign in, Netlify Identity (our web host's sign-in service) creates an account with your email address and emails you a sign-in link. It also stores a random password we generate, which you never see or use. Signing in sets a sign-in cookie and keeps you signed in in this browser.",
+3164,3165c3155
+<                 " ",
+<                 "If you join the waitlist, or sign up for cover and launch tips on the free Cover Brief page, we keep your email address and where you signed up from, including any campaign tags in the link you followed. Netlify, our web host, stores these sign-ups for us and keeps its own standard server logs. We use your email only to send Quillbench updates and tips. We don't delete sign-ups automatically yet. To unsubscribe or have your email deleted, email sarah@brundigebusiness.com.",
+---
+>                 " If you join the waitlist, or sign up for cover and launch tips on the free Cover Brief page, we keep your email address and where you signed up from, including any campaign tags in the link you followed. Netlify, our web host, stores these sign-ups for us and keeps its own standard server logs. We use your email only to send Quillbench updates and tips. We don't delete sign-ups automatically yet. To unsubscribe or have your email deleted, email sarah@brundigebusiness.com.",
+3174,3175c3164
+<                 " ",
+<                 "After you buy Cover Design or the Studio Bundle, the thank-you page asks for your email, package, book title, brief, a link to your files and any notes, along with your checkout reference. Netlify stores these for us so Quillbench can do your order. Your files link should only share what you want Quillbench to see. For Cover Design and the Studio Bundle, the AI tools we use to make your order process your brief, notes and the files you share. We use them only for your order. Email sarah@brundigebusiness.com to have your order details deleted after your order is finished.",
+---
+>                 " After you buy Cover Design or the Studio Bundle, the thank-you page asks for your email, package, book title, brief, a link to your files and any notes, along with your checkout reference. Netlify stores these for us so Quillbench can do your order. Your files link should only share what you want Quillbench to see. For Cover Design and the Studio Bundle, the AI tools we use to make your order process your brief, notes and the files you share. We use them only for your order. Email sarah@brundigebusiness.com to have your order details deleted after your order is finished.",
+3184,3185c3173
+<                 " ",
+<                 "For a Cover Check, you email Quillbench your cover image, genre and blurb. They're kept in Quillbench's email inbox and working files, and the AI tools we use to draft your Check process them. We use them only for your critique, including answering your follow-up questions. We delete them, and our emails about your Check, 90 days after delivery. To have them deleted sooner, email",
+---
+>                 " For a Cover Check, you email Quillbench your cover image, genre and blurb. They're kept in Quillbench's email inbox and working files, and the AI tools we use to draft your Check process them. We use them only for your critique, including answering your follow-up questions. We delete them, and our emails about your Check, 90 days after delivery. To have them deleted sooner, email",
+3202,3203c3190
+<                 " ",
+<                 "For Cover Design, the Studio Bundle and Cover Check, the AI tools we use don't use what you send us to train their models.",
+---
+>                 " For Cover Design, the Studio Bundle and Cover Check, the AI tools we use don't use what you send us to train their models.",
+3212,3213c3199
+<                 " ",
+<                 "Our visit counter doesn't use cookies. For each visit we record the page, the site that sent you, any campaign tags in the link, and a one-day code made from your IP address and browser that we can't turn back into either. We don't store your IP address. Visit records aren't deleted automatically yet.",
+---
+>                 " Our visit counter doesn't use cookies. For each visit we record the page, the site that sent you, any campaign tags in the link, and a one-day code made from your IP address and browser that we can't turn back into either. We don't store your IP address. Visit records aren't deleted automatically yet.",
+3247,3248c3233
+<                 " ",
+<                 "Quillbench is for adults 18 and over. If you're under 18, please don't send us your email, a brief or files. If you think a minor has sent us something, email sarah@brundigebusiness.com and we'll delete it.",
+---
+>                 " Quillbench is for adults 18 and over. If you're under 18, please don't send us your email, a brief or files. If you think a minor has sent us something, email sarah@brundigebusiness.com and we'll delete it.",
+3257,3258c3242
+<                 " ",
+<                 "If you choose Start on this device and don't sign in, your manuscripts never leave this browser. Page photos for Scan are never uploaded, signed in or not. We don't sell your data or your writing.",
+---
+>                 " If you choose Start on this device and don't sign in, your manuscripts never leave this browser. Page photos for Scan are never uploaded, signed in or not. We don't sell your data or your writing.",
+3850c3834
+<   ID = function (ID, ID) {
+---
+>   as = function (ID, ID) {
+3854c3838
+<     return ID(ID, 2);
+---
+>     return as(ID, 2);
+3873c3857
+<   as = function (ID) {
+---
+>   ID = function (ID) {
+3920c3904
+<         ID = as(ID).match(ID),
+---
+>         ID = ID(ID).match(ID),
+10308c10292
+<           ID += ID(ID[ID], 4);
+---
+>           ID += as(ID[ID], 4);
+10451c10435
+<     return ID(ID, 4);
+---
+>     return as(ID, 4);
+10638c10622
+<           ID[ID] = ID(ID[ID].id, 4);
+---
+>           ID[ID] = as(ID[ID].id, 4);
+10879c10863
+<             (ID[ID] = ID(ID, 4)));
+---
+>             (ID[ID] = as(ID, 4)));
+17137c17121
+<       ID = ID(as(ID));
+---
+>       ID = ID(ID(ID));
+17187c17171
+<       ID = ID(as(ID));
+---
+>       ID = ID(ID(ID));
+17229c17213
+<       ID = ID(as(ID));
+---
+>       ID = ID(ID(ID));
+20330c20314
+<             ID = ID.maxWidth === void 0 ? ID(as(ID)) : ID(ID, ID, ID.maxWidth, ID),
+---
+>             ID = ID.maxWidth === void 0 ? ID(ID(ID)) : ID(ID, ID, ID.maxWidth, ID),
+21071c21055
+<     ID = `${z0(n.title)}-interior.pdf`,
+---
+>     ID = `${F0(n.title)}-interior.pdf`,
+27769c27753
+<     ID = `urn:quillbench:${n.id || z0(t)}`;
+---
+>     ID = `urn:quillbench:${n.id || F0(t)}`;
+27805c27789
+<       ID(ID, `<p class="halftitle first">${Cn(t)}</p>`, "halftitle"),
+---
+>       ID(ID, `<p class="halftitle first">${Tn(t)}</p>`, "halftitle"),
+27815c27799
+<         `<h1>${Cn(t)}</h1>${o ? `<ID class="subtitle">${ID(ID)}</ID>` : ""}<p class="author">${Cn(a)}</p>`,
+---
+>         `<h1>${Tn(t)}</h1>${o ? `<ID class="subtitle">${ID(ID)}</ID>` : ""}<p class="author">${Tn(a)}</p>`,
+27824,27825c27808,27809
+<     `<p class="first">Copyright © ${Cn(s)} ${Cn(a)}</p>`,
+<     ID ? `<p>${Cn(u)}</p>` : "",
+---
+>     `<p class="first">Copyright © ${Tn(s)} ${Tn(a)}</p>`,
+>     ID ? `<p>${Tn(u)}</p>` : "",
+27842c27826
+<           `<p class="dedication first">${Cn(f)}</p>`,
+---
+>           `<p class="dedication first">${Tn(f)}</p>`,
+27858c27842
+<         ID.label ? `<p class="chapter-label first">${Cn(M.label)}</p>` : "",
+---
+>         ID.label ? `<p class="chapter-label first">${Tn(M.label)}</p>` : "",
+27860c27844
+<           ? `<h2>${Cn(M.title)}</h2>`
+---
+>           ? `<h2>${Tn(M.title)}</h2>`
+27863c27847
+<             : `<h2>${Cn(I)}</h2>`,
+---
+>             : `<h2>${Tn(I)}</h2>`,
+27871c27855
+<                 : `<p class="${_ === 0 ? "first" : ""}">${Cn(R)}</p>`,
+---
+>                 : `<p class="${_ === 0 ? "first" : ""}">${Tn(R)}</p>`,
+27894c27878
+<     ...T.map((ID) => `<li><a href="${M.href}">${Cn(M.heading)}</a></li>`),
+---
+>     ...T.map((ID) => `<li><a href="${M.href}">${Tn(M.heading)}</a></li>`),
+27943c27927
+<     ID = `${z0(n.title)}-ebook.epub`,
+---
+>     ID = `${F0(n.title)}-ebook.epub`,
+28568c28552
+<       ...L5(),
+---
+>       ...U5(),
+28732,28733c28716,28717
+<             ID(`[${T}]: Start ${Oe}, action=${He}`);
+<             const ID = `${He}-${Oe}`;
+---
+>             ID(`[${T}]: Start ${Oe}, action=${_e}`);
+>             const ID = `${_e}-${Oe}`;
+28846c28830
+<         const ID = `${Ke}-${He}`;
+---
+>         const ID = `${Xe}-${_e}`;
+28848c28832
+<           (ID(`[${Oe}]: Complete ${He}`),
+---
+>           (ID(`[${Oe}]: Complete ${_e}`),
+30225c30209
+<     ID = { ...ac(ID), [ID]: ID };
+---
+>     ID = { ...ic(ID), [ID]: ID };
+30474c30458
+<           : `${Gg().find((j) => j.id === R)?.title ?? "Package"} unlocked on this device`,
+---
+>           : `${Vg().find((N) => N.id === R)?.title ?? "Package"} unlocked on this device`,
+31021,31022c31005,31006
+<                                 ? `Get Studio Bundle ${To()}`
+<                                 : `Unlock · ${Ig(R.price)}`,
+---
+>                                 ? `Get Studio Bundle ${Eo()}`
+>                                 : `Unlock · ${Kg(R.price)}`,
+31092c31076
+<             children: ID ? "Opening checkout…" : `Get Studio Bundle ${To()}`,
+---
+>             children: ID ? "Opening checkout…" : `Get Studio Bundle ${Eo()}`,
+31318c31302
+<               ? `Page ${He + 1} retaken`
+---
+>               ? `Page ${_e + 1} retaken`
+31976c31960
+<         `${je === "replace" ? "Replaced with" : "Added"} ${qe} page${qe === 1 ? "" : "s"}`,
+---
+>         `${Ne === "replace" ? "Replaced with" : "Added"} ${Pe} page${Pe === 1 ? "" : "s"}`,
+32013c31997
+<         (ID && ID(ID), ID(`Downloaded ${je}`), ID(!0), ID(!0));
+---
+>         (ID && ID(ID), ID(`Downloaded ${Ne}`), ID(!0), ID(!0));
+32029c32013
+<         (ID && ID(ID), ID(`Downloaded ${je}`), ID(!0), ID(!0));
+---
+>         (ID && ID(ID), ID(`Downloaded ${Ne}`), ID(!0), ID(!0));
+32771a32756,32763
+> }
+> function ID(ID, ID) {
+>   return ID === "workspace"
+>     ? null
+>     : ID || (ID === "privacy" || ID === "terms" ? null : "library");
+> }
+> function ID(ID, ID, ID) {
+>   return ID || ID === null || ID === ID;
