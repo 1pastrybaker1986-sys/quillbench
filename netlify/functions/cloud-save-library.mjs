@@ -8,8 +8,7 @@
  * - Identity: enable on the site (dashboard → Identity). JWT via Authorization
  *   Bearer or Netlify Identity gateway → context.clientContext.user
  * - QUILLBENCH_BLOB_STORE — Blobs store name (default: quillbench-cloud-save)
- * - Optional API-mode fallback when not on Netlify runtime:
- *   NETLIFY_BLOBS_SITE_ID + NETLIFY_BLOBS_TOKEN (or NETLIFY_API_TOKEN)
+ * - Blobs auth: Netlify's built-in per-invocation access only (no token env vars).
  *
  * Key: owners/{identity.sub}/library.v0.json
  * Body (PUT): { payload: CloudSyncPayloadV0 }
@@ -56,23 +55,11 @@ function resolveUser(event, context) {
 }
 
 function openStore(event) {
-  try {
-    connectLambda(event);
-  } catch {
-    /* connectLambda only needed in Lambda compatibility mode */
-  }
-
-  const name = storeName();
-  const siteID = process.env.NETLIFY_BLOBS_SITE_ID?.trim() || process.env.SITE_ID?.trim();
-  const token =
-    process.env.NETLIFY_BLOBS_TOKEN?.trim() ||
-    process.env.NETLIFY_API_TOKEN?.trim() ||
-    process.env.BLOBS_TOKEN?.trim();
-
-  if (siteID && token) {
-    return getStore({ name, siteID, token });
-  }
-  return getStore(name);
+  // Use Netlify's built-in Blobs access (site-scoped credentials injected per invocation).
+  // No personal access token: a stale NETLIFY_BLOBS_TOKEN caused 401s on every read/write.
+  // connectLambda wires the Lambda-compat event's blobs context into getStore.
+  connectLambda(event);
+  return getStore(storeName());
 }
 
 function isValidPayload(payload) {
@@ -103,7 +90,7 @@ export async function handler(event, context) {
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     return json(503, {
-      error: `Blobs store unavailable (${storeName()}). Set QUILLBENCH_BLOB_STORE / NETLIFY_BLOBS_SITE_ID + token. ${message}`,
+      error: `Blobs store unavailable (${storeName()}). Uses built-in Netlify Blobs access. ${message}`,
     });
   }
 
