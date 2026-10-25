@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" fill="none" aria-hidden="true">
+  <defs>
+    <linearGradient id="win" x1="80" y1="40" x2="420" y2="280" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FBF7F2"/>
+      <stop offset="0.55" stop-color="#EDE4D8"/>
+      <stop offset="1" stop-color="#D9CFC2"/>
+    </linearGradient>
+    <linearGradient id="desk" x1="0" y1="300" x2="640" y2="480" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E8DFD4"/>
+      <stop offset="1" stop-color="#D4C8BA"/>
+    </linearGradient>
+    <linearGradient id="paper" x1="220" y1="160" x2="420" y2="360" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFCFA"/>
+      <stop offset="1" stop-color="#F3EBE2"/>
+    </linearGradient>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="1.2"/>
+    </filter>
+  </defs>
+  <!-- soft room -->
+  <rect width="640" height="480" fill="#F7F1EA"/>
+  <rect x="0" y="0" width="640" height="300" fill="url(#win)" opacity="0.9"/>
+  <!-- window light wash -->
+  <ellipse cx="310" cy="120" rx="220" ry="90" fill="#FFFCF8" opacity="0.55"/>
+  <!-- window frame suggestion -->
+  <rect x="90" y="48" width="260" height="170" rx="4" stroke="#C9B8A8" stroke-width="2" fill="rgba(255,252,248,0.35)"/>
+  <path d="M220 48v170M90 133h260" stroke="#C9B8A8" stroke-width="1.5" opacity="0.7"/>
+  <!-- desk surface -->
+  <path d="M0 300c80-18 180-28 320-28s240 10 320 28v180H0V300z" fill="url(#desk)"/>
+  <path d="M0 300c80-18 180-28 320-28s240 10 320 28" stroke="#B8A898" stroke-width="1.25" opacity="0.55"/>
+  <!-- blank paper -->
+  <g filter="url(#soft)">
+    <rect x="232" y="188" width="176" height="228" rx="3" fill="url(#paper)" stroke="#D2C4B4" stroke-width="1"/>
+    <rect x="248" y="210" width="144" height="1.5" fill="#E4D8CC" opacity="0.9"/>
+    <rect x="248" y="228" width="132" height="1.5" fill="#E4D8CC" opacity="0.75"/>
+    <rect x="248" y="246" width="140" height="1.5" fill="#E4D8CC" opacity="0.65"/>
+    <rect x="248" y="264" width="118" height="1.5" fill="#E4D8CC" opacity="0.55"/>
+  </g>
+  <!-- pen (metal accent tip only) -->
+  <g transform="translate(390 250) rotate(28)">
+    <rect x="0" y="0" width="92" height="8" rx="3" fill="#3A342E"/>
+    <rect x="72" y="1" width="14" height="6" rx="2" fill="#C47884"/>
+    <path d="M86 1.5 L98 4 L86 6.5 Z" fill="#7A2E3A"/>
+  </g>
+  <!-- thin metal rule on desk edge -->
+  <path d="M140 318h360" stroke="#C47884" stroke-width="1" opacity="0.35" stroke-linecap="round"/>
+</svg>

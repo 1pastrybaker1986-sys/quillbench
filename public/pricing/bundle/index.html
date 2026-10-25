@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light only" />
+    <meta name="theme-color" content="#F7F1EA" />
+    <meta name="description" content="Quillbench Studio Bundle — cover, print wrap, proofread up to 40,000 words, blurb polish, and 6 promo graphics. $499 USD." />
+    <meta property="og:title" content="Quillbench Studio Bundle · $499" />
+    <meta property="og:description" content="Cover, print wrap, proofread, blurb polish, and 6 promo graphics. Studio Bundle $499." />
+    <meta property="og:image" content="https://quillbench.netlify.app/og-image.png" />
+    <meta property="og:url" content="https://quillbench.netlify.app/pricing/bundle/" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Quillbench Studio Bundle · $499" />
+    <meta name="twitter:description" content="Cover, print wrap, proofread, blurb polish, and 6 promo graphics. Studio Bundle $499." />
+    <meta name="twitter:image" content="https://quillbench.netlify.app/og-image.png" />
+    <title>Quillbench | Studio Bundle $499</title>
+    <link rel="canonical" href="https://quillbench.netlify.app/pricing/bundle/" />
+    <style>
+      html,body{background:#F7F1EA;color:#1C1917;color-scheme:light only;margin:0}
+      body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;max-width:32rem;margin:3rem auto;padding:0 1.25rem;line-height:1.55}
+      h1{font-size:1.65rem;font-weight:650;margin:0 0 .5rem}
+      .price{font-size:2rem;font-weight:700;margin:.75rem 0}
+      ul{padding-left:1.2rem}
+      .btn{display:inline-block;margin-top:1rem;padding:.9rem 1.35rem;border-radius:.65rem;background:#1C1917;color:#F7F1EA;text-decoration:none;font-weight:600;border:0;cursor:pointer;font-size:1rem}
+      .btn:disabled{opacity:.6;cursor:wait}
+      a{color:#b86a62}
+      .err{color:#9b3b3b;margin-top:.75rem}
+      .eyebrow{letter-spacing:.04em;text-transform:uppercase;font-size:.75rem;color:#6b5f56;margin:0 0 .35rem}
+    </style>
+      <script defer src="/js/qb-count.js"></script>
+  </head>
+  <body>
+    <p style="margin:0 0 1.25rem;font-size:.95rem">Just need a cover? <a href="/pricing/cover">Cover Design is $99</a>.</p>
+    <p class="eyebrow">Want the whole launch done?</p>
+    <h1>Studio Bundle</h1>
+    <p>Cover (ebook front cover, 2400x2400 audiobook cover and 3D book mockup), print wrap, proofread up to 40,000 words (a novella or short book), blurb polish, and 6 promo graphics sized from your approved cover. Writing a full-length novel? Most run 70,000 to 110,000 words. Email Quillbench for a quote before you buy.</p>
+    <p class="price">$499</p>
+    <ul>
+      <li>Cover: ebook front cover, 2400x2400 audiobook cover, and a 3D book mockup</li>
+      <li>Print wrap (spine and back)</li>
+      <li>Proofread up to 40,000 words (a novella or short book). Writing a full-length novel? Most run 70,000 to 110,000 words. Email Quillbench for a quote before you buy.</li>
+      <li>Blurb polish</li>
+      <li>6 promo graphics sized from your approved cover: cover reveal, release banner, Instagram square, Instagram story, Facebook banner, and one ad</li>
+      <li>5 rounds of changes on cover and proofread; graphics get typo or crop fixes. Misses from the brief are fixed free and don't count as a round.</li>
+    </ul>
+    <p>Delivered within <strong>14 business days</strong> of your clock-start date. Your clock starts the day Quillbench emails to confirm your brief is complete (all 5 fields filled in and your files link opens), within 1 business day. Full refund before work starts. After that, refunds are case by case. Work starts on your clock-start date. <a href="/refund/">Refund policy</a></p>
+    <p>Some covers are made with AI tools and some by hand. Either way, Quillbench reviews and edits every cover before it's delivered.</p>
+    <p>Proofreading and blurb are done by hand. Promo graphics are made with AI help, and Quillbench edits every one.</p>
+    <button class="btn" id="buy" type="button">Get Studio Bundle $499</button>
+    <p id="err" class="err" hidden></p>
+    <p style="margin-top:1.75rem"><a href="/">Quillbench home</a> · <a href="/waitlist">Waitlist</a> · <a href="/refund/">Refunds</a> · <a href="/support/">Support</a> · <a href="/faq/">FAQ</a> · <a href="/privacy/">Privacy</a></p>
+    <script>
+      (function () {
+        var btn = document.getElementById("buy");
+        var err = document.getElementById("err");
+        // Back from Stripe restores this page from the back-forward cache with the button still
+        // disabled ("Opening checkout…"). Reset it so the buyer can try again without reloading.
+        window.addEventListener("pageshow", function () {
+          btn.disabled = false;
+          btn.textContent = "Get Studio Bundle $499";
+        });
+        btn.addEventListener("click", function () {
+          err.hidden = true;
+          btn.disabled = true;
+          btn.textContent = "Opening checkout…";
+          fetch("/.netlify/functions/create-checkout-session", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              packageId: "studio-bundle",
+              successUrl: location.origin + "/thank-you/?pkg=studio-bundle",
+              cancelUrl: location.origin + "/pricing/bundle?checkout=cancel",
+            }),
+          })
+            .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+            .then(function (x) {
+              if (x.ok && x.d && x.d.url) {
+                location.assign(x.d.url);
+                return;
+              }
+              btn.disabled = false;
+              btn.textContent = "Get Studio Bundle $499";
+              err.textContent = (x.d && (x.d.error || x.d.reason)) || "Checkout failed. Try again or email sarah@brundigebusiness.com.";
+              err.hidden = false;
+            })
+            .catch(function () {
+              btn.disabled = false;
+              btn.textContent = "Get Studio Bundle $499";
+              err.textContent = "Could not reach checkout. Check your connection.";
+              err.hidden = false;
+            });
+        });
+      })();
+    </script>
+    <p class="qb-addr" style="margin-top:.75rem;font-size:.85rem;color:#6b5f56">Brundige Business, 1401 Lavaca St PMB 41086, Austin, TX 78701</p>
+  </body>
+</html>
